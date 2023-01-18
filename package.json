@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc source/*.ts source/**/*.ts --outdir build/ --allowSyntheticDefaultImports --declaration --sourceMap",
+    "typecheck": "tsc --noEmit --listFiles", 
+    "clean:build": "rimraf build",
+    "clean:node_modules": "rimraf node_modules"
   },
   "repository": {
     "type": "git",
