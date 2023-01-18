@@ -13,20 +13,20 @@ function bisector(f) {
   let compare1, compare2, delta;
   if (f.length !== 2) {
     compare1 = ascending;
-    compare2 = (d, x) => ascending(f(d), x);
-    delta = (d, x) => f(d) - x;
+    compare2 = (d, x2) => ascending(f(d), x2);
+    delta = (d, x2) => f(d) - x2;
   } else {
     compare1 = f === ascending || f === descending ? f : zero;
     compare2 = f;
     delta = f;
   }
-  function left2(a, x, lo = 0, hi = a.length) {
+  function left2(a, x2, lo = 0, hi = a.length) {
     if (lo < hi) {
-      if (compare1(x, x) !== 0)
+      if (compare1(x2, x2) !== 0)
         return hi;
       do {
         const mid = lo + hi >>> 1;
-        if (compare2(a[mid], x) < 0)
+        if (compare2(a[mid], x2) < 0)
           lo = mid + 1;
         else
           hi = mid;
@@ -34,13 +34,13 @@ function bisector(f) {
     }
     return lo;
   }
-  function right2(a, x, lo = 0, hi = a.length) {
+  function right2(a, x2, lo = 0, hi = a.length) {
     if (lo < hi) {
-      if (compare1(x, x) !== 0)
+      if (compare1(x2, x2) !== 0)
         return hi;
       do {
         const mid = lo + hi >>> 1;
-        if (compare2(a[mid], x) <= 0)
+        if (compare2(a[mid], x2) <= 0)
           lo = mid + 1;
         else
           hi = mid;
@@ -48,9 +48,9 @@ function bisector(f) {
     }
     return lo;
   }
-  function center2(a, x, lo = 0, hi = a.length) {
-    const i = left2(a, x, lo, hi - 1);
-    return i > lo && delta(a[i - 1], x) > -delta(a[i], x) ? i - 1 : i;
+  function center2(a, x2, lo = 0, hi = a.length) {
+    const i = left2(a, x2, lo, hi - 1);
+    return i > lo && delta(a[i - 1], x2) > -delta(a[i], x2) ? i - 1 : i;
   }
   return { left: left2, center: center2, right: right2 };
 }
@@ -59,8 +59,8 @@ function zero() {
 }
 
 // node_modules/d3-array/src/number.js
-function number(x) {
-  return x === null ? NaN : +x;
+function number(x2) {
+  return x2 === null ? NaN : +x2;
 }
 
 // node_modules/d3-array/src/bisect.js
@@ -69,6 +69,137 @@ var bisectRight = ascendingBisect.right;
 var bisectLeft = ascendingBisect.left;
 var bisectCenter = bisector(number).center;
 var bisect_default = bisectRight;
+
+// node_modules/d3-array/src/extent.js
+function extent(values, valueof) {
+  let min2;
+  let max2;
+  if (valueof === void 0) {
+    for (const value of values) {
+      if (value != null) {
+        if (min2 === void 0) {
+          if (value >= value)
+            min2 = max2 = value;
+        } else {
+          if (min2 > value)
+            min2 = value;
+          if (max2 < value)
+            max2 = value;
+        }
+      }
+    }
+  } else {
+    let index2 = -1;
+    for (let value of values) {
+      if ((value = valueof(value, ++index2, values)) != null) {
+        if (min2 === void 0) {
+          if (value >= value)
+            min2 = max2 = value;
+        } else {
+          if (min2 > value)
+            min2 = value;
+          if (max2 < value)
+            max2 = value;
+        }
+      }
+    }
+  }
+  return [min2, max2];
+}
+
+// node_modules/internmap/src/index.js
+var InternMap = class extends Map {
+  constructor(entries, key = keyof) {
+    super();
+    Object.defineProperties(this, { _intern: { value: /* @__PURE__ */ new Map() }, _key: { value: key } });
+    if (entries != null)
+      for (const [key2, value] of entries)
+        this.set(key2, value);
+  }
+  get(key) {
+    return super.get(intern_get(this, key));
+  }
+  has(key) {
+    return super.has(intern_get(this, key));
+  }
+  set(key, value) {
+    return super.set(intern_set(this, key), value);
+  }
+  delete(key) {
+    return super.delete(intern_delete(this, key));
+  }
+};
+var InternSet = class extends Set {
+  constructor(values, key = keyof) {
+    super();
+    Object.defineProperties(this, { _intern: { value: /* @__PURE__ */ new Map() }, _key: { value: key } });
+    if (values != null)
+      for (const value of values)
+        this.add(value);
+  }
+  has(value) {
+    return super.has(intern_get(this, value));
+  }
+  add(value) {
+    return super.add(intern_set(this, value));
+  }
+  delete(value) {
+    return super.delete(intern_delete(this, value));
+  }
+};
+function intern_get({ _intern, _key }, value) {
+  const key = _key(value);
+  return _intern.has(key) ? _intern.get(key) : value;
+}
+function intern_set({ _intern, _key }, value) {
+  const key = _key(value);
+  if (_intern.has(key))
+    return _intern.get(key);
+  _intern.set(key, value);
+  return value;
+}
+function intern_delete({ _intern, _key }, value) {
+  const key = _key(value);
+  if (_intern.has(key)) {
+    value = _intern.get(key);
+    _intern.delete(key);
+  }
+  return value;
+}
+function keyof(value) {
+  return value !== null && typeof value === "object" ? value.valueOf() : value;
+}
+
+// node_modules/d3-array/src/identity.js
+function identity(x2) {
+  return x2;
+}
+
+// node_modules/d3-array/src/group.js
+function group(values, ...keys) {
+  return nest(values, identity, identity, keys);
+}
+function nest(values, map3, reduce, keys) {
+  return function regroup(values2, i) {
+    if (i >= keys.length)
+      return reduce(values2);
+    const groups2 = new InternMap();
+    const keyof2 = keys[i++];
+    let index2 = -1;
+    for (const value of values2) {
+      const key = keyof2(value, ++index2, values2);
+      const group2 = groups2.get(key);
+      if (group2)
+        group2.push(value);
+      else
+        groups2.set(key, [value]);
+    }
+    for (const [key, values3] of groups2) {
+      groups2.set(key, regroup(values3, i));
+    }
+    return map3(groups2);
+  }(values, 0);
+}
 
 // node_modules/d3-array/src/ticks.js
 var e10 = Math.sqrt(50);
@@ -122,9 +253,53 @@ function tickStep(start2, stop, count) {
   return stop < start2 ? -step1 : step1;
 }
 
+// node_modules/d3-array/src/range.js
+function range(start2, stop, step) {
+  start2 = +start2, stop = +stop, step = (n = arguments.length) < 2 ? (stop = start2, start2 = 0, 1) : n < 3 ? 1 : +step;
+  var i = -1, n = Math.max(0, Math.ceil((stop - start2) / step)) | 0, range2 = new Array(n);
+  while (++i < n) {
+    range2[i] = start2 + i * step;
+  }
+  return range2;
+}
+
+// node_modules/d3-array/src/least.js
+function least(values, compare = ascending) {
+  let min2;
+  let defined = false;
+  if (compare.length === 1) {
+    let minValue;
+    for (const element of values) {
+      const value = compare(element);
+      if (defined ? ascending(value, minValue) < 0 : ascending(value, value) === 0) {
+        min2 = element;
+        minValue = value;
+        defined = true;
+      }
+    }
+  } else {
+    for (const value of values) {
+      if (defined ? compare(value, min2) < 0 : compare(value, value) === 0) {
+        min2 = value;
+        defined = true;
+      }
+    }
+  }
+  return min2;
+}
+
+// node_modules/d3-array/src/map.js
+function map(values, mapper) {
+  if (typeof values[Symbol.iterator] !== "function")
+    throw new TypeError("values is not iterable");
+  if (typeof mapper !== "function")
+    throw new TypeError("mapper is not a function");
+  return Array.from(values, (value, index2) => mapper(value, index2, values));
+}
+
 // node_modules/d3-axis/src/identity.js
-function identity_default(x) {
-  return x;
+function identity_default(x2) {
+  return x2;
 }
 
 // node_modules/d3-axis/src/axis.js
@@ -133,11 +308,11 @@ var right = 2;
 var bottom = 3;
 var left = 4;
 var epsilon = 1e-6;
-function translateX(x) {
-  return "translate(" + x + ",0)";
+function translateX(x2) {
+  return "translate(" + x2 + ",0)";
 }
-function translateY(y) {
-  return "translate(0," + y + ")";
+function translateY(y2) {
+  return "translate(0," + y2 + ")";
 }
 function number2(scale) {
   return (d) => +scale(d);
@@ -152,15 +327,15 @@ function entering() {
   return !this.__axis;
 }
 function axis(orient, scale) {
-  var tickArguments = [], tickValues = null, tickFormat2 = null, tickSizeInner = 6, tickSizeOuter = 6, tickPadding = 3, offset = typeof window !== "undefined" && window.devicePixelRatio > 1 ? 0 : 0.5, k = orient === top || orient === left ? -1 : 1, x = orient === left || orient === right ? "x" : "y", transform2 = orient === top || orient === bottom ? translateX : translateY;
+  var tickArguments = [], tickValues = null, tickFormat = null, tickSizeInner = 6, tickSizeOuter = 6, tickPadding = 3, offset = typeof window !== "undefined" && window.devicePixelRatio > 1 ? 0 : 0.5, k = orient === top || orient === left ? -1 : 1, x2 = orient === left || orient === right ? "x" : "y", transform2 = orient === top || orient === bottom ? translateX : translateY;
   function axis2(context) {
-    var values = tickValues == null ? scale.ticks ? scale.ticks.apply(scale, tickArguments) : scale.domain() : tickValues, format2 = tickFormat2 == null ? scale.tickFormat ? scale.tickFormat.apply(scale, tickArguments) : identity_default : tickFormat2, spacing = Math.max(tickSizeInner, 0) + tickPadding, range = scale.range(), range0 = +range[0] + offset, range1 = +range[range.length - 1] + offset, position = (scale.bandwidth ? center : number2)(scale.copy(), offset), selection2 = context.selection ? context.selection() : context, path = selection2.selectAll(".domain").data([null]), tick = selection2.selectAll(".tick").data(values, scale).order(), tickExit = tick.exit(), tickEnter = tick.enter().append("g").attr("class", "tick"), line = tick.select("line"), text = tick.select("text");
-    path = path.merge(path.enter().insert("path", ".tick").attr("class", "domain").attr("stroke", "currentColor"));
+    var values = tickValues == null ? scale.ticks ? scale.ticks.apply(scale, tickArguments) : scale.domain() : tickValues, format2 = tickFormat == null ? scale.tickFormat ? scale.tickFormat.apply(scale, tickArguments) : identity_default : tickFormat, spacing = Math.max(tickSizeInner, 0) + tickPadding, range2 = scale.range(), range0 = +range2[0] + offset, range1 = +range2[range2.length - 1] + offset, position = (scale.bandwidth ? center : number2)(scale.copy(), offset), selection2 = context.selection ? context.selection() : context, path2 = selection2.selectAll(".domain").data([null]), tick = selection2.selectAll(".tick").data(values, scale).order(), tickExit = tick.exit(), tickEnter = tick.enter().append("g").attr("class", "tick"), line = tick.select("line"), text = tick.select("text");
+    path2 = path2.merge(path2.enter().insert("path", ".tick").attr("class", "domain").attr("stroke", "currentColor"));
     tick = tick.merge(tickEnter);
-    line = line.merge(tickEnter.append("line").attr("stroke", "currentColor").attr(x + "2", k * tickSizeInner));
-    text = text.merge(tickEnter.append("text").attr("fill", "currentColor").attr(x, k * spacing).attr("dy", orient === top ? "0em" : orient === bottom ? "0.71em" : "0.32em"));
+    line = line.merge(tickEnter.append("line").attr("stroke", "currentColor").attr(x2 + "2", k * tickSizeInner));
+    text = text.merge(tickEnter.append("text").attr("fill", "currentColor").attr(x2, k * spacing).attr("dy", orient === top ? "0em" : orient === bottom ? "0.71em" : "0.32em"));
     if (context !== selection2) {
-      path = path.transition(context);
+      path2 = path2.transition(context);
       tick = tick.transition(context);
       line = line.transition(context);
       text = text.transition(context);
@@ -173,12 +348,12 @@ function axis(orient, scale) {
       });
     }
     tickExit.remove();
-    path.attr("d", orient === left || orient === right ? tickSizeOuter ? "M" + k * tickSizeOuter + "," + range0 + "H" + offset + "V" + range1 + "H" + k * tickSizeOuter : "M" + offset + "," + range0 + "V" + range1 : tickSizeOuter ? "M" + range0 + "," + k * tickSizeOuter + "V" + offset + "H" + range1 + "V" + k * tickSizeOuter : "M" + range0 + "," + offset + "H" + range1);
+    path2.attr("d", orient === left || orient === right ? tickSizeOuter ? "M" + k * tickSizeOuter + "," + range0 + "H" + offset + "V" + range1 + "H" + k * tickSizeOuter : "M" + offset + "," + range0 + "V" + range1 : tickSizeOuter ? "M" + range0 + "," + k * tickSizeOuter + "V" + offset + "H" + range1 + "V" + k * tickSizeOuter : "M" + range0 + "," + offset + "H" + range1);
     tick.attr("opacity", 1).attr("transform", function(d) {
       return transform2(position(d) + offset);
     });
-    line.attr(x + "2", k * tickSizeInner);
-    text.attr(x, k * spacing).text(format2);
+    line.attr(x2 + "2", k * tickSizeInner);
+    text.attr(x2, k * spacing).text(format2);
     selection2.filter(entering).attr("fill", "none").attr("font-size", 10).attr("font-family", "sans-serif").attr("text-anchor", orient === right ? "start" : orient === left ? "end" : "middle");
     selection2.each(function() {
       this.__axis = position;
@@ -197,7 +372,7 @@ function axis(orient, scale) {
     return arguments.length ? (tickValues = _ == null ? null : Array.from(_), axis2) : tickValues && tickValues.slice();
   };
   axis2.tickFormat = function(_) {
-    return arguments.length ? (tickFormat2 = _, axis2) : tickFormat2;
+    return arguments.length ? (tickFormat = _, axis2) : tickFormat;
   };
   axis2.tickSize = function(_) {
     return arguments.length ? (tickSizeInner = tickSizeOuter = +_, axis2) : tickSizeInner;
@@ -358,9 +533,9 @@ function selector_default(selector) {
 function select_default(select) {
   if (typeof select !== "function")
     select = selector_default(select);
-  for (var groups = this._groups, m = groups.length, subgroups = new Array(m), j = 0; j < m; ++j) {
-    for (var group = groups[j], n = group.length, subgroup = subgroups[j] = new Array(n), node, subnode, i = 0; i < n; ++i) {
-      if ((node = group[i]) && (subnode = select.call(node, node.__data__, i, group))) {
+  for (var groups2 = this._groups, m = groups2.length, subgroups = new Array(m), j = 0; j < m; ++j) {
+    for (var group2 = groups2[j], n = group2.length, subgroup = subgroups[j] = new Array(n), node, subnode, i = 0; i < n; ++i) {
+      if ((node = group2[i]) && (subnode = select.call(node, node.__data__, i, group2))) {
         if ("__data__" in node)
           subnode.__data__ = node.__data__;
         subgroup[i] = subnode;
@@ -371,8 +546,8 @@ function select_default(select) {
 }
 
 // node_modules/d3-selection/src/array.js
-function array(x) {
-  return x == null ? [] : Array.isArray(x) ? x : Array.from(x);
+function array(x2) {
+  return x2 == null ? [] : Array.isArray(x2) ? x2 : Array.from(x2);
 }
 
 // node_modules/d3-selection/src/selectorAll.js
@@ -396,10 +571,10 @@ function selectAll_default(select) {
     select = arrayAll(select);
   else
     select = selectorAll_default(select);
-  for (var groups = this._groups, m = groups.length, subgroups = [], parents = [], j = 0; j < m; ++j) {
-    for (var group = groups[j], n = group.length, node, i = 0; i < n; ++i) {
-      if (node = group[i]) {
-        subgroups.push(select.call(node, node.__data__, i, group));
+  for (var groups2 = this._groups, m = groups2.length, subgroups = [], parents = [], j = 0; j < m; ++j) {
+    for (var group2 = groups2[j], n = group2.length, node, i = 0; i < n; ++i) {
+      if (node = group2[i]) {
+        subgroups.push(select.call(node, node.__data__, i, group2));
         parents.push(node);
       }
     }
@@ -451,9 +626,9 @@ function selectChildren_default(match) {
 function filter_default(match) {
   if (typeof match !== "function")
     match = matcher_default(match);
-  for (var groups = this._groups, m = groups.length, subgroups = new Array(m), j = 0; j < m; ++j) {
-    for (var group = groups[j], n = group.length, subgroup = subgroups[j] = [], node, i = 0; i < n; ++i) {
-      if ((node = group[i]) && match.call(node, node.__data__, i, group)) {
+  for (var groups2 = this._groups, m = groups2.length, subgroups = new Array(m), j = 0; j < m; ++j) {
+    for (var group2 = groups2[j], n = group2.length, subgroup = subgroups[j] = [], node, i = 0; i < n; ++i) {
+      if ((node = group2[i]) && match.call(node, node.__data__, i, group2)) {
         subgroup.push(node);
       }
     }
@@ -494,17 +669,17 @@ EnterNode.prototype = {
 };
 
 // node_modules/d3-selection/src/constant.js
-function constant_default(x) {
+function constant_default(x2) {
   return function() {
-    return x;
+    return x2;
   };
 }
 
 // node_modules/d3-selection/src/selection/data.js
-function bindIndex(parent, group, enter, update, exit, data) {
-  var i = 0, node, groupLength = group.length, dataLength = data.length;
+function bindIndex(parent, group2, enter, update, exit, data) {
+  var i = 0, node, groupLength = group2.length, dataLength = data.length;
   for (; i < dataLength; ++i) {
-    if (node = group[i]) {
+    if (node = group2[i]) {
       node.__data__ = data[i];
       update[i] = node;
     } else {
@@ -512,16 +687,16 @@ function bindIndex(parent, group, enter, update, exit, data) {
     }
   }
   for (; i < groupLength; ++i) {
-    if (node = group[i]) {
+    if (node = group2[i]) {
       exit[i] = node;
     }
   }
 }
-function bindKey(parent, group, enter, update, exit, data, key) {
-  var i, node, nodeByKeyValue = /* @__PURE__ */ new Map(), groupLength = group.length, dataLength = data.length, keyValues = new Array(groupLength), keyValue;
+function bindKey(parent, group2, enter, update, exit, data, key) {
+  var i, node, nodeByKeyValue = /* @__PURE__ */ new Map(), groupLength = group2.length, dataLength = data.length, keyValues = new Array(groupLength), keyValue;
   for (i = 0; i < groupLength; ++i) {
-    if (node = group[i]) {
-      keyValues[i] = keyValue = key.call(node, node.__data__, i, group) + "";
+    if (node = group2[i]) {
+      keyValues[i] = keyValue = key.call(node, node.__data__, i, group2) + "";
       if (nodeByKeyValue.has(keyValue)) {
         exit[i] = node;
       } else {
@@ -540,7 +715,7 @@ function bindKey(parent, group, enter, update, exit, data, key) {
     }
   }
   for (i = 0; i < groupLength; ++i) {
-    if ((node = group[i]) && nodeByKeyValue.get(keyValues[i]) === node) {
+    if ((node = group2[i]) && nodeByKeyValue.get(keyValues[i]) === node) {
       exit[i] = node;
     }
   }
@@ -551,12 +726,12 @@ function datum(node) {
 function data_default(value, key) {
   if (!arguments.length)
     return Array.from(this, datum);
-  var bind = key ? bindKey : bindIndex, parents = this._parents, groups = this._groups;
+  var bind = key ? bindKey : bindIndex, parents = this._parents, groups2 = this._groups;
   if (typeof value !== "function")
     value = constant_default(value);
-  for (var m = groups.length, update = new Array(m), enter = new Array(m), exit = new Array(m), j = 0; j < m; ++j) {
-    var parent = parents[j], group = groups[j], groupLength = group.length, data = arraylike(value.call(parent, parent && parent.__data__, j, parents)), dataLength = data.length, enterGroup = enter[j] = new Array(dataLength), updateGroup = update[j] = new Array(dataLength), exitGroup = exit[j] = new Array(groupLength);
-    bind(parent, group, enterGroup, updateGroup, exitGroup, data, key);
+  for (var m = groups2.length, update = new Array(m), enter = new Array(m), exit = new Array(m), j = 0; j < m; ++j) {
+    var parent = parents[j], group2 = groups2[j], groupLength = group2.length, data = arraylike(value.call(parent, parent && parent.__data__, j, parents)), dataLength = data.length, enterGroup = enter[j] = new Array(dataLength), updateGroup = update[j] = new Array(dataLength), exitGroup = exit[j] = new Array(groupLength);
+    bind(parent, group2, enterGroup, updateGroup, exitGroup, data, key);
     for (var i0 = 0, i1 = 0, previous, next; i0 < dataLength; ++i0) {
       if (previous = enterGroup[i0]) {
         if (i0 >= i1)
@@ -621,9 +796,9 @@ function merge_default(context) {
 
 // node_modules/d3-selection/src/selection/order.js
 function order_default() {
-  for (var groups = this._groups, j = -1, m = groups.length; ++j < m; ) {
-    for (var group = groups[j], i = group.length - 1, next = group[i], node; --i >= 0; ) {
-      if (node = group[i]) {
+  for (var groups2 = this._groups, j = -1, m = groups2.length; ++j < m; ) {
+    for (var group2 = groups2[j], i = group2.length - 1, next = group2[i], node; --i >= 0; ) {
+      if (node = group2[i]) {
         if (next && node.compareDocumentPosition(next) ^ 4)
           next.parentNode.insertBefore(node, next);
         next = node;
@@ -640,9 +815,9 @@ function sort_default(compare) {
   function compareNode(a, b) {
     return a && b ? compare(a.__data__, b.__data__) : !a - !b;
   }
-  for (var groups = this._groups, m = groups.length, sortgroups = new Array(m), j = 0; j < m; ++j) {
-    for (var group = groups[j], n = group.length, sortgroup = sortgroups[j] = new Array(n), node, i = 0; i < n; ++i) {
-      if (node = group[i]) {
+  for (var groups2 = this._groups, m = groups2.length, sortgroups = new Array(m), j = 0; j < m; ++j) {
+    for (var group2 = groups2[j], n = group2.length, sortgroup = sortgroups[j] = new Array(n), node, i = 0; i < n; ++i) {
+      if (node = group2[i]) {
         sortgroup[i] = node;
       }
     }
@@ -669,9 +844,9 @@ function nodes_default() {
 
 // node_modules/d3-selection/src/selection/node.js
 function node_default() {
-  for (var groups = this._groups, j = 0, m = groups.length; j < m; ++j) {
-    for (var group = groups[j], i = 0, n = group.length; i < n; ++i) {
-      var node = group[i];
+  for (var groups2 = this._groups, j = 0, m = groups2.length; j < m; ++j) {
+    for (var group2 = groups2[j], i = 0, n = group2.length; i < n; ++i) {
+      var node = group2[i];
       if (node)
         return node;
     }
@@ -694,10 +869,10 @@ function empty_default() {
 
 // node_modules/d3-selection/src/selection/each.js
 function each_default(callback) {
-  for (var groups = this._groups, j = 0, m = groups.length; j < m; ++j) {
-    for (var group = groups[j], i = 0, n = group.length, node; i < n; ++i) {
-      if (node = group[i])
-        callback.call(node, node.__data__, i, group);
+  for (var groups2 = this._groups, j = 0, m = groups2.length; j < m; ++j) {
+    for (var group2 = groups2[j], i = 0, n = group2.length, node; i < n; ++i) {
+      if (node = group2[i])
+        callback.call(node, node.__data__, i, group2);
     }
   }
   return this;
@@ -1079,9 +1254,9 @@ function dispatch_default2(type2, params) {
 
 // node_modules/d3-selection/src/selection/iterator.js
 function* iterator_default() {
-  for (var groups = this._groups, j = 0, m = groups.length; j < m; ++j) {
-    for (var group = groups[j], i = 0, n = group.length, node; i < n; ++i) {
-      if (node = group[i])
+  for (var groups2 = this._groups, j = 0, m = groups2.length; j < m; ++j) {
+    for (var group2 = groups2[j], i = 0, n = group2.length, node; i < n; ++i) {
+      if (node = group2[i])
         yield node;
     }
   }
@@ -1089,8 +1264,8 @@ function* iterator_default() {
 
 // node_modules/d3-selection/src/selection/index.js
 var root = [null];
-function Selection(groups, parents) {
-  this._groups = groups;
+function Selection(groups2, parents) {
+  this._groups = groups2;
   this._parents = parents;
 }
 function selection() {
@@ -1147,6 +1322,35 @@ function select_default2(selector) {
 // node_modules/d3-selection/src/create.js
 function create_default(name) {
   return select_default2(creator_default(name).call(document.documentElement));
+}
+
+// node_modules/d3-selection/src/sourceEvent.js
+function sourceEvent_default(event) {
+  let sourceEvent;
+  while (sourceEvent = event.sourceEvent)
+    event = sourceEvent;
+  return event;
+}
+
+// node_modules/d3-selection/src/pointer.js
+function pointer_default(event, node) {
+  event = sourceEvent_default(event);
+  if (node === void 0)
+    node = event.currentTarget;
+  if (node) {
+    var svg = node.ownerSVGElement || node;
+    if (svg.createSVGPoint) {
+      var point = svg.createSVGPoint();
+      point.x = event.clientX, point.y = event.clientY;
+      point = point.matrixTransform(node.getScreenCTM().inverse());
+      return [point.x, point.y];
+    }
+    if (node.getBoundingClientRect) {
+      var rect = node.getBoundingClientRect();
+      return [event.clientX - rect.left - node.clientLeft, event.clientY - rect.top - node.clientTop];
+    }
+  }
+  return [event.pageX, event.pageY];
 }
 
 // node_modules/d3-color/src/define.js
@@ -1512,9 +1716,9 @@ function hsl2rgb(h, m1, m2) {
 }
 
 // node_modules/d3-interpolate/src/basis.js
-function basis(t1, v0, v1, v2, v3) {
-  var t2 = t1 * t1, t3 = t2 * t1;
-  return ((1 - 3 * t1 + 3 * t2 - t3) * v0 + (4 - 6 * t2 + 3 * t3) * v1 + (1 + 3 * t1 + 3 * t2 - 3 * t3) * v2 + t3 * v3) / 6;
+function basis(t12, v0, v1, v2, v3) {
+  var t2 = t12 * t12, t3 = t2 * t12;
+  return ((1 - 3 * t12 + 3 * t2 - t3) * v0 + (4 - 6 * t2 + 3 * t3) * v1 + (1 + 3 * t12 + 3 * t2 - 3 * t3) * v2 + t3 * v3) / 6;
 }
 function basis_default(values) {
   var n = values.length - 1;
@@ -1534,7 +1738,7 @@ function basisClosed_default(values) {
 }
 
 // node_modules/d3-interpolate/src/constant.js
-var constant_default2 = (x) => () => x;
+var constant_default2 = (x2) => () => x2;
 
 // node_modules/d3-interpolate/src/color.js
 function linear(a, d) {
@@ -1542,14 +1746,14 @@ function linear(a, d) {
     return a + t * d;
   };
 }
-function exponential(a, b, y) {
-  return a = Math.pow(a, y), b = Math.pow(b, y) - a, y = 1 / y, function(t) {
-    return Math.pow(a + t * b, y);
+function exponential(a, b, y2) {
+  return a = Math.pow(a, y2), b = Math.pow(b, y2) - a, y2 = 1 / y2, function(t) {
+    return Math.pow(a + t * b, y2);
   };
 }
-function gamma(y) {
-  return (y = +y) === 1 ? nogamma : function(a, b) {
-    return b - a ? exponential(a, b, y) : constant_default2(isNaN(a) ? b : a);
+function gamma(y2) {
+  return (y2 = +y2) === 1 ? nogamma : function(a, b) {
+    return b - a ? exponential(a, b, y2) : constant_default2(isNaN(a) ? b : a);
   };
 }
 function nogamma(a, b) {
@@ -1558,8 +1762,8 @@ function nogamma(a, b) {
 }
 
 // node_modules/d3-interpolate/src/rgb.js
-var rgb_default = function rgbGamma(y) {
-  var color2 = gamma(y);
+var rgb_default = function rgbGamma(y2) {
+  var color2 = gamma(y2);
   function rgb2(start2, end) {
     var r = color2((start2 = rgb(start2)).r, (end = rgb(end)).r), g = color2(start2.g, end.g), b = color2(start2.b, end.b), opacity = nogamma(start2.opacity, end.opacity);
     return function(t) {
@@ -1608,20 +1812,20 @@ function numberArray_default(a, b) {
     return c;
   };
 }
-function isNumberArray(x) {
-  return ArrayBuffer.isView(x) && !(x instanceof DataView);
+function isNumberArray(x2) {
+  return ArrayBuffer.isView(x2) && !(x2 instanceof DataView);
 }
 
 // node_modules/d3-interpolate/src/array.js
 function genericArray(a, b) {
-  var nb = b ? b.length : 0, na = a ? Math.min(nb, a.length) : 0, x = new Array(na), c = new Array(nb), i;
+  var nb = b ? b.length : 0, na = a ? Math.min(nb, a.length) : 0, x2 = new Array(na), c = new Array(nb), i;
   for (i = 0; i < na; ++i)
-    x[i] = value_default(a[i], b[i]);
+    x2[i] = value_default(a[i], b[i]);
   for (; i < nb; ++i)
     c[i] = b[i];
   return function(t) {
     for (i = 0; i < na; ++i)
-      c[i] = x[i](t);
+      c[i] = x2[i](t);
     return c;
   };
 }
@@ -1726,7 +1930,7 @@ function round_default(a, b) {
 
 // node_modules/d3-interpolate/src/transform/decompose.js
 var degrees = 180 / Math.PI;
-var identity = {
+var identity2 = {
   translateX: 0,
   translateY: 0,
   rotate: 0,
@@ -1758,16 +1962,16 @@ function decompose_default(a, b, c, d, e, f) {
 var svgNode;
 function parseCss(value) {
   const m = new (typeof DOMMatrix === "function" ? DOMMatrix : WebKitCSSMatrix)(value + "");
-  return m.isIdentity ? identity : decompose_default(m.a, m.b, m.c, m.d, m.e, m.f);
+  return m.isIdentity ? identity2 : decompose_default(m.a, m.b, m.c, m.d, m.e, m.f);
 }
 function parseSvg(value) {
   if (value == null)
-    return identity;
+    return identity2;
   if (!svgNode)
     svgNode = document.createElementNS("http://www.w3.org/2000/svg", "g");
   svgNode.setAttribute("transform", value);
   if (!(value = svgNode.transform.baseVal.consolidate()))
-    return identity;
+    return identity2;
   value = value.matrix;
   return decompose_default(value.a, value.b, value.c, value.d, value.e, value.f);
 }
@@ -1911,18 +2115,18 @@ function poke() {
     clockSkew -= delay, clockLast = now2;
 }
 function nap() {
-  var t0, t1 = taskHead, t2, time = Infinity;
-  while (t1) {
-    if (t1._call) {
-      if (time > t1._time)
-        time = t1._time;
-      t0 = t1, t1 = t1._next;
+  var t02, t12 = taskHead, t2, time = Infinity;
+  while (t12) {
+    if (t12._call) {
+      if (time > t12._time)
+        time = t12._time;
+      t02 = t12, t12 = t12._next;
     } else {
-      t2 = t1._next, t1._next = null;
-      t1 = t0 ? t0._next = t2 : taskHead = t2;
+      t2 = t12._next, t12._next = null;
+      t12 = t02 ? t02._next = t2 : taskHead = t2;
     }
   }
-  taskTail = t0;
+  taskTail = t02;
   sleep(time);
 }
 function sleep(time) {
@@ -1964,7 +2168,7 @@ var STARTED = 3;
 var RUNNING = 4;
 var ENDING = 5;
 var ENDED = 6;
-function schedule_default(node, name, id2, index, group, timing) {
+function schedule_default(node, name, id2, index2, group2, timing) {
   var schedules = node.__transition;
   if (!schedules)
     node.__transition = {};
@@ -1972,9 +2176,9 @@ function schedule_default(node, name, id2, index, group, timing) {
     return;
   create(node, id2, {
     name,
-    index,
+    index: index2,
     // For context during callback.
-    group,
+    group: group2,
     // For context during callback.
     on: emptyOn,
     tween: emptyTween,
@@ -2237,23 +2441,23 @@ function attrInterpolateNS(fullname, i) {
   };
 }
 function attrTweenNS(fullname, value) {
-  var t0, i0;
+  var t02, i0;
   function tween() {
     var i = value.apply(this, arguments);
     if (i !== i0)
-      t0 = (i0 = i) && attrInterpolateNS(fullname, i);
-    return t0;
+      t02 = (i0 = i) && attrInterpolateNS(fullname, i);
+    return t02;
   }
   tween._value = value;
   return tween;
 }
 function attrTween(name, value) {
-  var t0, i0;
+  var t02, i0;
   function tween() {
     var i = value.apply(this, arguments);
     if (i !== i0)
-      t0 = (i0 = i) && attrInterpolate(name, i);
-    return t0;
+      t02 = (i0 = i) && attrInterpolate(name, i);
+    return t02;
   }
   tween._value = value;
   return tween;
@@ -2334,9 +2538,9 @@ function easeVarying_default(value) {
 function filter_default2(match) {
   if (typeof match !== "function")
     match = matcher_default(match);
-  for (var groups = this._groups, m = groups.length, subgroups = new Array(m), j = 0; j < m; ++j) {
-    for (var group = groups[j], n = group.length, subgroup = subgroups[j] = [], node, i = 0; i < n; ++i) {
-      if ((node = group[i]) && match.call(node, node.__data__, i, group)) {
+  for (var groups2 = this._groups, m = groups2.length, subgroups = new Array(m), j = 0; j < m; ++j) {
+    for (var group2 = groups2[j], n = group2.length, subgroup = subgroups[j] = [], node, i = 0; i < n; ++i) {
+      if ((node = group2[i]) && match.call(node, node.__data__, i, group2)) {
         subgroup.push(node);
       }
     }
@@ -2404,9 +2608,9 @@ function select_default3(select) {
   var name = this._name, id2 = this._id;
   if (typeof select !== "function")
     select = selector_default(select);
-  for (var groups = this._groups, m = groups.length, subgroups = new Array(m), j = 0; j < m; ++j) {
-    for (var group = groups[j], n = group.length, subgroup = subgroups[j] = new Array(n), node, subnode, i = 0; i < n; ++i) {
-      if ((node = group[i]) && (subnode = select.call(node, node.__data__, i, group))) {
+  for (var groups2 = this._groups, m = groups2.length, subgroups = new Array(m), j = 0; j < m; ++j) {
+    for (var group2 = groups2[j], n = group2.length, subgroup = subgroups[j] = new Array(n), node, subnode, i = 0; i < n; ++i) {
+      if ((node = group2[i]) && (subnode = select.call(node, node.__data__, i, group2))) {
         if ("__data__" in node)
           subnode.__data__ = node.__data__;
         subgroup[i] = subnode;
@@ -2422,10 +2626,10 @@ function selectAll_default2(select) {
   var name = this._name, id2 = this._id;
   if (typeof select !== "function")
     select = selectorAll_default(select);
-  for (var groups = this._groups, m = groups.length, subgroups = [], parents = [], j = 0; j < m; ++j) {
-    for (var group = groups[j], n = group.length, node, i = 0; i < n; ++i) {
-      if (node = group[i]) {
-        for (var children2 = select.call(node, node.__data__, i, group), child, inherit2 = get2(node, id2), k = 0, l = children2.length; k < l; ++k) {
+  for (var groups2 = this._groups, m = groups2.length, subgroups = [], parents = [], j = 0; j < m; ++j) {
+    for (var group2 = groups2[j], n = group2.length, node, i = 0; i < n; ++i) {
+      if (node = group2[i]) {
+        for (var children2 = select.call(node, node.__data__, i, group2), child, inherit2 = get2(node, id2), k = 0, l = children2.length; k < l; ++k) {
           if (child = children2[k]) {
             schedule_default(child, name, id2, k, children2, inherit2);
           }
@@ -2538,12 +2742,12 @@ function textInterpolate(i) {
   };
 }
 function textTween(value) {
-  var t0, i0;
+  var t02, i0;
   function tween() {
     var i = value.apply(this, arguments);
     if (i !== i0)
-      t0 = (i0 = i) && textInterpolate(i);
-    return t0;
+      t02 = (i0 = i) && textInterpolate(i);
+    return t02;
   }
   tween._value = value;
   return tween;
@@ -2562,11 +2766,11 @@ function textTween_default(value) {
 // node_modules/d3-transition/src/transition/transition.js
 function transition_default() {
   var name = this._name, id0 = this._id, id1 = newId();
-  for (var groups = this._groups, m = groups.length, j = 0; j < m; ++j) {
-    for (var group = groups[j], n = group.length, node, i = 0; i < n; ++i) {
-      if (node = group[i]) {
+  for (var groups2 = this._groups, m = groups2.length, j = 0; j < m; ++j) {
+    for (var group2 = groups2[j], n = group2.length, node, i = 0; i < n; ++i) {
+      if (node = group2[i]) {
         var inherit2 = get2(node, id0);
-        schedule_default(node, name, id1, i, group, {
+        schedule_default(node, name, id1, i, group2, {
           time: inherit2.time + inherit2.delay + inherit2.duration,
           delay: 0,
           duration: inherit2.duration,
@@ -2575,7 +2779,7 @@ function transition_default() {
       }
     }
   }
-  return new Transition(groups, this._parents, name, id1);
+  return new Transition(groups2, this._parents, name, id1);
 }
 
 // node_modules/d3-transition/src/transition/end.js
@@ -2603,8 +2807,8 @@ function end_default() {
 
 // node_modules/d3-transition/src/transition/index.js
 var id = 0;
-function Transition(groups, parents, name, id2) {
-  this._groups = groups;
+function Transition(groups2, parents, name, id2) {
+  this._groups = groups2;
   this._parents = parents;
   this._name = name;
   this._id = id2;
@@ -2678,14 +2882,14 @@ function transition_default2(name) {
   } else {
     id2 = newId(), (timing = defaultTiming).time = now(), name = name == null ? null : name + "";
   }
-  for (var groups = this._groups, m = groups.length, j = 0; j < m; ++j) {
-    for (var group = groups[j], n = group.length, node, i = 0; i < n; ++i) {
-      if (node = group[i]) {
-        schedule_default(node, name, id2, i, group, timing || inherit(node, id2));
+  for (var groups2 = this._groups, m = groups2.length, j = 0; j < m; ++j) {
+    for (var group2 = groups2[j], n = group2.length, node, i = 0; i < n; ++i) {
+      if (node = group2[i]) {
+        schedule_default(node, name, id2, i, group2, timing || inherit(node, id2));
       }
     }
   }
-  return new Transition(groups, this._parents, name, id2);
+  return new Transition(groups2, this._parents, name, id2);
 }
 
 // node_modules/d3-transition/src/selection/index.js
@@ -2703,8 +2907,8 @@ function number22(e) {
 var X = {
   name: "x",
   handles: ["w", "e"].map(type),
-  input: function(x, e) {
-    return x == null ? null : [[+x[0], e[0][1]], [+x[1], e[1][1]]];
+  input: function(x2, e) {
+    return x2 == null ? null : [[+x2[0], e[0][1]], [+x2[1], e[1][1]]];
   },
   output: function(xy) {
     return xy && [xy[0][0], xy[1][0]];
@@ -2713,8 +2917,8 @@ var X = {
 var Y = {
   name: "y",
   handles: ["n", "s"].map(type),
-  input: function(y, e) {
-    return y == null ? null : [[e[0][0], +y[0]], [e[1][0], +y[1]]];
+  input: function(y2, e) {
+    return y2 == null ? null : [[e[0][0], +y2[0]], [e[1][0], +y2[1]]];
   },
   output: function(xy) {
     return xy && [xy[0][1], xy[1][1]];
@@ -2734,23 +2938,124 @@ function type(t) {
   return { type: t };
 }
 
-// node_modules/d3-format/src/formatDecimal.js
-function formatDecimal_default(x) {
-  return Math.abs(x = Math.round(x)) >= 1e21 ? x.toLocaleString("en").replace(/,/g, "") : x.toString(10);
+// node_modules/d3-path/src/path.js
+var pi = Math.PI;
+var tau = 2 * pi;
+var epsilon2 = 1e-6;
+var tauEpsilon = tau - epsilon2;
+function append(strings) {
+  this._ += strings[0];
+  for (let i = 1, n = strings.length; i < n; ++i) {
+    this._ += arguments[i] + strings[i];
+  }
 }
-function formatDecimalParts(x, p) {
-  if ((i = (x = p ? x.toExponential(p - 1) : x.toExponential()).indexOf("e")) < 0)
+function appendRound(digits) {
+  let d = Math.floor(digits);
+  if (!(d >= 0))
+    throw new Error(`invalid digits: ${digits}`);
+  if (d > 15)
+    return append;
+  const k = 10 ** d;
+  return function(strings) {
+    this._ += strings[0];
+    for (let i = 1, n = strings.length; i < n; ++i) {
+      this._ += Math.round(arguments[i] * k) / k + strings[i];
+    }
+  };
+}
+var Path = class {
+  constructor(digits) {
+    this._x0 = this._y0 = // start of current subpath
+    this._x1 = this._y1 = null;
+    this._ = "";
+    this._append = digits == null ? append : appendRound(digits);
+  }
+  moveTo(x2, y2) {
+    this._append`M${this._x0 = this._x1 = +x2},${this._y0 = this._y1 = +y2}`;
+  }
+  closePath() {
+    if (this._x1 !== null) {
+      this._x1 = this._x0, this._y1 = this._y0;
+      this._append`Z`;
+    }
+  }
+  lineTo(x2, y2) {
+    this._append`L${this._x1 = +x2},${this._y1 = +y2}`;
+  }
+  quadraticCurveTo(x1, y1, x2, y2) {
+    this._append`Q${+x1},${+y1},${this._x1 = +x2},${this._y1 = +y2}`;
+  }
+  bezierCurveTo(x1, y1, x2, y2, x3, y3) {
+    this._append`C${+x1},${+y1},${+x2},${+y2},${this._x1 = +x3},${this._y1 = +y3}`;
+  }
+  arcTo(x1, y1, x2, y2, r) {
+    x1 = +x1, y1 = +y1, x2 = +x2, y2 = +y2, r = +r;
+    if (r < 0)
+      throw new Error(`negative radius: ${r}`);
+    let x0 = this._x1, y0 = this._y1, x21 = x2 - x1, y21 = y2 - y1, x01 = x0 - x1, y01 = y0 - y1, l01_2 = x01 * x01 + y01 * y01;
+    if (this._x1 === null) {
+      this._append`M${this._x1 = x1},${this._y1 = y1}`;
+    } else if (!(l01_2 > epsilon2))
+      ;
+    else if (!(Math.abs(y01 * x21 - y21 * x01) > epsilon2) || !r) {
+      this._append`L${this._x1 = x1},${this._y1 = y1}`;
+    } else {
+      let x20 = x2 - x0, y20 = y2 - y0, l21_2 = x21 * x21 + y21 * y21, l20_2 = x20 * x20 + y20 * y20, l21 = Math.sqrt(l21_2), l01 = Math.sqrt(l01_2), l = r * Math.tan((pi - Math.acos((l21_2 + l01_2 - l20_2) / (2 * l21 * l01))) / 2), t01 = l / l01, t21 = l / l21;
+      if (Math.abs(t01 - 1) > epsilon2) {
+        this._append`L${x1 + t01 * x01},${y1 + t01 * y01}`;
+      }
+      this._append`A${r},${r},0,0,${+(y01 * x20 > x01 * y20)},${this._x1 = x1 + t21 * x21},${this._y1 = y1 + t21 * y21}`;
+    }
+  }
+  arc(x2, y2, r, a0, a1, ccw) {
+    x2 = +x2, y2 = +y2, r = +r, ccw = !!ccw;
+    if (r < 0)
+      throw new Error(`negative radius: ${r}`);
+    let dx = r * Math.cos(a0), dy = r * Math.sin(a0), x0 = x2 + dx, y0 = y2 + dy, cw = 1 ^ ccw, da = ccw ? a0 - a1 : a1 - a0;
+    if (this._x1 === null) {
+      this._append`M${x0},${y0}`;
+    } else if (Math.abs(this._x1 - x0) > epsilon2 || Math.abs(this._y1 - y0) > epsilon2) {
+      this._append`L${x0},${y0}`;
+    }
+    if (!r)
+      return;
+    if (da < 0)
+      da = da % tau + tau;
+    if (da > tauEpsilon) {
+      this._append`A${r},${r},0,1,${cw},${x2 - dx},${y2 - dy}A${r},${r},0,1,${cw},${this._x1 = x0},${this._y1 = y0}`;
+    } else if (da > epsilon2) {
+      this._append`A${r},${r},0,${+(da >= pi)},${cw},${this._x1 = x2 + r * Math.cos(a1)},${this._y1 = y2 + r * Math.sin(a1)}`;
+    }
+  }
+  rect(x2, y2, w, h) {
+    this._append`M${this._x0 = this._x1 = +x2},${this._y0 = this._y1 = +y2}h${w = +w}v${+h}h${-w}Z`;
+  }
+  toString() {
+    return this._;
+  }
+};
+function path() {
+  return new Path();
+}
+path.prototype = Path.prototype;
+
+// node_modules/d3-format/src/formatDecimal.js
+function formatDecimal_default(x2) {
+  return Math.abs(x2 = Math.round(x2)) >= 1e21 ? x2.toLocaleString("en").replace(/,/g, "") : x2.toString(10);
+}
+function formatDecimalParts(x2, p) {
+  if ((i = (x2 = p ? x2.toExponential(p - 1) : x2.toExponential()).indexOf("e")) < 0)
     return null;
-  var i, coefficient = x.slice(0, i);
+  var i, coefficient = x2.slice(0, i);
   return [
     coefficient.length > 1 ? coefficient[0] + coefficient.slice(2) : coefficient,
-    +x.slice(i + 1)
+    +x2.slice(i + 1)
   ];
 }
 
 // node_modules/d3-format/src/exponent.js
-function exponent_default(x) {
-  return x = formatDecimalParts(Math.abs(x)), x ? x[1] : NaN;
+function exponent_default(x2) {
+  return x2 = formatDecimalParts(Math.abs(x2)), x2 ? x2[1] : NaN;
 }
 
 // node_modules/d3-format/src/formatGroup.js
@@ -2840,50 +3145,50 @@ function formatTrim_default(s) {
 
 // node_modules/d3-format/src/formatPrefixAuto.js
 var prefixExponent;
-function formatPrefixAuto_default(x, p) {
-  var d = formatDecimalParts(x, p);
+function formatPrefixAuto_default(x2, p) {
+  var d = formatDecimalParts(x2, p);
   if (!d)
-    return x + "";
+    return x2 + "";
   var coefficient = d[0], exponent = d[1], i = exponent - (prefixExponent = Math.max(-8, Math.min(8, Math.floor(exponent / 3))) * 3) + 1, n = coefficient.length;
-  return i === n ? coefficient : i > n ? coefficient + new Array(i - n + 1).join("0") : i > 0 ? coefficient.slice(0, i) + "." + coefficient.slice(i) : "0." + new Array(1 - i).join("0") + formatDecimalParts(x, Math.max(0, p + i - 1))[0];
+  return i === n ? coefficient : i > n ? coefficient + new Array(i - n + 1).join("0") : i > 0 ? coefficient.slice(0, i) + "." + coefficient.slice(i) : "0." + new Array(1 - i).join("0") + formatDecimalParts(x2, Math.max(0, p + i - 1))[0];
 }
 
 // node_modules/d3-format/src/formatRounded.js
-function formatRounded_default(x, p) {
-  var d = formatDecimalParts(x, p);
+function formatRounded_default(x2, p) {
+  var d = formatDecimalParts(x2, p);
   if (!d)
-    return x + "";
+    return x2 + "";
   var coefficient = d[0], exponent = d[1];
   return exponent < 0 ? "0." + new Array(-exponent).join("0") + coefficient : coefficient.length > exponent + 1 ? coefficient.slice(0, exponent + 1) + "." + coefficient.slice(exponent + 1) : coefficient + new Array(exponent - coefficient.length + 2).join("0");
 }
 
 // node_modules/d3-format/src/formatTypes.js
 var formatTypes_default = {
-  "%": (x, p) => (x * 100).toFixed(p),
-  "b": (x) => Math.round(x).toString(2),
-  "c": (x) => x + "",
+  "%": (x2, p) => (x2 * 100).toFixed(p),
+  "b": (x2) => Math.round(x2).toString(2),
+  "c": (x2) => x2 + "",
   "d": formatDecimal_default,
-  "e": (x, p) => x.toExponential(p),
-  "f": (x, p) => x.toFixed(p),
-  "g": (x, p) => x.toPrecision(p),
-  "o": (x) => Math.round(x).toString(8),
-  "p": (x, p) => formatRounded_default(x * 100, p),
+  "e": (x2, p) => x2.toExponential(p),
+  "f": (x2, p) => x2.toFixed(p),
+  "g": (x2, p) => x2.toPrecision(p),
+  "o": (x2) => Math.round(x2).toString(8),
+  "p": (x2, p) => formatRounded_default(x2 * 100, p),
   "r": formatRounded_default,
   "s": formatPrefixAuto_default,
-  "X": (x) => Math.round(x).toString(16).toUpperCase(),
-  "x": (x) => Math.round(x).toString(16)
+  "X": (x2) => Math.round(x2).toString(16).toUpperCase(),
+  "x": (x2) => Math.round(x2).toString(16)
 };
 
 // node_modules/d3-format/src/identity.js
-function identity_default2(x) {
-  return x;
+function identity_default2(x2) {
+  return x2;
 }
 
 // node_modules/d3-format/src/locale.js
-var map = Array.prototype.map;
+var map2 = Array.prototype.map;
 var prefixes = ["y", "z", "a", "f", "p", "n", "\xB5", "m", "", "k", "M", "G", "T", "P", "E", "Z", "Y"];
-function locale_default(locale2) {
-  var group = locale2.grouping === void 0 || locale2.thousands === void 0 ? identity_default2 : formatGroup_default(map.call(locale2.grouping, Number), locale2.thousands + ""), currencyPrefix = locale2.currency === void 0 ? "" : locale2.currency[0] + "", currencySuffix = locale2.currency === void 0 ? "" : locale2.currency[1] + "", decimal = locale2.decimal === void 0 ? "." : locale2.decimal + "", numerals = locale2.numerals === void 0 ? identity_default2 : formatNumerals_default(map.call(locale2.numerals, String)), percent = locale2.percent === void 0 ? "%" : locale2.percent + "", minus = locale2.minus === void 0 ? "\u2212" : locale2.minus + "", nan = locale2.nan === void 0 ? "NaN" : locale2.nan + "";
+function locale_default(locale3) {
+  var group2 = locale3.grouping === void 0 || locale3.thousands === void 0 ? identity_default2 : formatGroup_default(map2.call(locale3.grouping, Number), locale3.thousands + ""), currencyPrefix = locale3.currency === void 0 ? "" : locale3.currency[0] + "", currencySuffix = locale3.currency === void 0 ? "" : locale3.currency[1] + "", decimal = locale3.decimal === void 0 ? "." : locale3.decimal + "", numerals = locale3.numerals === void 0 ? identity_default2 : formatNumerals_default(map2.call(locale3.numerals, String)), percent = locale3.percent === void 0 ? "%" : locale3.percent + "", minus = locale3.minus === void 0 ? "\u2212" : locale3.minus + "", nan = locale3.nan === void 0 ? "NaN" : locale3.nan + "";
   function newFormat(specifier) {
     specifier = formatSpecifier(specifier);
     var fill = specifier.fill, align = specifier.align, sign = specifier.sign, symbol = specifier.symbol, zero3 = specifier.zero, width = specifier.width, comma = specifier.comma, precision = specifier.precision, trim = specifier.trim, type2 = specifier.type;
@@ -2923,10 +3228,10 @@ function locale_default(locale2) {
         }
       }
       if (comma && !zero3)
-        value = group(value, Infinity);
+        value = group2(value, Infinity);
       var length = valuePrefix.length + value.length + valueSuffix.length, padding = length < width ? new Array(width - length + 1).join(fill) : "";
       if (comma && zero3)
-        value = group(padding + value, padding.length ? width - valueSuffix.length : Infinity), padding = "";
+        value = group2(padding + value, padding.length ? width - valueSuffix.length : Infinity), padding = "";
       switch (align) {
         case "<":
           value = valuePrefix + value + valueSuffix + padding;
@@ -2976,24 +3281,8 @@ function defaultLocale(definition) {
   return locale;
 }
 
-// node_modules/d3-format/src/precisionFixed.js
-function precisionFixed_default(step) {
-  return Math.max(0, -exponent_default(Math.abs(step)));
-}
-
-// node_modules/d3-format/src/precisionPrefix.js
-function precisionPrefix_default(step, value) {
-  return Math.max(0, Math.max(-8, Math.min(8, Math.floor(exponent_default(value) / 3))) * 3 - exponent_default(Math.abs(step)));
-}
-
-// node_modules/d3-format/src/precisionRound.js
-function precisionRound_default(step, max2) {
-  step = Math.abs(step), max2 = Math.abs(max2) - step;
-  return Math.max(0, exponent_default(max2) - exponent_default(step)) + 1;
-}
-
 // node_modules/d3-scale/src/init.js
-function initRange(domain, range) {
+function initRange(domain, range2) {
   switch (arguments.length) {
     case 0:
       break;
@@ -3001,97 +3290,97 @@ function initRange(domain, range) {
       this.range(domain);
       break;
     default:
-      this.range(range).domain(domain);
+      this.range(range2).domain(domain);
       break;
   }
   return this;
 }
 
 // node_modules/d3-scale/src/constant.js
-function constants(x) {
+function constants(x2) {
   return function() {
-    return x;
+    return x2;
   };
 }
 
 // node_modules/d3-scale/src/number.js
-function number3(x) {
-  return +x;
+function number3(x2) {
+  return +x2;
 }
 
 // node_modules/d3-scale/src/continuous.js
 var unit = [0, 1];
-function identity2(x) {
-  return x;
+function identity3(x2) {
+  return x2;
 }
 function normalize(a, b) {
-  return (b -= a = +a) ? function(x) {
-    return (x - a) / b;
+  return (b -= a = +a) ? function(x2) {
+    return (x2 - a) / b;
   } : constants(isNaN(b) ? NaN : 0.5);
 }
 function clamper(a, b) {
   var t;
   if (a > b)
     t = a, a = b, b = t;
-  return function(x) {
-    return Math.max(a, Math.min(b, x));
+  return function(x2) {
+    return Math.max(a, Math.min(b, x2));
   };
 }
-function bimap(domain, range, interpolate) {
-  var d0 = domain[0], d1 = domain[1], r0 = range[0], r1 = range[1];
+function bimap(domain, range2, interpolate) {
+  var d0 = domain[0], d1 = domain[1], r0 = range2[0], r1 = range2[1];
   if (d1 < d0)
     d0 = normalize(d1, d0), r0 = interpolate(r1, r0);
   else
     d0 = normalize(d0, d1), r0 = interpolate(r0, r1);
-  return function(x) {
-    return r0(d0(x));
+  return function(x2) {
+    return r0(d0(x2));
   };
 }
-function polymap(domain, range, interpolate) {
-  var j = Math.min(domain.length, range.length) - 1, d = new Array(j), r = new Array(j), i = -1;
+function polymap(domain, range2, interpolate) {
+  var j = Math.min(domain.length, range2.length) - 1, d = new Array(j), r = new Array(j), i = -1;
   if (domain[j] < domain[0]) {
     domain = domain.slice().reverse();
-    range = range.slice().reverse();
+    range2 = range2.slice().reverse();
   }
   while (++i < j) {
     d[i] = normalize(domain[i], domain[i + 1]);
-    r[i] = interpolate(range[i], range[i + 1]);
+    r[i] = interpolate(range2[i], range2[i + 1]);
   }
-  return function(x) {
-    var i2 = bisect_default(domain, x, 1, j) - 1;
-    return r[i2](d[i2](x));
+  return function(x2) {
+    var i2 = bisect_default(domain, x2, 1, j) - 1;
+    return r[i2](d[i2](x2));
   };
 }
 function copy(source, target) {
   return target.domain(source.domain()).range(source.range()).interpolate(source.interpolate()).clamp(source.clamp()).unknown(source.unknown());
 }
 function transformer() {
-  var domain = unit, range = unit, interpolate = value_default, transform2, untransform, unknown, clamp = identity2, piecewise, output, input;
+  var domain = unit, range2 = unit, interpolate = value_default, transform2, untransform, unknown, clamp = identity3, piecewise, output, input;
   function rescale() {
-    var n = Math.min(domain.length, range.length);
-    if (clamp !== identity2)
+    var n = Math.min(domain.length, range2.length);
+    if (clamp !== identity3)
       clamp = clamper(domain[0], domain[n - 1]);
     piecewise = n > 2 ? polymap : bimap;
     output = input = null;
     return scale;
   }
-  function scale(x) {
-    return x == null || isNaN(x = +x) ? unknown : (output || (output = piecewise(domain.map(transform2), range, interpolate)))(transform2(clamp(x)));
+  function scale(x2) {
+    return x2 == null || isNaN(x2 = +x2) ? unknown : (output || (output = piecewise(domain.map(transform2), range2, interpolate)))(transform2(clamp(x2)));
   }
-  scale.invert = function(y) {
-    return clamp(untransform((input || (input = piecewise(range, domain.map(transform2), number_default)))(y)));
+  scale.invert = function(y2) {
+    return clamp(untransform((input || (input = piecewise(range2, domain.map(transform2), number_default)))(y2)));
   };
   scale.domain = function(_) {
     return arguments.length ? (domain = Array.from(_, number3), rescale()) : domain.slice();
   };
   scale.range = function(_) {
-    return arguments.length ? (range = Array.from(_), rescale()) : range.slice();
+    return arguments.length ? (range2 = Array.from(_), rescale()) : range2.slice();
   };
   scale.rangeRound = function(_) {
-    return range = Array.from(_), interpolate = round_default, rescale();
+    return range2 = Array.from(_), interpolate = round_default, rescale();
   };
   scale.clamp = function(_) {
-    return arguments.length ? (clamp = _ ? true : identity2, rescale()) : clamp !== identity2;
+    return arguments.length ? (clamp = _ ? true : identity3, rescale()) : clamp !== identity3;
   };
   scale.interpolate = function(_) {
     return arguments.length ? (interpolate = _, rescale()) : interpolate;
@@ -3105,161 +3394,1422 @@ function transformer() {
   };
 }
 function continuous() {
-  return transformer()(identity2, identity2);
+  return transformer()(identity3, identity3);
 }
 
-// node_modules/d3-scale/src/tickFormat.js
-function tickFormat(start2, stop, count, specifier) {
-  var step = tickStep(start2, stop, count), precision;
-  specifier = formatSpecifier(specifier == null ? ",f" : specifier);
-  switch (specifier.type) {
-    case "s": {
-      var value = Math.max(Math.abs(start2), Math.abs(stop));
-      if (specifier.precision == null && !isNaN(precision = precisionPrefix_default(step, value)))
-        specifier.precision = precision;
-      return formatPrefix(specifier, value);
-    }
-    case "":
-    case "e":
-    case "g":
-    case "p":
-    case "r": {
-      if (specifier.precision == null && !isNaN(precision = precisionRound_default(step, Math.max(Math.abs(start2), Math.abs(stop)))))
-        specifier.precision = precision - (specifier.type === "e");
-      break;
-    }
-    case "f":
-    case "%": {
-      if (specifier.precision == null && !isNaN(precision = precisionFixed_default(step)))
-        specifier.precision = precision - (specifier.type === "%") * 2;
-      break;
-    }
+// node_modules/d3-scale/src/nice.js
+function nice(domain, interval2) {
+  domain = domain.slice();
+  var i0 = 0, i1 = domain.length - 1, x0 = domain[i0], x1 = domain[i1], t;
+  if (x1 < x0) {
+    t = i0, i0 = i1, i1 = t;
+    t = x0, x0 = x1, x1 = t;
   }
-  return format(specifier);
+  domain[i0] = interval2.floor(x0);
+  domain[i1] = interval2.ceil(x1);
+  return domain;
 }
 
-// node_modules/d3-scale/src/linear.js
-function linearish(scale) {
-  var domain = scale.domain;
-  scale.ticks = function(count) {
-    var d = domain();
-    return ticks(d[0], d[d.length - 1], count == null ? 10 : count);
-  };
-  scale.tickFormat = function(count, specifier) {
-    var d = domain();
-    return tickFormat(d[0], d[d.length - 1], count == null ? 10 : count, specifier);
-  };
-  scale.nice = function(count) {
-    if (count == null)
-      count = 10;
-    var d = domain();
-    var i0 = 0;
-    var i1 = d.length - 1;
-    var start2 = d[i0];
-    var stop = d[i1];
-    var prestep;
-    var step;
-    var maxIter = 10;
-    if (stop < start2) {
-      step = start2, start2 = stop, stop = step;
-      step = i0, i0 = i1, i1 = step;
-    }
-    while (maxIter-- > 0) {
-      step = tickIncrement(start2, stop, count);
-      if (step === prestep) {
-        d[i0] = start2;
-        d[i1] = stop;
-        return domain(d);
-      } else if (step > 0) {
-        start2 = Math.floor(start2 / step) * step;
-        stop = Math.ceil(stop / step) * step;
-      } else if (step < 0) {
-        start2 = Math.ceil(start2 * step) / step;
-        stop = Math.floor(stop * step) / step;
-      } else {
-        break;
-      }
-      prestep = step;
+// node_modules/d3-scale/src/log.js
+function transformLog(x2) {
+  return Math.log(x2);
+}
+function transformExp(x2) {
+  return Math.exp(x2);
+}
+function transformLogn(x2) {
+  return -Math.log(-x2);
+}
+function transformExpn(x2) {
+  return -Math.exp(-x2);
+}
+function pow10(x2) {
+  return isFinite(x2) ? +("1e" + x2) : x2 < 0 ? 0 : x2;
+}
+function powp(base) {
+  return base === 10 ? pow10 : base === Math.E ? Math.exp : (x2) => Math.pow(base, x2);
+}
+function logp(base) {
+  return base === Math.E ? Math.log : base === 10 && Math.log10 || base === 2 && Math.log2 || (base = Math.log(base), (x2) => Math.log(x2) / base);
+}
+function reflect(f) {
+  return (x2, k) => -f(-x2, k);
+}
+function loggish(transform2) {
+  const scale = transform2(transformLog, transformExp);
+  const domain = scale.domain;
+  let base = 10;
+  let logs;
+  let pows;
+  function rescale() {
+    logs = logp(base), pows = powp(base);
+    if (domain()[0] < 0) {
+      logs = reflect(logs), pows = reflect(pows);
+      transform2(transformLogn, transformExpn);
+    } else {
+      transform2(transformLog, transformExp);
     }
     return scale;
+  }
+  scale.base = function(_) {
+    return arguments.length ? (base = +_, rescale()) : base;
+  };
+  scale.domain = function(_) {
+    return arguments.length ? (domain(_), rescale()) : domain();
+  };
+  scale.ticks = (count) => {
+    const d = domain();
+    let u = d[0];
+    let v = d[d.length - 1];
+    const r = v < u;
+    if (r)
+      [u, v] = [v, u];
+    let i = logs(u);
+    let j = logs(v);
+    let k;
+    let t;
+    const n = count == null ? 10 : +count;
+    let z = [];
+    if (!(base % 1) && j - i < n) {
+      i = Math.floor(i), j = Math.ceil(j);
+      if (u > 0)
+        for (; i <= j; ++i) {
+          for (k = 1; k < base; ++k) {
+            t = i < 0 ? k / pows(-i) : k * pows(i);
+            if (t < u)
+              continue;
+            if (t > v)
+              break;
+            z.push(t);
+          }
+        }
+      else
+        for (; i <= j; ++i) {
+          for (k = base - 1; k >= 1; --k) {
+            t = i > 0 ? k / pows(-i) : k * pows(i);
+            if (t < u)
+              continue;
+            if (t > v)
+              break;
+            z.push(t);
+          }
+        }
+      if (z.length * 2 < n)
+        z = ticks(u, v, n);
+    } else {
+      z = ticks(i, j, Math.min(j - i, n)).map(pows);
+    }
+    return r ? z.reverse() : z;
+  };
+  scale.tickFormat = (count, specifier) => {
+    if (count == null)
+      count = 10;
+    if (specifier == null)
+      specifier = base === 10 ? "s" : ",";
+    if (typeof specifier !== "function") {
+      if (!(base % 1) && (specifier = formatSpecifier(specifier)).precision == null)
+        specifier.trim = true;
+      specifier = format(specifier);
+    }
+    if (count === Infinity)
+      return specifier;
+    const k = Math.max(1, base * count / scale.ticks().length);
+    return (d) => {
+      let i = d / pows(Math.round(logs(d)));
+      if (i * base < base - 0.5)
+        i *= base;
+      return i <= k ? specifier(d) : "";
+    };
+  };
+  scale.nice = () => {
+    return domain(nice(domain(), {
+      floor: (x2) => pows(Math.floor(logs(x2))),
+      ceil: (x2) => pows(Math.ceil(logs(x2)))
+    }));
   };
   return scale;
 }
-function linear2() {
-  var scale = continuous();
-  scale.copy = function() {
-    return copy(scale, linear2());
-  };
+function log() {
+  const scale = loggish(transformer()).domain([1, 10]);
+  scale.copy = () => copy(scale, log()).base(scale.base());
   initRange.apply(scale, arguments);
-  return linearish(scale);
+  return scale;
+}
+
+// node_modules/d3-time/src/interval.js
+var t0 = new Date();
+var t1 = new Date();
+function timeInterval(floori, offseti, count, field) {
+  function interval2(date2) {
+    return floori(date2 = arguments.length === 0 ? new Date() : new Date(+date2)), date2;
+  }
+  interval2.floor = (date2) => {
+    return floori(date2 = new Date(+date2)), date2;
+  };
+  interval2.ceil = (date2) => {
+    return floori(date2 = new Date(date2 - 1)), offseti(date2, 1), floori(date2), date2;
+  };
+  interval2.round = (date2) => {
+    const d0 = interval2(date2), d1 = interval2.ceil(date2);
+    return date2 - d0 < d1 - date2 ? d0 : d1;
+  };
+  interval2.offset = (date2, step) => {
+    return offseti(date2 = new Date(+date2), step == null ? 1 : Math.floor(step)), date2;
+  };
+  interval2.range = (start2, stop, step) => {
+    const range2 = [];
+    start2 = interval2.ceil(start2);
+    step = step == null ? 1 : Math.floor(step);
+    if (!(start2 < stop) || !(step > 0))
+      return range2;
+    let previous;
+    do
+      range2.push(previous = new Date(+start2)), offseti(start2, step), floori(start2);
+    while (previous < start2 && start2 < stop);
+    return range2;
+  };
+  interval2.filter = (test) => {
+    return timeInterval((date2) => {
+      if (date2 >= date2)
+        while (floori(date2), !test(date2))
+          date2.setTime(date2 - 1);
+    }, (date2, step) => {
+      if (date2 >= date2) {
+        if (step < 0)
+          while (++step <= 0) {
+            while (offseti(date2, -1), !test(date2)) {
+            }
+          }
+        else
+          while (--step >= 0) {
+            while (offseti(date2, 1), !test(date2)) {
+            }
+          }
+      }
+    });
+  };
+  if (count) {
+    interval2.count = (start2, end) => {
+      t0.setTime(+start2), t1.setTime(+end);
+      floori(t0), floori(t1);
+      return Math.floor(count(t0, t1));
+    };
+    interval2.every = (step) => {
+      step = Math.floor(step);
+      return !isFinite(step) || !(step > 0) ? null : !(step > 1) ? interval2 : interval2.filter(field ? (d) => field(d) % step === 0 : (d) => interval2.count(0, d) % step === 0);
+    };
+  }
+  return interval2;
+}
+
+// node_modules/d3-time/src/millisecond.js
+var millisecond = timeInterval(() => {
+}, (date2, step) => {
+  date2.setTime(+date2 + step);
+}, (start2, end) => {
+  return end - start2;
+});
+millisecond.every = (k) => {
+  k = Math.floor(k);
+  if (!isFinite(k) || !(k > 0))
+    return null;
+  if (!(k > 1))
+    return millisecond;
+  return timeInterval((date2) => {
+    date2.setTime(Math.floor(date2 / k) * k);
+  }, (date2, step) => {
+    date2.setTime(+date2 + step * k);
+  }, (start2, end) => {
+    return (end - start2) / k;
+  });
+};
+var milliseconds = millisecond.range;
+
+// node_modules/d3-time/src/duration.js
+var durationSecond = 1e3;
+var durationMinute = durationSecond * 60;
+var durationHour = durationMinute * 60;
+var durationDay = durationHour * 24;
+var durationWeek = durationDay * 7;
+var durationMonth = durationDay * 30;
+var durationYear = durationDay * 365;
+
+// node_modules/d3-time/src/second.js
+var second = timeInterval((date2) => {
+  date2.setTime(date2 - date2.getMilliseconds());
+}, (date2, step) => {
+  date2.setTime(+date2 + step * durationSecond);
+}, (start2, end) => {
+  return (end - start2) / durationSecond;
+}, (date2) => {
+  return date2.getUTCSeconds();
+});
+var seconds = second.range;
+
+// node_modules/d3-time/src/minute.js
+var timeMinute = timeInterval((date2) => {
+  date2.setTime(date2 - date2.getMilliseconds() - date2.getSeconds() * durationSecond);
+}, (date2, step) => {
+  date2.setTime(+date2 + step * durationMinute);
+}, (start2, end) => {
+  return (end - start2) / durationMinute;
+}, (date2) => {
+  return date2.getMinutes();
+});
+var timeMinutes = timeMinute.range;
+var utcMinute = timeInterval((date2) => {
+  date2.setUTCSeconds(0, 0);
+}, (date2, step) => {
+  date2.setTime(+date2 + step * durationMinute);
+}, (start2, end) => {
+  return (end - start2) / durationMinute;
+}, (date2) => {
+  return date2.getUTCMinutes();
+});
+var utcMinutes = utcMinute.range;
+
+// node_modules/d3-time/src/hour.js
+var timeHour = timeInterval((date2) => {
+  date2.setTime(date2 - date2.getMilliseconds() - date2.getSeconds() * durationSecond - date2.getMinutes() * durationMinute);
+}, (date2, step) => {
+  date2.setTime(+date2 + step * durationHour);
+}, (start2, end) => {
+  return (end - start2) / durationHour;
+}, (date2) => {
+  return date2.getHours();
+});
+var timeHours = timeHour.range;
+var utcHour = timeInterval((date2) => {
+  date2.setUTCMinutes(0, 0, 0);
+}, (date2, step) => {
+  date2.setTime(+date2 + step * durationHour);
+}, (start2, end) => {
+  return (end - start2) / durationHour;
+}, (date2) => {
+  return date2.getUTCHours();
+});
+var utcHours = utcHour.range;
+
+// node_modules/d3-time/src/day.js
+var timeDay = timeInterval(
+  (date2) => date2.setHours(0, 0, 0, 0),
+  (date2, step) => date2.setDate(date2.getDate() + step),
+  (start2, end) => (end - start2 - (end.getTimezoneOffset() - start2.getTimezoneOffset()) * durationMinute) / durationDay,
+  (date2) => date2.getDate() - 1
+);
+var timeDays = timeDay.range;
+var utcDay = timeInterval((date2) => {
+  date2.setUTCHours(0, 0, 0, 0);
+}, (date2, step) => {
+  date2.setUTCDate(date2.getUTCDate() + step);
+}, (start2, end) => {
+  return (end - start2) / durationDay;
+}, (date2) => {
+  return date2.getUTCDate() - 1;
+});
+var utcDays = utcDay.range;
+var unixDay = timeInterval((date2) => {
+  date2.setUTCHours(0, 0, 0, 0);
+}, (date2, step) => {
+  date2.setUTCDate(date2.getUTCDate() + step);
+}, (start2, end) => {
+  return (end - start2) / durationDay;
+}, (date2) => {
+  return Math.floor(date2 / durationDay);
+});
+var unixDays = unixDay.range;
+
+// node_modules/d3-time/src/week.js
+function timeWeekday(i) {
+  return timeInterval((date2) => {
+    date2.setDate(date2.getDate() - (date2.getDay() + 7 - i) % 7);
+    date2.setHours(0, 0, 0, 0);
+  }, (date2, step) => {
+    date2.setDate(date2.getDate() + step * 7);
+  }, (start2, end) => {
+    return (end - start2 - (end.getTimezoneOffset() - start2.getTimezoneOffset()) * durationMinute) / durationWeek;
+  });
+}
+var timeSunday = timeWeekday(0);
+var timeMonday = timeWeekday(1);
+var timeTuesday = timeWeekday(2);
+var timeWednesday = timeWeekday(3);
+var timeThursday = timeWeekday(4);
+var timeFriday = timeWeekday(5);
+var timeSaturday = timeWeekday(6);
+var timeSundays = timeSunday.range;
+var timeMondays = timeMonday.range;
+var timeTuesdays = timeTuesday.range;
+var timeWednesdays = timeWednesday.range;
+var timeThursdays = timeThursday.range;
+var timeFridays = timeFriday.range;
+var timeSaturdays = timeSaturday.range;
+function utcWeekday(i) {
+  return timeInterval((date2) => {
+    date2.setUTCDate(date2.getUTCDate() - (date2.getUTCDay() + 7 - i) % 7);
+    date2.setUTCHours(0, 0, 0, 0);
+  }, (date2, step) => {
+    date2.setUTCDate(date2.getUTCDate() + step * 7);
+  }, (start2, end) => {
+    return (end - start2) / durationWeek;
+  });
+}
+var utcSunday = utcWeekday(0);
+var utcMonday = utcWeekday(1);
+var utcTuesday = utcWeekday(2);
+var utcWednesday = utcWeekday(3);
+var utcThursday = utcWeekday(4);
+var utcFriday = utcWeekday(5);
+var utcSaturday = utcWeekday(6);
+var utcSundays = utcSunday.range;
+var utcMondays = utcMonday.range;
+var utcTuesdays = utcTuesday.range;
+var utcWednesdays = utcWednesday.range;
+var utcThursdays = utcThursday.range;
+var utcFridays = utcFriday.range;
+var utcSaturdays = utcSaturday.range;
+
+// node_modules/d3-time/src/month.js
+var timeMonth = timeInterval((date2) => {
+  date2.setDate(1);
+  date2.setHours(0, 0, 0, 0);
+}, (date2, step) => {
+  date2.setMonth(date2.getMonth() + step);
+}, (start2, end) => {
+  return end.getMonth() - start2.getMonth() + (end.getFullYear() - start2.getFullYear()) * 12;
+}, (date2) => {
+  return date2.getMonth();
+});
+var timeMonths = timeMonth.range;
+var utcMonth = timeInterval((date2) => {
+  date2.setUTCDate(1);
+  date2.setUTCHours(0, 0, 0, 0);
+}, (date2, step) => {
+  date2.setUTCMonth(date2.getUTCMonth() + step);
+}, (start2, end) => {
+  return end.getUTCMonth() - start2.getUTCMonth() + (end.getUTCFullYear() - start2.getUTCFullYear()) * 12;
+}, (date2) => {
+  return date2.getUTCMonth();
+});
+var utcMonths = utcMonth.range;
+
+// node_modules/d3-time/src/year.js
+var timeYear = timeInterval((date2) => {
+  date2.setMonth(0, 1);
+  date2.setHours(0, 0, 0, 0);
+}, (date2, step) => {
+  date2.setFullYear(date2.getFullYear() + step);
+}, (start2, end) => {
+  return end.getFullYear() - start2.getFullYear();
+}, (date2) => {
+  return date2.getFullYear();
+});
+timeYear.every = (k) => {
+  return !isFinite(k = Math.floor(k)) || !(k > 0) ? null : timeInterval((date2) => {
+    date2.setFullYear(Math.floor(date2.getFullYear() / k) * k);
+    date2.setMonth(0, 1);
+    date2.setHours(0, 0, 0, 0);
+  }, (date2, step) => {
+    date2.setFullYear(date2.getFullYear() + step * k);
+  });
+};
+var timeYears = timeYear.range;
+var utcYear = timeInterval((date2) => {
+  date2.setUTCMonth(0, 1);
+  date2.setUTCHours(0, 0, 0, 0);
+}, (date2, step) => {
+  date2.setUTCFullYear(date2.getUTCFullYear() + step);
+}, (start2, end) => {
+  return end.getUTCFullYear() - start2.getUTCFullYear();
+}, (date2) => {
+  return date2.getUTCFullYear();
+});
+utcYear.every = (k) => {
+  return !isFinite(k = Math.floor(k)) || !(k > 0) ? null : timeInterval((date2) => {
+    date2.setUTCFullYear(Math.floor(date2.getUTCFullYear() / k) * k);
+    date2.setUTCMonth(0, 1);
+    date2.setUTCHours(0, 0, 0, 0);
+  }, (date2, step) => {
+    date2.setUTCFullYear(date2.getUTCFullYear() + step * k);
+  });
+};
+var utcYears = utcYear.range;
+
+// node_modules/d3-time/src/ticks.js
+function ticker(year, month, week, day, hour, minute) {
+  const tickIntervals = [
+    [second, 1, durationSecond],
+    [second, 5, 5 * durationSecond],
+    [second, 15, 15 * durationSecond],
+    [second, 30, 30 * durationSecond],
+    [minute, 1, durationMinute],
+    [minute, 5, 5 * durationMinute],
+    [minute, 15, 15 * durationMinute],
+    [minute, 30, 30 * durationMinute],
+    [hour, 1, durationHour],
+    [hour, 3, 3 * durationHour],
+    [hour, 6, 6 * durationHour],
+    [hour, 12, 12 * durationHour],
+    [day, 1, durationDay],
+    [day, 2, 2 * durationDay],
+    [week, 1, durationWeek],
+    [month, 1, durationMonth],
+    [month, 3, 3 * durationMonth],
+    [year, 1, durationYear]
+  ];
+  function ticks2(start2, stop, count) {
+    const reverse = stop < start2;
+    if (reverse)
+      [start2, stop] = [stop, start2];
+    const interval2 = count && typeof count.range === "function" ? count : tickInterval(start2, stop, count);
+    const ticks3 = interval2 ? interval2.range(start2, +stop + 1) : [];
+    return reverse ? ticks3.reverse() : ticks3;
+  }
+  function tickInterval(start2, stop, count) {
+    const target = Math.abs(stop - start2) / count;
+    const i = bisector(([, , step2]) => step2).right(tickIntervals, target);
+    if (i === tickIntervals.length)
+      return year.every(tickStep(start2 / durationYear, stop / durationYear, count));
+    if (i === 0)
+      return millisecond.every(Math.max(tickStep(start2, stop, count), 1));
+    const [t, step] = tickIntervals[target / tickIntervals[i - 1][2] < tickIntervals[i][2] / target ? i - 1 : i];
+    return t.every(step);
+  }
+  return [ticks2, tickInterval];
+}
+var [utcTicks, utcTickInterval] = ticker(utcYear, utcMonth, utcSunday, unixDay, utcHour, utcMinute);
+var [timeTicks, timeTickInterval] = ticker(timeYear, timeMonth, timeSunday, timeDay, timeHour, timeMinute);
+
+// node_modules/d3-time-format/src/locale.js
+function localDate(d) {
+  if (0 <= d.y && d.y < 100) {
+    var date2 = new Date(-1, d.m, d.d, d.H, d.M, d.S, d.L);
+    date2.setFullYear(d.y);
+    return date2;
+  }
+  return new Date(d.y, d.m, d.d, d.H, d.M, d.S, d.L);
+}
+function utcDate(d) {
+  if (0 <= d.y && d.y < 100) {
+    var date2 = new Date(Date.UTC(-1, d.m, d.d, d.H, d.M, d.S, d.L));
+    date2.setUTCFullYear(d.y);
+    return date2;
+  }
+  return new Date(Date.UTC(d.y, d.m, d.d, d.H, d.M, d.S, d.L));
+}
+function newDate(y2, m, d) {
+  return { y: y2, m, d, H: 0, M: 0, S: 0, L: 0 };
+}
+function formatLocale(locale3) {
+  var locale_dateTime = locale3.dateTime, locale_date = locale3.date, locale_time = locale3.time, locale_periods = locale3.periods, locale_weekdays = locale3.days, locale_shortWeekdays = locale3.shortDays, locale_months = locale3.months, locale_shortMonths = locale3.shortMonths;
+  var periodRe = formatRe(locale_periods), periodLookup = formatLookup(locale_periods), weekdayRe = formatRe(locale_weekdays), weekdayLookup = formatLookup(locale_weekdays), shortWeekdayRe = formatRe(locale_shortWeekdays), shortWeekdayLookup = formatLookup(locale_shortWeekdays), monthRe = formatRe(locale_months), monthLookup = formatLookup(locale_months), shortMonthRe = formatRe(locale_shortMonths), shortMonthLookup = formatLookup(locale_shortMonths);
+  var formats = {
+    "a": formatShortWeekday,
+    "A": formatWeekday,
+    "b": formatShortMonth,
+    "B": formatMonth,
+    "c": null,
+    "d": formatDayOfMonth,
+    "e": formatDayOfMonth,
+    "f": formatMicroseconds,
+    "g": formatYearISO,
+    "G": formatFullYearISO,
+    "H": formatHour24,
+    "I": formatHour12,
+    "j": formatDayOfYear,
+    "L": formatMilliseconds,
+    "m": formatMonthNumber,
+    "M": formatMinutes,
+    "p": formatPeriod,
+    "q": formatQuarter,
+    "Q": formatUnixTimestamp,
+    "s": formatUnixTimestampSeconds,
+    "S": formatSeconds,
+    "u": formatWeekdayNumberMonday,
+    "U": formatWeekNumberSunday,
+    "V": formatWeekNumberISO,
+    "w": formatWeekdayNumberSunday,
+    "W": formatWeekNumberMonday,
+    "x": null,
+    "X": null,
+    "y": formatYear,
+    "Y": formatFullYear,
+    "Z": formatZone,
+    "%": formatLiteralPercent
+  };
+  var utcFormats = {
+    "a": formatUTCShortWeekday,
+    "A": formatUTCWeekday,
+    "b": formatUTCShortMonth,
+    "B": formatUTCMonth,
+    "c": null,
+    "d": formatUTCDayOfMonth,
+    "e": formatUTCDayOfMonth,
+    "f": formatUTCMicroseconds,
+    "g": formatUTCYearISO,
+    "G": formatUTCFullYearISO,
+    "H": formatUTCHour24,
+    "I": formatUTCHour12,
+    "j": formatUTCDayOfYear,
+    "L": formatUTCMilliseconds,
+    "m": formatUTCMonthNumber,
+    "M": formatUTCMinutes,
+    "p": formatUTCPeriod,
+    "q": formatUTCQuarter,
+    "Q": formatUnixTimestamp,
+    "s": formatUnixTimestampSeconds,
+    "S": formatUTCSeconds,
+    "u": formatUTCWeekdayNumberMonday,
+    "U": formatUTCWeekNumberSunday,
+    "V": formatUTCWeekNumberISO,
+    "w": formatUTCWeekdayNumberSunday,
+    "W": formatUTCWeekNumberMonday,
+    "x": null,
+    "X": null,
+    "y": formatUTCYear,
+    "Y": formatUTCFullYear,
+    "Z": formatUTCZone,
+    "%": formatLiteralPercent
+  };
+  var parses = {
+    "a": parseShortWeekday,
+    "A": parseWeekday,
+    "b": parseShortMonth,
+    "B": parseMonth,
+    "c": parseLocaleDateTime,
+    "d": parseDayOfMonth,
+    "e": parseDayOfMonth,
+    "f": parseMicroseconds,
+    "g": parseYear,
+    "G": parseFullYear,
+    "H": parseHour24,
+    "I": parseHour24,
+    "j": parseDayOfYear,
+    "L": parseMilliseconds,
+    "m": parseMonthNumber,
+    "M": parseMinutes,
+    "p": parsePeriod,
+    "q": parseQuarter,
+    "Q": parseUnixTimestamp,
+    "s": parseUnixTimestampSeconds,
+    "S": parseSeconds,
+    "u": parseWeekdayNumberMonday,
+    "U": parseWeekNumberSunday,
+    "V": parseWeekNumberISO,
+    "w": parseWeekdayNumberSunday,
+    "W": parseWeekNumberMonday,
+    "x": parseLocaleDate,
+    "X": parseLocaleTime,
+    "y": parseYear,
+    "Y": parseFullYear,
+    "Z": parseZone,
+    "%": parseLiteralPercent
+  };
+  formats.x = newFormat(locale_date, formats);
+  formats.X = newFormat(locale_time, formats);
+  formats.c = newFormat(locale_dateTime, formats);
+  utcFormats.x = newFormat(locale_date, utcFormats);
+  utcFormats.X = newFormat(locale_time, utcFormats);
+  utcFormats.c = newFormat(locale_dateTime, utcFormats);
+  function newFormat(specifier, formats2) {
+    return function(date2) {
+      var string = [], i = -1, j = 0, n = specifier.length, c, pad2, format2;
+      if (!(date2 instanceof Date))
+        date2 = new Date(+date2);
+      while (++i < n) {
+        if (specifier.charCodeAt(i) === 37) {
+          string.push(specifier.slice(j, i));
+          if ((pad2 = pads[c = specifier.charAt(++i)]) != null)
+            c = specifier.charAt(++i);
+          else
+            pad2 = c === "e" ? " " : "0";
+          if (format2 = formats2[c])
+            c = format2(date2, pad2);
+          string.push(c);
+          j = i + 1;
+        }
+      }
+      string.push(specifier.slice(j, i));
+      return string.join("");
+    };
+  }
+  function newParse(specifier, Z) {
+    return function(string) {
+      var d = newDate(1900, void 0, 1), i = parseSpecifier(d, specifier, string += "", 0), week, day;
+      if (i != string.length)
+        return null;
+      if ("Q" in d)
+        return new Date(d.Q);
+      if ("s" in d)
+        return new Date(d.s * 1e3 + ("L" in d ? d.L : 0));
+      if (Z && !("Z" in d))
+        d.Z = 0;
+      if ("p" in d)
+        d.H = d.H % 12 + d.p * 12;
+      if (d.m === void 0)
+        d.m = "q" in d ? d.q : 0;
+      if ("V" in d) {
+        if (d.V < 1 || d.V > 53)
+          return null;
+        if (!("w" in d))
+          d.w = 1;
+        if ("Z" in d) {
+          week = utcDate(newDate(d.y, 0, 1)), day = week.getUTCDay();
+          week = day > 4 || day === 0 ? utcMonday.ceil(week) : utcMonday(week);
+          week = utcDay.offset(week, (d.V - 1) * 7);
+          d.y = week.getUTCFullYear();
+          d.m = week.getUTCMonth();
+          d.d = week.getUTCDate() + (d.w + 6) % 7;
+        } else {
+          week = localDate(newDate(d.y, 0, 1)), day = week.getDay();
+          week = day > 4 || day === 0 ? timeMonday.ceil(week) : timeMonday(week);
+          week = timeDay.offset(week, (d.V - 1) * 7);
+          d.y = week.getFullYear();
+          d.m = week.getMonth();
+          d.d = week.getDate() + (d.w + 6) % 7;
+        }
+      } else if ("W" in d || "U" in d) {
+        if (!("w" in d))
+          d.w = "u" in d ? d.u % 7 : "W" in d ? 1 : 0;
+        day = "Z" in d ? utcDate(newDate(d.y, 0, 1)).getUTCDay() : localDate(newDate(d.y, 0, 1)).getDay();
+        d.m = 0;
+        d.d = "W" in d ? (d.w + 6) % 7 + d.W * 7 - (day + 5) % 7 : d.w + d.U * 7 - (day + 6) % 7;
+      }
+      if ("Z" in d) {
+        d.H += d.Z / 100 | 0;
+        d.M += d.Z % 100;
+        return utcDate(d);
+      }
+      return localDate(d);
+    };
+  }
+  function parseSpecifier(d, specifier, string, j) {
+    var i = 0, n = specifier.length, m = string.length, c, parse;
+    while (i < n) {
+      if (j >= m)
+        return -1;
+      c = specifier.charCodeAt(i++);
+      if (c === 37) {
+        c = specifier.charAt(i++);
+        parse = parses[c in pads ? specifier.charAt(i++) : c];
+        if (!parse || (j = parse(d, string, j)) < 0)
+          return -1;
+      } else if (c != string.charCodeAt(j++)) {
+        return -1;
+      }
+    }
+    return j;
+  }
+  function parsePeriod(d, string, i) {
+    var n = periodRe.exec(string.slice(i));
+    return n ? (d.p = periodLookup.get(n[0].toLowerCase()), i + n[0].length) : -1;
+  }
+  function parseShortWeekday(d, string, i) {
+    var n = shortWeekdayRe.exec(string.slice(i));
+    return n ? (d.w = shortWeekdayLookup.get(n[0].toLowerCase()), i + n[0].length) : -1;
+  }
+  function parseWeekday(d, string, i) {
+    var n = weekdayRe.exec(string.slice(i));
+    return n ? (d.w = weekdayLookup.get(n[0].toLowerCase()), i + n[0].length) : -1;
+  }
+  function parseShortMonth(d, string, i) {
+    var n = shortMonthRe.exec(string.slice(i));
+    return n ? (d.m = shortMonthLookup.get(n[0].toLowerCase()), i + n[0].length) : -1;
+  }
+  function parseMonth(d, string, i) {
+    var n = monthRe.exec(string.slice(i));
+    return n ? (d.m = monthLookup.get(n[0].toLowerCase()), i + n[0].length) : -1;
+  }
+  function parseLocaleDateTime(d, string, i) {
+    return parseSpecifier(d, locale_dateTime, string, i);
+  }
+  function parseLocaleDate(d, string, i) {
+    return parseSpecifier(d, locale_date, string, i);
+  }
+  function parseLocaleTime(d, string, i) {
+    return parseSpecifier(d, locale_time, string, i);
+  }
+  function formatShortWeekday(d) {
+    return locale_shortWeekdays[d.getDay()];
+  }
+  function formatWeekday(d) {
+    return locale_weekdays[d.getDay()];
+  }
+  function formatShortMonth(d) {
+    return locale_shortMonths[d.getMonth()];
+  }
+  function formatMonth(d) {
+    return locale_months[d.getMonth()];
+  }
+  function formatPeriod(d) {
+    return locale_periods[+(d.getHours() >= 12)];
+  }
+  function formatQuarter(d) {
+    return 1 + ~~(d.getMonth() / 3);
+  }
+  function formatUTCShortWeekday(d) {
+    return locale_shortWeekdays[d.getUTCDay()];
+  }
+  function formatUTCWeekday(d) {
+    return locale_weekdays[d.getUTCDay()];
+  }
+  function formatUTCShortMonth(d) {
+    return locale_shortMonths[d.getUTCMonth()];
+  }
+  function formatUTCMonth(d) {
+    return locale_months[d.getUTCMonth()];
+  }
+  function formatUTCPeriod(d) {
+    return locale_periods[+(d.getUTCHours() >= 12)];
+  }
+  function formatUTCQuarter(d) {
+    return 1 + ~~(d.getUTCMonth() / 3);
+  }
+  return {
+    format: function(specifier) {
+      var f = newFormat(specifier += "", formats);
+      f.toString = function() {
+        return specifier;
+      };
+      return f;
+    },
+    parse: function(specifier) {
+      var p = newParse(specifier += "", false);
+      p.toString = function() {
+        return specifier;
+      };
+      return p;
+    },
+    utcFormat: function(specifier) {
+      var f = newFormat(specifier += "", utcFormats);
+      f.toString = function() {
+        return specifier;
+      };
+      return f;
+    },
+    utcParse: function(specifier) {
+      var p = newParse(specifier += "", true);
+      p.toString = function() {
+        return specifier;
+      };
+      return p;
+    }
+  };
+}
+var pads = { "-": "", "_": " ", "0": "0" };
+var numberRe = /^\s*\d+/;
+var percentRe = /^%/;
+var requoteRe = /[\\^$*+?|[\]().{}]/g;
+function pad(value, fill, width) {
+  var sign = value < 0 ? "-" : "", string = (sign ? -value : value) + "", length = string.length;
+  return sign + (length < width ? new Array(width - length + 1).join(fill) + string : string);
+}
+function requote(s) {
+  return s.replace(requoteRe, "\\$&");
+}
+function formatRe(names) {
+  return new RegExp("^(?:" + names.map(requote).join("|") + ")", "i");
+}
+function formatLookup(names) {
+  return new Map(names.map((name, i) => [name.toLowerCase(), i]));
+}
+function parseWeekdayNumberSunday(d, string, i) {
+  var n = numberRe.exec(string.slice(i, i + 1));
+  return n ? (d.w = +n[0], i + n[0].length) : -1;
+}
+function parseWeekdayNumberMonday(d, string, i) {
+  var n = numberRe.exec(string.slice(i, i + 1));
+  return n ? (d.u = +n[0], i + n[0].length) : -1;
+}
+function parseWeekNumberSunday(d, string, i) {
+  var n = numberRe.exec(string.slice(i, i + 2));
+  return n ? (d.U = +n[0], i + n[0].length) : -1;
+}
+function parseWeekNumberISO(d, string, i) {
+  var n = numberRe.exec(string.slice(i, i + 2));
+  return n ? (d.V = +n[0], i + n[0].length) : -1;
+}
+function parseWeekNumberMonday(d, string, i) {
+  var n = numberRe.exec(string.slice(i, i + 2));
+  return n ? (d.W = +n[0], i + n[0].length) : -1;
+}
+function parseFullYear(d, string, i) {
+  var n = numberRe.exec(string.slice(i, i + 4));
+  return n ? (d.y = +n[0], i + n[0].length) : -1;
+}
+function parseYear(d, string, i) {
+  var n = numberRe.exec(string.slice(i, i + 2));
+  return n ? (d.y = +n[0] + (+n[0] > 68 ? 1900 : 2e3), i + n[0].length) : -1;
+}
+function parseZone(d, string, i) {
+  var n = /^(Z)|([+-]\d\d)(?::?(\d\d))?/.exec(string.slice(i, i + 6));
+  return n ? (d.Z = n[1] ? 0 : -(n[2] + (n[3] || "00")), i + n[0].length) : -1;
+}
+function parseQuarter(d, string, i) {
+  var n = numberRe.exec(string.slice(i, i + 1));
+  return n ? (d.q = n[0] * 3 - 3, i + n[0].length) : -1;
+}
+function parseMonthNumber(d, string, i) {
+  var n = numberRe.exec(string.slice(i, i + 2));
+  return n ? (d.m = n[0] - 1, i + n[0].length) : -1;
+}
+function parseDayOfMonth(d, string, i) {
+  var n = numberRe.exec(string.slice(i, i + 2));
+  return n ? (d.d = +n[0], i + n[0].length) : -1;
+}
+function parseDayOfYear(d, string, i) {
+  var n = numberRe.exec(string.slice(i, i + 3));
+  return n ? (d.m = 0, d.d = +n[0], i + n[0].length) : -1;
+}
+function parseHour24(d, string, i) {
+  var n = numberRe.exec(string.slice(i, i + 2));
+  return n ? (d.H = +n[0], i + n[0].length) : -1;
+}
+function parseMinutes(d, string, i) {
+  var n = numberRe.exec(string.slice(i, i + 2));
+  return n ? (d.M = +n[0], i + n[0].length) : -1;
+}
+function parseSeconds(d, string, i) {
+  var n = numberRe.exec(string.slice(i, i + 2));
+  return n ? (d.S = +n[0], i + n[0].length) : -1;
+}
+function parseMilliseconds(d, string, i) {
+  var n = numberRe.exec(string.slice(i, i + 3));
+  return n ? (d.L = +n[0], i + n[0].length) : -1;
+}
+function parseMicroseconds(d, string, i) {
+  var n = numberRe.exec(string.slice(i, i + 6));
+  return n ? (d.L = Math.floor(n[0] / 1e3), i + n[0].length) : -1;
+}
+function parseLiteralPercent(d, string, i) {
+  var n = percentRe.exec(string.slice(i, i + 1));
+  return n ? i + n[0].length : -1;
+}
+function parseUnixTimestamp(d, string, i) {
+  var n = numberRe.exec(string.slice(i));
+  return n ? (d.Q = +n[0], i + n[0].length) : -1;
+}
+function parseUnixTimestampSeconds(d, string, i) {
+  var n = numberRe.exec(string.slice(i));
+  return n ? (d.s = +n[0], i + n[0].length) : -1;
+}
+function formatDayOfMonth(d, p) {
+  return pad(d.getDate(), p, 2);
+}
+function formatHour24(d, p) {
+  return pad(d.getHours(), p, 2);
+}
+function formatHour12(d, p) {
+  return pad(d.getHours() % 12 || 12, p, 2);
+}
+function formatDayOfYear(d, p) {
+  return pad(1 + timeDay.count(timeYear(d), d), p, 3);
+}
+function formatMilliseconds(d, p) {
+  return pad(d.getMilliseconds(), p, 3);
+}
+function formatMicroseconds(d, p) {
+  return formatMilliseconds(d, p) + "000";
+}
+function formatMonthNumber(d, p) {
+  return pad(d.getMonth() + 1, p, 2);
+}
+function formatMinutes(d, p) {
+  return pad(d.getMinutes(), p, 2);
+}
+function formatSeconds(d, p) {
+  return pad(d.getSeconds(), p, 2);
+}
+function formatWeekdayNumberMonday(d) {
+  var day = d.getDay();
+  return day === 0 ? 7 : day;
+}
+function formatWeekNumberSunday(d, p) {
+  return pad(timeSunday.count(timeYear(d) - 1, d), p, 2);
+}
+function dISO(d) {
+  var day = d.getDay();
+  return day >= 4 || day === 0 ? timeThursday(d) : timeThursday.ceil(d);
+}
+function formatWeekNumberISO(d, p) {
+  d = dISO(d);
+  return pad(timeThursday.count(timeYear(d), d) + (timeYear(d).getDay() === 4), p, 2);
+}
+function formatWeekdayNumberSunday(d) {
+  return d.getDay();
+}
+function formatWeekNumberMonday(d, p) {
+  return pad(timeMonday.count(timeYear(d) - 1, d), p, 2);
+}
+function formatYear(d, p) {
+  return pad(d.getFullYear() % 100, p, 2);
+}
+function formatYearISO(d, p) {
+  d = dISO(d);
+  return pad(d.getFullYear() % 100, p, 2);
+}
+function formatFullYear(d, p) {
+  return pad(d.getFullYear() % 1e4, p, 4);
+}
+function formatFullYearISO(d, p) {
+  var day = d.getDay();
+  d = day >= 4 || day === 0 ? timeThursday(d) : timeThursday.ceil(d);
+  return pad(d.getFullYear() % 1e4, p, 4);
+}
+function formatZone(d) {
+  var z = d.getTimezoneOffset();
+  return (z > 0 ? "-" : (z *= -1, "+")) + pad(z / 60 | 0, "0", 2) + pad(z % 60, "0", 2);
+}
+function formatUTCDayOfMonth(d, p) {
+  return pad(d.getUTCDate(), p, 2);
+}
+function formatUTCHour24(d, p) {
+  return pad(d.getUTCHours(), p, 2);
+}
+function formatUTCHour12(d, p) {
+  return pad(d.getUTCHours() % 12 || 12, p, 2);
+}
+function formatUTCDayOfYear(d, p) {
+  return pad(1 + utcDay.count(utcYear(d), d), p, 3);
+}
+function formatUTCMilliseconds(d, p) {
+  return pad(d.getUTCMilliseconds(), p, 3);
+}
+function formatUTCMicroseconds(d, p) {
+  return formatUTCMilliseconds(d, p) + "000";
+}
+function formatUTCMonthNumber(d, p) {
+  return pad(d.getUTCMonth() + 1, p, 2);
+}
+function formatUTCMinutes(d, p) {
+  return pad(d.getUTCMinutes(), p, 2);
+}
+function formatUTCSeconds(d, p) {
+  return pad(d.getUTCSeconds(), p, 2);
+}
+function formatUTCWeekdayNumberMonday(d) {
+  var dow = d.getUTCDay();
+  return dow === 0 ? 7 : dow;
+}
+function formatUTCWeekNumberSunday(d, p) {
+  return pad(utcSunday.count(utcYear(d) - 1, d), p, 2);
+}
+function UTCdISO(d) {
+  var day = d.getUTCDay();
+  return day >= 4 || day === 0 ? utcThursday(d) : utcThursday.ceil(d);
+}
+function formatUTCWeekNumberISO(d, p) {
+  d = UTCdISO(d);
+  return pad(utcThursday.count(utcYear(d), d) + (utcYear(d).getUTCDay() === 4), p, 2);
+}
+function formatUTCWeekdayNumberSunday(d) {
+  return d.getUTCDay();
+}
+function formatUTCWeekNumberMonday(d, p) {
+  return pad(utcMonday.count(utcYear(d) - 1, d), p, 2);
+}
+function formatUTCYear(d, p) {
+  return pad(d.getUTCFullYear() % 100, p, 2);
+}
+function formatUTCYearISO(d, p) {
+  d = UTCdISO(d);
+  return pad(d.getUTCFullYear() % 100, p, 2);
+}
+function formatUTCFullYear(d, p) {
+  return pad(d.getUTCFullYear() % 1e4, p, 4);
+}
+function formatUTCFullYearISO(d, p) {
+  var day = d.getUTCDay();
+  d = day >= 4 || day === 0 ? utcThursday(d) : utcThursday.ceil(d);
+  return pad(d.getUTCFullYear() % 1e4, p, 4);
+}
+function formatUTCZone() {
+  return "+0000";
+}
+function formatLiteralPercent() {
+  return "%";
+}
+function formatUnixTimestamp(d) {
+  return +d;
+}
+function formatUnixTimestampSeconds(d) {
+  return Math.floor(+d / 1e3);
+}
+
+// node_modules/d3-time-format/src/defaultLocale.js
+var locale2;
+var timeFormat;
+var timeParse;
+var utcFormat;
+var utcParse;
+defaultLocale2({
+  dateTime: "%x, %X",
+  date: "%-m/%-d/%Y",
+  time: "%-I:%M:%S %p",
+  periods: ["AM", "PM"],
+  days: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+  shortDays: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+  months: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+  shortMonths: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+});
+function defaultLocale2(definition) {
+  locale2 = formatLocale(definition);
+  timeFormat = locale2.format;
+  timeParse = locale2.parse;
+  utcFormat = locale2.utcFormat;
+  utcParse = locale2.utcParse;
+  return locale2;
+}
+
+// node_modules/d3-scale/src/time.js
+function date(t) {
+  return new Date(t);
+}
+function number4(t) {
+  return t instanceof Date ? +t : +new Date(+t);
+}
+function calendar(ticks2, tickInterval, year, month, week, day, hour, minute, second2, format2) {
+  var scale = continuous(), invert = scale.invert, domain = scale.domain;
+  var formatMillisecond = format2(".%L"), formatSecond = format2(":%S"), formatMinute = format2("%I:%M"), formatHour = format2("%I %p"), formatDay = format2("%a %d"), formatWeek = format2("%b %d"), formatMonth = format2("%B"), formatYear2 = format2("%Y");
+  function tickFormat(date2) {
+    return (second2(date2) < date2 ? formatMillisecond : minute(date2) < date2 ? formatSecond : hour(date2) < date2 ? formatMinute : day(date2) < date2 ? formatHour : month(date2) < date2 ? week(date2) < date2 ? formatDay : formatWeek : year(date2) < date2 ? formatMonth : formatYear2)(date2);
+  }
+  scale.invert = function(y2) {
+    return new Date(invert(y2));
+  };
+  scale.domain = function(_) {
+    return arguments.length ? domain(Array.from(_, number4)) : domain().map(date);
+  };
+  scale.ticks = function(interval2) {
+    var d = domain();
+    return ticks2(d[0], d[d.length - 1], interval2 == null ? 10 : interval2);
+  };
+  scale.tickFormat = function(count, specifier) {
+    return specifier == null ? tickFormat : format2(specifier);
+  };
+  scale.nice = function(interval2) {
+    var d = domain();
+    if (!interval2 || typeof interval2.range !== "function")
+      interval2 = tickInterval(d[0], d[d.length - 1], interval2 == null ? 10 : interval2);
+    return interval2 ? domain(nice(d, interval2)) : scale;
+  };
+  scale.copy = function() {
+    return copy(scale, calendar(ticks2, tickInterval, year, month, week, day, hour, minute, second2, format2));
+  };
+  return scale;
+}
+
+// node_modules/d3-scale/src/utcTime.js
+function utcTime() {
+  return initRange.apply(calendar(utcTicks, utcTickInterval, utcYear, utcMonth, utcSunday, utcDay, utcHour, utcMinute, second, utcFormat).domain([Date.UTC(2e3, 0, 1), Date.UTC(2e3, 0, 2)]), arguments);
+}
+
+// node_modules/d3-shape/src/constant.js
+function constant_default4(x2) {
+  return function constant() {
+    return x2;
+  };
+}
+
+// node_modules/d3-shape/src/path.js
+function withPath(shape) {
+  let digits = 3;
+  shape.digits = function(_) {
+    if (!arguments.length)
+      return digits;
+    if (_ == null) {
+      digits = null;
+    } else {
+      const d = Math.floor(_);
+      if (!(d >= 0))
+        throw new RangeError(`invalid digits: ${_}`);
+      digits = d;
+    }
+    return shape;
+  };
+  return () => new Path(digits);
+}
+
+// node_modules/d3-shape/src/array.js
+var slice = Array.prototype.slice;
+function array_default(x2) {
+  return typeof x2 === "object" && "length" in x2 ? x2 : Array.from(x2);
+}
+
+// node_modules/d3-shape/src/curve/linear.js
+function Linear(context) {
+  this._context = context;
+}
+Linear.prototype = {
+  areaStart: function() {
+    this._line = 0;
+  },
+  areaEnd: function() {
+    this._line = NaN;
+  },
+  lineStart: function() {
+    this._point = 0;
+  },
+  lineEnd: function() {
+    if (this._line || this._line !== 0 && this._point === 1)
+      this._context.closePath();
+    this._line = 1 - this._line;
+  },
+  point: function(x2, y2) {
+    x2 = +x2, y2 = +y2;
+    switch (this._point) {
+      case 0:
+        this._point = 1;
+        this._line ? this._context.lineTo(x2, y2) : this._context.moveTo(x2, y2);
+        break;
+      case 1:
+        this._point = 2;
+      default:
+        this._context.lineTo(x2, y2);
+        break;
+    }
+  }
+};
+function linear_default(context) {
+  return new Linear(context);
+}
+
+// node_modules/d3-shape/src/point.js
+function x(p) {
+  return p[0];
+}
+function y(p) {
+  return p[1];
+}
+
+// node_modules/d3-shape/src/line.js
+function line_default(x2, y2) {
+  var defined = constant_default4(true), context = null, curve = linear_default, output = null, path2 = withPath(line);
+  x2 = typeof x2 === "function" ? x2 : x2 === void 0 ? x : constant_default4(x2);
+  y2 = typeof y2 === "function" ? y2 : y2 === void 0 ? y : constant_default4(y2);
+  function line(data) {
+    var i, n = (data = array_default(data)).length, d, defined0 = false, buffer;
+    if (context == null)
+      output = curve(buffer = path2());
+    for (i = 0; i <= n; ++i) {
+      if (!(i < n && defined(d = data[i], i, data)) === defined0) {
+        if (defined0 = !defined0)
+          output.lineStart();
+        else
+          output.lineEnd();
+      }
+      if (defined0)
+        output.point(+x2(d, i, data), +y2(d, i, data));
+    }
+    if (buffer)
+      return output = null, buffer + "" || null;
+  }
+  line.x = function(_) {
+    return arguments.length ? (x2 = typeof _ === "function" ? _ : constant_default4(+_), line) : x2;
+  };
+  line.y = function(_) {
+    return arguments.length ? (y2 = typeof _ === "function" ? _ : constant_default4(+_), line) : y2;
+  };
+  line.defined = function(_) {
+    return arguments.length ? (defined = typeof _ === "function" ? _ : constant_default4(!!_), line) : defined;
+  };
+  line.curve = function(_) {
+    return arguments.length ? (curve = _, context != null && (output = curve(context)), line) : curve;
+  };
+  line.context = function(_) {
+    return arguments.length ? (_ == null ? context = output = null : output = curve(context = _), line) : context;
+  };
+  return line;
 }
 
 // node_modules/d3-zoom/src/transform.js
-function Transform(k, x, y) {
+function Transform(k, x2, y2) {
   this.k = k;
-  this.x = x;
-  this.y = y;
+  this.x = x2;
+  this.y = y2;
 }
 Transform.prototype = {
   constructor: Transform,
   scale: function(k) {
     return k === 1 ? this : new Transform(this.k * k, this.x, this.y);
   },
-  translate: function(x, y) {
-    return x === 0 & y === 0 ? this : new Transform(this.k, this.x + this.k * x, this.y + this.k * y);
+  translate: function(x2, y2) {
+    return x2 === 0 & y2 === 0 ? this : new Transform(this.k, this.x + this.k * x2, this.y + this.k * y2);
   },
   apply: function(point) {
     return [point[0] * this.k + this.x, point[1] * this.k + this.y];
   },
-  applyX: function(x) {
-    return x * this.k + this.x;
+  applyX: function(x2) {
+    return x2 * this.k + this.x;
   },
-  applyY: function(y) {
-    return y * this.k + this.y;
+  applyY: function(y2) {
+    return y2 * this.k + this.y;
   },
   invert: function(location) {
     return [(location[0] - this.x) / this.k, (location[1] - this.y) / this.k];
   },
-  invertX: function(x) {
-    return (x - this.x) / this.k;
+  invertX: function(x2) {
+    return (x2 - this.x) / this.k;
   },
-  invertY: function(y) {
-    return (y - this.y) / this.k;
+  invertY: function(y2) {
+    return (y2 - this.y) / this.k;
   },
-  rescaleX: function(x) {
-    return x.copy().domain(x.range().map(this.invertX, this).map(x.invert, x));
+  rescaleX: function(x2) {
+    return x2.copy().domain(x2.range().map(this.invertX, this).map(x2.invert, x2));
   },
-  rescaleY: function(y) {
-    return y.copy().domain(y.range().map(this.invertY, this).map(y.invert, y));
+  rescaleY: function(y2) {
+    return y2.copy().domain(y2.range().map(this.invertY, this).map(y2.invert, y2));
   },
   toString: function() {
     return "translate(" + this.x + "," + this.y + ") scale(" + this.k + ")";
   }
 };
-var identity3 = new Transform(1, 0, 0);
+var identity4 = new Transform(1, 0, 0);
 transform.prototype = Transform.prototype;
 function transform(node) {
   while (!node.__zoom)
     if (!(node = node.parentNode))
-      return identity3;
+      return identity4;
   return node.__zoom;
 }
 
 // source/lineChart.ts
-var makeChart = (data) => {
-  const margin = { top: 10, right: 30, bottom: 30, left: 60 }, width = 460 - margin.left - margin.right, height = 400 - margin.top - margin.bottom;
-  const svg = create_default("svg").attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom).attr("viewBox", [0, 0, width, height]).attr("style", "max-width: 100%;").append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-  var x = linear2().domain([0, 1e3]).range([0, width]);
-  svg.append("g").attr("transform", "translate(0," + height + ")").call(axisBottom(x));
-  var y = linear2().domain([0, 500]).range([height, 0]);
-  svg.append("g").call(axisLeft(y));
-  svg.append("g").selectAll("dot").data(data).enter().append("circle").attr("cx", function(d) {
-    return x(d.x);
-  }).attr("cy", function(d) {
-    return y(d.y);
-  }).attr("r", 1.5).style("fill", "#69b3a2");
-  return svg;
+var extentIsDefined = (extent2) => extent2 !== [void 0, void 0] ? false : true;
+var BasicChart = (data, {
+  x: x2,
+  y: y2,
+  z,
+  basis: basis2 = 1,
+  curve = linear_default,
+  marginTop = 20,
+  marginRight = 30,
+  marginBottom = 30,
+  marginLeft = 40,
+  width = 640,
+  height = 400,
+  xType = utcTime,
+  xDomain,
+  xRange = [marginLeft, width - marginRight],
+  yType = log,
+  yDomain,
+  yRange = [height - marginBottom, marginTop],
+  lineColor = "#606060",
+  strokeLinecap = "round",
+  strokeLinejoin = "round",
+  strokeWidth = 1,
+  strokeOpacity = 1,
+  xFormat = ",.1f",
+  yFormat = ",.1f",
+  xLabel,
+  yLabel,
+  xAxisOffset = 1,
+  drawLine = true,
+  drawPoints = true,
+  pointRadius = 1.5,
+  pointFillColor = "#202020",
+  pointFillOpacity = 0,
+  pointStrokeColor = "#202020",
+  pointStrokeOpacity = 0.5,
+  color: color2 = "currentColor",
+  mixBlendMode = "multiply"
+}) => {
+  const X2 = map(data, x2);
+  const Y2 = map(data, y2);
+  const Z = map(data, z);
+  const I = range(X2.length);
+  const D = map(data, (d, i) => !isNaN(x2(d)) && !isNaN(y2(d)));
+  Y2.forEach((y3, i) => Y2[i] = y3 / basis2);
+  if (xDomain === void 0) {
+    const xExtent = extent(X2);
+    xDomain = extentIsDefined(xExtent) ? xExtent : [-10, 10];
+  }
+  if (yDomain === void 0) {
+    const yExtent = extent(Y2);
+    yDomain = extentIsDefined(yExtent) ? yExtent : [-10, 10];
+  }
+  const zDomain = new InternSet(Z);
+  const xScale = xType(xDomain, xRange);
+  const yScale = yType(yDomain, yRange);
+  const xAxis = axisBottom(xScale).ticks(width / 80).tickSizeOuter(0).tickFormat((d) => format(xFormat)(d));
+  const yAxis = axisLeft(yScale).ticks(height / 80).tickFormat((d) => format(yFormat)(d));
+  const svg = create_default("svg").attr("width", width).attr("height", height).attr("viewBox", [0, 0, width, height]).attr("style", "max-width: 100%; height: auto; height: intrinsic;").on("pointerenter", pointerentered).on("pointermove", pointermoved).on("pointerleave", pointerleft).on("touchstart", (event) => event.preventDefault());
+  svg.append("g").attr("transform", `translate(0,${yScale(xAxisOffset)})`).call(xAxis).call(
+    (g) => g.append("text").attr("x", width / 2).attr("y", marginBottom).attr("fill", "currentColor").attr("text-anchor", "start").text(xLabel)
+  );
+  svg.append("g").attr("transform", `translate(${marginLeft},0)`).call(yAxis).call((g) => g.select(".domain").remove()).call(
+    (g) => g.selectAll(".tick line").clone().attr("x2", width - marginLeft - marginRight).attr("stroke-opacity", 0.1)
+  ).call(
+    (g) => g.append("text").attr("transform", "rotate(270)").attr("x", -height / 2).attr("y", -marginLeft + 20).attr("fill", "currentColor").attr("text-anchor", "start").text(yLabel)
+  );
+  const path2 = (() => {
+    if (drawLine) {
+      const line = line_default().defined((i) => {
+        var _a;
+        return (_a = D[i[0]]) != null ? _a : false;
+      }).curve(curve).x(([i]) => {
+        var _a, _b;
+        return (_b = xScale((_a = X2[i]) != null ? _a : 0)) != null ? _b : 0;
+      }).y(([, i]) => {
+        var _a, _b;
+        return (_b = yScale((_a = Y2[i]) != null ? _a : 0)) != null ? _b : 0;
+      });
+      const groupedData = group(I, (i) => Z[i]);
+      return svg.append("g").attr("fill", "none").attr("stroke", typeof color2 === "string" ? color2 : null).attr("stroke-linecap", strokeLinecap).attr("stroke-linejoin", strokeLinejoin).attr("stroke-width", strokeWidth).attr("stroke-opacity", strokeOpacity).selectAll("path").data(groupedData).join("path").style("mix-blend-mode", mixBlendMode).attr("d", ([, i]) => line(i != null ? i : 0));
+    }
+  })();
+  const points = (() => {
+    const groupedDataMap = group(I, (i) => Z[i]);
+    const groupedData = Array.from(groupedDataMap.values());
+    if (drawPoints) {
+      return groupedData.map((d) => {
+        return svg.append("g").selectAll("circle").data(d).enter().append("circle").attr("fill", pointFillColor).attr("fill-opacity", pointFillOpacity).attr("cx", (d2, i) => {
+          var _a, _b;
+          return (_b = xScale((_a = X2[i]) != null ? _a : 0)) != null ? _b : 0;
+        }).attr("cy", (d2, i) => {
+          var _a, _b;
+          return (_b = yScale((_a = Y2[i]) != null ? _a : 0)) != null ? _b : 0;
+        }).attr("stroke", pointStrokeColor).attr("stroke-opacity", pointStrokeOpacity).attr("r", pointRadius);
+      });
+    }
+  })();
+  const tooltip = svg.append("g").attr("display", "none");
+  tooltip.append("circle").attr("r", 2.5);
+  const ttBgWidth = 120;
+  const ttBgHeight = 45;
+  tooltip.append("rect").attr("width", ttBgWidth).attr("height", ttBgHeight).attr("x", -ttBgWidth / 2).attr("y", -ttBgHeight - 17).attr(
+    "style",
+    "fill:#fff; fill-opacity:0.5; stroke:#000; stroke-opacity:0.5;"
+  );
+  tooltip.append("text").attr("font-family", "sans-serif").attr("font-size", 12).attr("text-anchor", "middle").attr("y", -8);
+  function pointermoved(event) {
+    var _a, _b;
+    const [xm, ym] = pointer_default(event);
+    const ptIdx = least(
+      I,
+      (i) => {
+        var _a2, _b2, _c, _d;
+        return Math.hypot((_b2 = xScale((_a2 = X2[i]) != null ? _a2 : 0)) != null ? _b2 : 0 - xm, (_d = yScale((_c = Y2[i]) != null ? _c : 0)) != null ? _d : 0 - ym);
+      }
+    );
+    tooltip.attr(
+      "transform",
+      `translate(${xScale((_a = X2[ptIdx != null ? ptIdx : 0]) != null ? _a : 0)},${yScale((_b = Y2[ptIdx != null ? ptIdx : 0]) != null ? _b : 0)})`
+    );
+    path2 && path2.style("stroke", ([z2]) => Z[ptIdx != null ? ptIdx : 0] === z2 ? null : "#ddd").filter(([z2]) => Z[ptIdx != null ? ptIdx : 0] === z2).raise();
+    points && points.map((pointGroup) => {
+      const foo = pointGroup.selectAll("circle").join("circle").attr("r", 0).attr("r", 0);
+    });
+  }
+  function pointerentered() {
+    path2 && path2.style("mix-blend-mode", null).style("stroke", "#ddd");
+    tooltip.attr("display", null);
+  }
+  function pointerleft() {
+    tooltip.attr("display", "none");
+    path2 && path2.style("mix-blend-mode", mixBlendMode).style("stroke", null);
+  }
+  return svg.node();
 };
 export {
-  makeChart
+  BasicChart
 };
