@@ -12,7 +12,7 @@ export const makeChart = (data: { x: number; y: number }[]) => {
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
     .attr("viewBox", [0, 0, width, height])
-    .attr("style", "max-width: 100%; height: auto; height: intrinsic;")
+    .attr("style", "max-width: 100%;")
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
