@@ -3249,9 +3249,9 @@ function transform(node) {
 var makeChart = (data) => {
   const margin = { top: 10, right: 30, bottom: 30, left: 60 }, width = 460 - margin.left - margin.right, height = 400 - margin.top - margin.bottom;
   const svg = create_default("svg").attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom).attr("viewBox", [0, 0, width, height]).attr("style", "max-width: 100%;").append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-  var x = linear2().domain([0, 4e3]).range([0, width]);
+  var x = linear2().domain([0, 1e3]).range([0, width]);
   svg.append("g").attr("transform", "translate(0," + height + ")").call(axisBottom(x));
-  var y = linear2().domain([0, 5e5]).range([height, 0]);
+  var y = linear2().domain([0, 500]).range([height, 0]);
   svg.append("g").call(axisLeft(y));
   svg.append("g").selectAll("dot").data(data).enter().append("circle").attr("cx", function(d) {
     return x(d.x);
