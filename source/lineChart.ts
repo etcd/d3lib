@@ -5,7 +5,7 @@ const extentIsDefined = (
 ): extent is [number, number] =>
   extent !== ([undefined, undefined] as const) ? false : true;
 
-export const BasicChart = <T>(
+export const makeBasicChart = <T>(
   data: T[],
   {
     x,
