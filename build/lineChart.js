@@ -4675,7 +4675,7 @@ function transform(node) {
 
 // source/lineChart.ts
 var extentIsDefined = (extent2) => extent2 !== [void 0, void 0] ? false : true;
-var makeBasicChart = (data, {
+var make = (data, {
   x: x2,
   y: y2,
   z,
@@ -4811,5 +4811,5 @@ var makeBasicChart = (data, {
   return svg.node();
 };
 export {
-  makeBasicChart
+  make
 };
