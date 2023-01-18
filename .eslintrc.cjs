@@ -6,7 +6,7 @@ module.exports = {
     sourceType: "module",
   },
   plugins: ["@typescript-eslint", "simple-import-sort"],
-  extends: ["next/core-web-vitals", "plugin:@typescript-eslint/recommended"],
+  extends: ["plugin:@typescript-eslint/recommended"],
   rules: {
     // imports linting
     "@typescript-eslint/consistent-type-imports": "warn",

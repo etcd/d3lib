@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc source/*.ts source/**/*.ts --outdir build/ --allowSyntheticDefaultImports --declaration --sourceMap",
+    "build": "tsc source/*.ts --outdir build/ --allowSyntheticDefaultImports --declaration --sourceMap",
     "typecheck": "tsc --noEmit --listFiles",
     "clean:build": "rimraf build",
     "clean:node_modules": "rimraf node_modules"
