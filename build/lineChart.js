@@ -1144,6 +1144,11 @@ function select_default2(selector) {
   return typeof selector === "string" ? new Selection([[document.querySelector(selector)]], [document.documentElement]) : new Selection([[selector]], root);
 }
 
+// node_modules/d3-selection/src/create.js
+function create_default(name) {
+  return select_default2(creator_default(name).call(document.documentElement));
+}
+
 // node_modules/d3-color/src/define.js
 function define_default(constructor, factory, prototype) {
   constructor.prototype = factory.prototype = prototype;
@@ -3243,7 +3248,7 @@ function transform(node) {
 // source/lineChart.ts
 var makeChart = (data) => {
   const margin = { top: 10, right: 30, bottom: 30, left: 60 }, width = 460 - margin.left - margin.right, height = 400 - margin.top - margin.bottom;
-  const svg = select_default2("#my_dataviz").append("svg").attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom).append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+  const svg = create_default("svg").attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom).append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
   var x = linear2().domain([0, 4e3]).range([0, width]);
   svg.append("g").attr("transform", "translate(0," + height + ")").call(axisBottom(x));
   var y = linear2().domain([0, 5e5]).range([height, 0]);

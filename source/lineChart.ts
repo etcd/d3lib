@@ -8,8 +8,7 @@ export const makeChart = (data: { x: number; y: number }[]) => {
 
   // append the svg object to the body of the page
   const svg = d3
-    .select("#my_dataviz")
-    .append("svg")
+    .create("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
     .append("g")
