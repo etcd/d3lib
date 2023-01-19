@@ -4702,7 +4702,7 @@ var make = (data, {
     (g) => g.append("text").attr("transform", "rotate(270)").attr("x", -height / 2).attr("y", -marginLeft + 20).attr("fill", "currentColor").attr("text-anchor", "start").text(yLabel)
   );
   const dataGroupsByZ = group(data, (dp) => z(dp));
-  const path2 = (() => {
+  const lines = (() => {
     if (drawLine) {
       const makeLine = line_default().defined(([xVal, yVal]) => !isNaN(xVal) && !isNaN(yVal)).x(([xVal]) => xScale(xVal)).y(([_xVal, yVal]) => yScale(yVal)).curve(linear_default);
       return svg.append("g").attr("fill", "none").attr("stroke", typeof color2 === "string" ? color2 : null).attr("stroke-linecap", strokeLinecap).attr("stroke-linejoin", strokeLinejoin).attr("stroke-width", strokeWidth).attr("stroke-opacity", strokeOpacity).selectAll("path").data(dataGroupsByZ).join("path").style("mix-blend-mode", mixBlendMode).attr(
@@ -4718,28 +4718,28 @@ var make = (data, {
       });
     }
   })();
-  const tooltip = svg.append("g").attr("display", "none");
-  tooltip.append("circle").attr("r", 2.5);
+  const tooltipGroup = svg.append("g").attr("display", "none");
+  tooltipGroup.append("circle").attr("r", 2.5);
   const ttBgWidth = 120;
   const ttBgHeight = 45;
-  tooltip.append("rect").attr("width", ttBgWidth).attr("height", ttBgHeight).attr("x", -ttBgWidth / 2).attr("y", -ttBgHeight - 17).attr(
+  tooltipGroup.append("rect").attr("width", ttBgWidth).attr("height", ttBgHeight).attr("x", -ttBgWidth / 2).attr("y", -ttBgHeight - 17).attr(
     "style",
     "fill:#fff; fill-opacity:0.5; stroke:#000; stroke-opacity:0.5;"
   );
-  tooltip.append("text").attr("font-family", "sans-serif").attr("font-size", 12).attr("text-anchor", "middle").attr("y", -8);
+  tooltipGroup.append("text").attr("font-family", "sans-serif").attr("font-size", 12).attr("text-anchor", "middle").attr("y", -8);
   function pointermoved(event) {
     const [pointerX, pointerY] = pointer_default(event);
     const closestDp = least(data, (dp) => {
       return Math.hypot(xScale(x2(dp)) - pointerX, yScale(y2(dp)) - pointerY);
     });
-    tooltip.attr(
+    tooltipGroup.attr(
       "transform",
       `translate(${xScale(x2(closestDp))},${yScale(y2(closestDp))})`
     );
-    tooltip.select("text").call(
-      (text) => text.selectAll("tspan").data(makeTitle(closestDp)).join("tspan").attr("x", 0).attr("y", (_, i) => `${(i - 3) * 1.2}em`).attr("font-weight", (_, i) => i === 0 && "bold").text((d) => d)
+    tooltipGroup.select("text").call(
+      (text) => text.selectAll("tspan").data(makeTitle(closestDp)).join("tspan").attr("x", 0).attr("y", (_text, i) => `${(i - 3) * 1.2}em`).attr("font-weight", (_text, i) => i === 0 && "bold").text((text2) => text2)
     );
-    path2 && path2.style(
+    lines && lines.style(
       "stroke",
       ([zHovered]) => z(closestDp) === zHovered ? null : "#ddd"
     ).filter(([zHovered]) => z(closestDp) === zHovered).raise();
@@ -4748,12 +4748,12 @@ var make = (data, {
     });
   }
   function pointerentered() {
-    path2 && path2.style("mix-blend-mode", null).style("stroke", "#ddd");
-    tooltip.attr("display", null);
+    lines && lines.style("mix-blend-mode", null).style("stroke", "#ddd");
+    tooltipGroup.attr("display", null);
   }
   function pointerleft() {
-    tooltip.attr("display", "none");
-    path2 && path2.style("mix-blend-mode", mixBlendMode).style("stroke", null);
+    tooltipGroup.attr("display", "none");
+    lines && lines.style("mix-blend-mode", mixBlendMode).style("stroke", null);
   }
   return svg.node();
 };

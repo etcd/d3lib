@@ -215,7 +215,7 @@ export const make = <T>(
   const dataGroupsByZ = d3.group(data, (dp) => z(dp));
 
   // line
-  const path = (() => {
+  const lines = (() => {
     if (drawLine) {
       const makeLine = d3
         .line()
@@ -285,13 +285,13 @@ export const make = <T>(
   })();
 
   // tooltip
-  const tooltip = svg.append("g").attr("display", "none");
+  const tooltipGroup = svg.append("g").attr("display", "none");
   // tooltip dot
-  tooltip.append("circle").attr("r", 2.5);
+  tooltipGroup.append("circle").attr("r", 2.5);
   // tooltip bg
   const ttBgWidth = 120;
   const ttBgHeight = 45;
-  tooltip
+  tooltipGroup
     .append("rect")
     .attr("width", ttBgWidth)
     .attr("height", ttBgHeight)
@@ -302,7 +302,7 @@ export const make = <T>(
       "fill:#fff; fill-opacity:0.5; stroke:#000; stroke-opacity:0.5;"
     );
   // tooltip text
-  tooltip
+  tooltipGroup
     .append("text")
     .attr("font-family", "sans-serif")
     .attr("font-size", 12)
@@ -310,6 +310,7 @@ export const make = <T>(
     .attr("y", -8);
 
   function pointermoved(event: PointerEvent) {
+    // get the position of the pointer
     const [pointerX, pointerY] = d3.pointer(event);
 
     // closest datapoint to pointer position
@@ -318,27 +319,27 @@ export const make = <T>(
     });
 
     // translate the tooltip
-    tooltip.attr(
+    tooltipGroup.attr(
       "transform",
       `translate(${xScale(x(closestDp!))},${yScale(y(closestDp!))})`
     );
 
     // add tooltip text
-    tooltip.select("text").call((text) =>
+    tooltipGroup.select("text").call((text) =>
       text
         .selectAll("tspan")
         .data(makeTitle(closestDp!))
         .join("tspan")
         .attr("x", 0)
-        .attr("y", (_, i) => `${(i - 3) * 1.2}em`)
-        .attr("font-weight", (_, i) => i === 0 && "bold")
-        .text((d) => d)
+        .attr("y", (_text, i) => `${(i - 3) * 1.2}em`)
+        .attr("font-weight", (_text, i) => i === 0 && "bold")
+        .text((text) => text)
     );
 
     // emphasize hovered Z
     // path
-    path &&
-      path
+    lines &&
+      lines
         .style("stroke", ([zHovered]) =>
           z(closestDp!) === zHovered ? null : "#ddd"
         )
@@ -397,13 +398,13 @@ export const make = <T>(
   }
 
   function pointerentered() {
-    path && path.style("mix-blend-mode", null).style("stroke", "#ddd");
-    tooltip.attr("display", null);
+    lines && lines.style("mix-blend-mode", null).style("stroke", "#ddd");
+    tooltipGroup.attr("display", null);
   }
 
   function pointerleft() {
-    tooltip.attr("display", "none");
-    path && path.style("mix-blend-mode", mixBlendMode).style("stroke", null);
+    tooltipGroup.attr("display", "none");
+    lines && lines.style("mix-blend-mode", mixBlendMode).style("stroke", null);
     // svg.node().value = null;
     // svg.dispatch("input", { bubbles: true });
   }
