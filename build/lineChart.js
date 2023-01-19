@@ -4713,14 +4713,13 @@ var make = (data, {
   color: color2 = "currentColor",
   mixBlendMode = "multiply"
 }) => {
-  const X2 = map(data, x2);
   const Y2 = map(data, y2);
   const Z = map(data, z);
-  const I = range(X2.length);
+  const I = range(data.length);
   const D = map(data, (d, i) => !isNaN(x2(d)) && !isNaN(y2(d)));
   Y2.forEach((y3, i) => Y2[i] = y3 / basis2);
   if (xDomain === void 0) {
-    const xExtent = extent(X2);
+    const xExtent = extent(data.map((d) => x2(d)));
     xDomain = extentIsDefined(xExtent) ? xExtent : [-10, 10];
   }
   if (yDomain === void 0) {
@@ -4743,12 +4742,12 @@ var make = (data, {
   );
   const path2 = (() => {
     if (drawLine) {
-      const line = line_default().defined((i) => {
+      const line = line_default().defined((r) => {
         var _a;
-        return (_a = D[i[0]]) != null ? _a : false;
+        return (_a = D[r[0]]) != null ? _a : false;
       }).curve(curve).x(([i]) => {
-        var _a, _b;
-        return (_b = xScale((_a = X2[i]) != null ? _a : 0)) != null ? _b : 0;
+        var _a;
+        return (_a = xScale(x2(data[i]))) != null ? _a : 0;
       }).y(([, i]) => {
         var _a, _b;
         return (_b = yScale((_a = Y2[i]) != null ? _a : 0)) != null ? _b : 0;
@@ -4764,7 +4763,7 @@ var make = (data, {
       return groupedData.map((d) => {
         return svg.append("g").selectAll("circle").data(d).enter().append("circle").attr("fill", pointFillColor).attr("fill-opacity", pointFillOpacity).attr("cx", (d2, i) => {
           var _a, _b;
-          return (_b = xScale((_a = X2[i]) != null ? _a : 0)) != null ? _b : 0;
+          return (_b = xScale((_a = x2(data[i])) != null ? _a : 0)) != null ? _b : 0;
         }).attr("cy", (d2, i) => {
           var _a, _b;
           return (_b = yScale((_a = Y2[i]) != null ? _a : 0)) != null ? _b : 0;
@@ -4782,18 +4781,18 @@ var make = (data, {
   );
   tooltip.append("text").attr("font-family", "sans-serif").attr("font-size", 12).attr("text-anchor", "middle").attr("y", -8);
   function pointermoved(event) {
-    var _a, _b;
+    var _a;
     const [xm, ym] = pointer_default(event);
     const ptIdx = least(
       I,
       (i) => {
-        var _a2, _b2, _c, _d;
-        return Math.hypot((_b2 = xScale((_a2 = X2[i]) != null ? _a2 : 0)) != null ? _b2 : 0 - xm, (_d = yScale((_c = Y2[i]) != null ? _c : 0)) != null ? _d : 0 - ym);
+        var _a2, _b, _c;
+        return Math.hypot((_a2 = xScale(x2(data[i]))) != null ? _a2 : 0 - xm, (_c = yScale((_b = Y2[i]) != null ? _b : 0)) != null ? _c : 0 - ym);
       }
     );
     tooltip.attr(
       "transform",
-      `translate(${xScale((_a = X2[ptIdx != null ? ptIdx : 0]) != null ? _a : 0)},${yScale((_b = Y2[ptIdx != null ? ptIdx : 0]) != null ? _b : 0)})`
+      `translate(${xScale(x2(data[ptIdx != null ? ptIdx : 0]))},${yScale((_a = Y2[ptIdx != null ? ptIdx : 0]) != null ? _a : 0)})`
     );
     path2 && path2.style("stroke", ([z2]) => Z[ptIdx != null ? ptIdx : 0] === z2 ? null : "#ddd").filter(([z2]) => Z[ptIdx != null ? ptIdx : 0] === z2).raise();
     points && points.map((pointGroup) => {

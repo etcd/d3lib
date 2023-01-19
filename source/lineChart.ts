@@ -125,10 +125,10 @@ export const make = <T>(
   }
 ) => {
   // values
-  const X = d3.map(data, x);
+
   const Y = d3.map(data, y);
   const Z = d3.map(data, z);
-  const I = d3.range(X.length);
+  const I = d3.range(data.length);
 
   // prune invalid datapoints
   const D = d3.map(data, (d, i) => !isNaN(x(d)) && !isNaN(y(d)));
@@ -138,7 +138,7 @@ export const make = <T>(
 
   // Compute default domains
   if (xDomain === undefined) {
-    const xExtent = d3.extent(X);
+    const xExtent = d3.extent(data.map((d) => x(d)));
     xDomain = extentIsDefined(xExtent) ? xExtent : [-10, 10];
   }
   if (yDomain === undefined) {
@@ -226,9 +226,9 @@ export const make = <T>(
     if (drawLine) {
       const line = d3
         .line()
-        .defined((i) => D[i[0]] ?? false)
+        .defined((r) => D[r[0]] ?? false)
         .curve(curve)
-        .x(([i]) => xScale(X[i] ?? 0) ?? 0)
+        .x(([i]) => xScale(x(data[i]!)) ?? 0)
         .y(([, i]) => yScale(Y[i] ?? 0) ?? 0);
 
       const groupedData = d3.group(I, (i) => Z[i]);
@@ -268,7 +268,7 @@ export const make = <T>(
             .append("circle")
             .attr("fill", pointFillColor)
             .attr("fill-opacity", pointFillOpacity)
-            .attr("cx", (d, i) => xScale(X[i] ?? 0) ?? 0)
+            .attr("cx", (d, i) => xScale(x(data[i]!) ?? 0) ?? 0)
             .attr("cy", (d, i) => yScale(Y[i] ?? 0) ?? 0)
             .attr("stroke", pointStrokeColor)
             .attr("stroke-opacity", pointStrokeOpacity)
@@ -322,13 +322,13 @@ export const make = <T>(
     const [xm, ym] = d3.pointer(event);
     // closest point
     const ptIdx = d3.least(I, (i) =>
-      Math.hypot(xScale(X[i] ?? 0) ?? 0 - xm, yScale(Y[i] ?? 0) ?? 0 - ym)
+      Math.hypot(xScale(x(data[i]!)) ?? 0 - xm, yScale(Y[i] ?? 0) ?? 0 - ym)
     );
 
     // translate the tooltip
     tooltip.attr(
       "transform",
-      `translate(${xScale(X[ptIdx ?? 0] ?? 0)},${yScale(Y[ptIdx ?? 0] ?? 0)})`
+      `translate(${xScale(x(data[ptIdx ?? 0]!))},${yScale(Y[ptIdx ?? 0] ?? 0)})`
     );
 
     // add tooltip text
