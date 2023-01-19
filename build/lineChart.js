@@ -4674,7 +4674,7 @@ function transform(node) {
 }
 
 // source/lineChart.ts
-var extentIsDefined = (extent2) => extent2 !== [void 0, void 0] ? false : true;
+var extentIsDefined = (extent2) => extent2[0] === void 0 ? false : true;
 var make = (data, {
   x: x2,
   y: y2,

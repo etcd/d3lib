@@ -2,8 +2,7 @@ import * as d3 from "d3";
 
 const extentIsDefined = (
   extent: [number, number] | [undefined, undefined]
-): extent is [number, number] =>
-  extent !== ([undefined, undefined] as const) ? false : true;
+): extent is [number, number] => (extent[0] === undefined ? false : true);
 
 export const make = <T>(
   data: T[],
