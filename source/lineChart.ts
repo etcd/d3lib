@@ -151,10 +151,6 @@ export const make = <T>(
   const xScale = xType(xDomain, xRange);
   const yScale = yType(yDomain, yRange);
 
-  console.log("new chart");
-  console.log(xScale(3));
-  console.log(yScale(3), yDomain, yRange);
-
   // axes
   const xAxis = d3
     .axisBottom(xScale)
