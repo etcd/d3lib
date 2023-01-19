@@ -226,9 +226,9 @@ export const make = <T>(
           }
           return xScale(x(data[xIdx]!))!;
         })
-        .y(([, yIdx]) => {
+        .y(([xIdx, yIdx]) => {
           if (!x(data[yIdx]!)) {
-            console.log("FOOy");
+            console.log("FOOy", xIdx, yIdx);
           }
           return yScale(y(data[yIdx]!))!;
         })

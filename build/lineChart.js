@@ -4707,9 +4707,9 @@ ${formatXValue(x2(dp))}, ${formatYValue(y2(dp))}`;
           console.log("FOOx");
         }
         return xScale(x2(data[xIdx]));
-      }).y(([, yIdx]) => {
+      }).y(([xIdx, yIdx]) => {
         if (!x2(data[yIdx])) {
-          console.log("FOOy");
+          console.log("FOOy", xIdx, yIdx);
         }
         return yScale(y2(data[yIdx]));
       }).curve(linear_default);
