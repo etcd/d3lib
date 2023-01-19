@@ -154,7 +154,7 @@ export const make = <T>(
 
   console.log("new chart");
   console.log(xScale(3));
-  console.log(yScale(3));
+  console.log(yScale(3), yDomain, yRange);
 
   // axes
   const xAxis = d3
@@ -235,8 +235,6 @@ export const make = <T>(
         .curve(curve)
         .x(([i]) => xScale(X[i] ?? 0) ?? 0)
         .y(([, i]) => yScale(Y[i] ?? 0) ?? 0);
-
-      console.log(line);
 
       const groupedData = d3.group(I, (i) => Z[i]);
 

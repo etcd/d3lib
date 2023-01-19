@@ -4732,7 +4732,7 @@ var make = (data, {
   const yScale = yType(yDomain, yRange);
   console.log("new chart");
   console.log(xScale(3));
-  console.log(yScale(3));
+  console.log(yScale(3), yDomain, yRange);
   const xAxis = axisBottom(xScale).ticks(width / 80).tickSizeOuter(0).tickFormat((d) => format(xFormat)(d));
   const yAxis = axisLeft(yScale).ticks(height / 80).tickFormat((d) => format(yFormat)(d));
   const svg = create_default("svg").attr("width", width).attr("height", height).attr("viewBox", [0, 0, width, height]).attr("style", "max-width: 100%; height: auto; height: intrinsic;").on("pointerenter", pointerentered).on("pointermove", pointermoved).on("pointerleave", pointerleft).on("touchstart", (event) => event.preventDefault());
@@ -4756,7 +4756,6 @@ var make = (data, {
         var _a, _b;
         return (_b = yScale((_a = Y2[i]) != null ? _a : 0)) != null ? _b : 0;
       });
-      console.log(line);
       const groupedData = group(I, (i) => Z[i]);
       return svg.append("g").attr("fill", "none").attr("stroke", typeof color2 === "string" ? color2 : null).attr("stroke-linecap", strokeLinecap).attr("stroke-linejoin", strokeLinejoin).attr("stroke-width", strokeWidth).attr("stroke-opacity", strokeOpacity).selectAll("path").data(groupedData).join("path").style("mix-blend-mode", mixBlendMode).attr("d", ([, i]) => line(i != null ? i : 0));
     }
