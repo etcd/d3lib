@@ -4681,7 +4681,6 @@ var make = (data, {
     (g) => g.append("text").attr("transform", "rotate(270)").attr("x", -height / 2).attr("y", -marginLeft + 20).attr("fill", "currentColor").attr("text-anchor", "start").attr("font-weight", "bold").text(yLabel)
   );
   const dataGroupsByZ = group(data, (dp) => z(dp));
-  console.log(dataGroupsByZ);
   const lines = (() => {
     if (drawLine) {
       const makeLine = line_default().defined(([xVal, yVal]) => !isNaN(xVal) && !isNaN(yVal)).x(([xVal]) => xScale(xVal)).y(([_xVal, yVal]) => yScale(yVal)).curve(linear_default);

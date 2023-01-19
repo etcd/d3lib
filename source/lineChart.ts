@@ -53,7 +53,7 @@ export const make = <T>(
     /** given datapoint, returns the (quantitative) y-value */
     readonly y: (p: T) => number;
     /** given datapoint, returns the (categorical) z-value */
-    readonly z: (p: T) => number;
+    readonly z: (p: T) => number | string;
     /** top margin (px) */
     readonly marginTop: number;
     /** right margin (px) */
@@ -214,11 +214,8 @@ export const make = <T>(
         .text(yLabel)
     );
 
-  // TODO: this shouldn't be typed as [number, T[]]
   // group data by z
   const dataGroupsByZ = d3.group(data, (dp) => z(dp));
-
-  console.log(dataGroupsByZ);
 
   // line
   const lines = (() => {
