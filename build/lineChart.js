@@ -4674,15 +4674,20 @@ var make = (data, {
   color: color2 = "currentColor",
   mixBlendMode = "multiply"
 }) => {
+  console.log(xDomain);
   if (xDomain === void 0) {
     const xExtent = extent(data.map(x2));
     console.log(xExtent);
     xDomain = extentIsDefined(xExtent) ? xExtent : [-10, 10];
   }
+  console.log(xDomain);
+  console.log(yDomain);
   if (yDomain === void 0) {
     const yExtent = extent(data.map(y2));
+    console.log(yExtent);
     yDomain = extentIsDefined(yExtent) ? yExtent : [-10, 10];
   }
+  console.log(yDomain);
   const xScale = xType(xDomain, xRange);
   const yScale = yType(yDomain, yRange);
   const xAxis = axisBottom(xScale).ticks(width / 80).tickSizeOuter(0).tickFormat((d) => format(xFormat)(d));

@@ -126,16 +126,26 @@ export const make = <T>(
     mixBlendMode: string;
   }
 ) => {
+  console.log(xDomain);
+
   // Compute default domains
   if (xDomain === undefined) {
     const xExtent = d3.extent(data.map(x));
-    console.log(xExtent)
+    console.log(xExtent);
     xDomain = extentIsDefined(xExtent) ? xExtent : [-10, 10];
   }
+  console.log(xDomain);
+
+  console.log(yDomain);
+
   if (yDomain === undefined) {
     const yExtent = d3.extent(data.map(y));
+    console.log(yExtent);
+
     yDomain = extentIsDefined(yExtent) ? yExtent : [-10, 10];
   }
+  console.log(yDomain);
+
 
   // scales
   const xScale = xType(xDomain, xRange);
