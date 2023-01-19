@@ -3,8 +3,9 @@ import * as d3 from "d3";
 import * as Arrays from "./utilities/Arrays";
 
 const extentIsDefined = (
-  extent: [number, number] | [undefined, undefined]
-): extent is [number, number] => (extent[0] === undefined ? false : true);
+  extent: readonly [number, number] | readonly [undefined, undefined]
+): extent is readonly [number, number] =>
+  extent[0] === undefined ? false : true;
 
 export const make = <T>(
   data: T[],
@@ -48,108 +49,97 @@ export const make = <T>(
     mixBlendMode = "multiply",
   }: {
     /** given datapoint, returns the (temporal) x-value */
-    x: (p: T) => number;
+    readonly x: (p: T) => number;
     /** given datapoint, returns the (quantitative) y-value */
-    y: (p: T) => number;
+    readonly y: (p: T) => number;
     /** given datapoint, returns the (categorical) z-value */
-    z: (p: T) => number;
+    readonly z: (p: T) => number;
     /** top margin (px) */
-    marginTop: number;
+    readonly marginTop: number;
     /** right margin (px) */
-    marginRight: number;
+    readonly marginRight: number;
     /** bottom margin (px) */
-    marginBottom: number;
+    readonly marginBottom: number;
     /** left margin (px) */
-    marginLeft: number;
+    readonly marginLeft: number;
     /** outer width of chart (px) */
-    width: number;
+    readonly width: number;
     /** outer height of chart (px) */
-    height: number;
+    readonly height: number;
     /**
      * Function to return the x-scale type. Valid scales
      * are ones with the `tickFormat` property.
      */
-    xType: (
+    readonly xType: (
       domain: Iterable<d3.NumberValue>,
       range: Iterable<number>
     ) => d3.AxisScale<Date | d3.NumberValue>;
     /** x domain min and max */
-    xDomain?: [number, number];
+    readonly xDomain?: readonly [number, number];
     /** x range min and max */
-    xRange: [number, number];
+    readonly xRange: readonly [number, number];
     /**
      * Function to return the y-scale type. Valid scales
      * are ones with the `tickFormat` property.
      */
-    yType: (
+    readonly yType: (
       domain: Iterable<d3.NumberValue>,
       range: Iterable<number>
     ) => d3.AxisScale<Date | d3.NumberValue>;
     /** y domain min and max */
-    yDomain?: [number, number];
+    readonly yDomain?: readonly [number, number];
     /** y range min and max */
-    yRange: [number, number];
+    readonly yRange: readonly [number, number];
     /** stroke color of line */
-    lineColor: string;
+    readonly lineColor: string;
     /** stroke line cap of the line */
-    strokeLinecap: string;
+    readonly strokeLinecap: string;
     /** stroke line join of the line */
-    strokeLinejoin: string;
+    readonly strokeLinejoin: string;
     /** stroke width of line (px) */
-    strokeWidth: number;
+    readonly strokeWidth: number;
     /** stroke opacity of line */
-    strokeOpacity: number;
+    readonly strokeOpacity: number;
     /** a format specifier string for the x-axis */
-    xFormat: string;
+    readonly xFormat: string;
     /** a format specifier string for the y-axis */
-    yFormat: string;
+    readonly yFormat: string;
     /** x-axis label */
-    xLabel: string;
+    readonly xLabel: string;
     /** y-axis label */
-    yLabel: string;
+    readonly yLabel: string;
     /** the y value at which to render the x axis (useful for log scales that don't have y=0) */
-    xAxisOffset: number;
+    readonly xAxisOffset: number;
 
     /** whether to draw the lines connecting data points */
-    drawLine: boolean;
+    readonly drawLine: boolean;
     /** whether to draw the data points */
-    drawPoints: boolean;
+    readonly drawPoints: boolean;
     /** point radius */
-    pointRadius: number;
-    pointFillColor: string;
-    pointFillOpacity: number;
-    pointStrokeColor: string;
-    pointStrokeOpacity: number;
+    readonly pointRadius: number;
+    readonly pointFillColor: string;
+    readonly pointFillOpacity: number;
+    readonly pointStrokeColor: string;
+    readonly pointStrokeOpacity: number;
     /** stroke color of line, as a constant or a function of z */
-    color: string;
+    readonly color: string;
     /** blend mode of lines */
-    mixBlendMode: string;
+    readonly mixBlendMode: string;
   }
 ) => {
-  console.log(xDomain);
-
   // Compute default domains
-  if (xDomain === undefined) {
-    const xExtent = d3.extent(data.map(x));
-    console.log(xExtent);
-    xDomain = extentIsDefined(xExtent) ? xExtent : [-10, 10];
-  }
-  console.log(xDomain);
-
-  console.log(yDomain);
-
-  if (yDomain === undefined) {
-    const yExtent = d3.extent(data.map(y));
-    console.log(yExtent);
-
-    yDomain = extentIsDefined(yExtent) ? yExtent : [-10, 10];
-  }
-  console.log(yDomain);
-
+  const defaultXDomain = (() => {
+    const xExtent = Arrays.extent(data.map(x));
+    return extentIsDefined(xExtent) ? xExtent : [-10, 10];
+  })();
+  const defaultYDomain = (() => {
+    const yExtent = Arrays.extent(data.map(y));
+    return extentIsDefined(yExtent) ? yExtent : [-10, 10];
+  })();
 
   // scales
-  const xScale = xType(xDomain, xRange);
-  const yScale = yType(yDomain, yRange);
+  const xScale = xType(xDomain ?? defaultXDomain, xRange);
+  const yScale = yType(yDomain ?? defaultYDomain, yRange);
 
   // axes
   const xAxis = d3

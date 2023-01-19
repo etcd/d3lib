@@ -70,43 +70,6 @@ var bisectLeft = ascendingBisect.left;
 var bisectCenter = bisector(number).center;
 var bisect_default = bisectRight;
 
-// node_modules/d3-array/src/extent.js
-function extent(values, valueof) {
-  let min2;
-  let max2;
-  if (valueof === void 0) {
-    for (const value of values) {
-      if (value != null) {
-        if (min2 === void 0) {
-          if (value >= value)
-            min2 = max2 = value;
-        } else {
-          if (min2 > value)
-            min2 = value;
-          if (max2 < value)
-            max2 = value;
-        }
-      }
-    }
-  } else {
-    let index2 = -1;
-    for (let value of values) {
-      if ((value = valueof(value, ++index2, values)) != null) {
-        if (min2 === void 0) {
-          if (value >= value)
-            min2 = max2 = value;
-        } else {
-          if (min2 > value)
-            min2 = value;
-          if (max2 < value)
-            max2 = value;
-        }
-      }
-    }
-  }
-  return [min2, max2];
-}
-
 // node_modules/internmap/src/index.js
 var InternMap = class extends Map {
   constructor(entries, key = keyof) {
@@ -4636,6 +4599,22 @@ function transform(node) {
   return node.__zoom;
 }
 
+// source/utilities/Arrays.ts
+var extent = (array2) => {
+  if (array2.length === 0)
+    return [void 0, void 0];
+  return array2.reduce(
+    (prev, current) => {
+      if (prev[1] < current)
+        return [prev[0], current];
+      if (current < prev[0])
+        return [current, prev[1]];
+      return prev;
+    },
+    [array2[0], array2[0]]
+  );
+};
+
 // source/lineChart.ts
 var extentIsDefined = (extent2) => extent2[0] === void 0 ? false : true;
 var make = (data, {
@@ -4674,22 +4653,16 @@ var make = (data, {
   color: color2 = "currentColor",
   mixBlendMode = "multiply"
 }) => {
-  console.log(xDomain);
-  if (xDomain === void 0) {
+  const defaultXDomain = (() => {
     const xExtent = extent(data.map(x2));
-    console.log(xExtent);
-    xDomain = extentIsDefined(xExtent) ? xExtent : [-10, 10];
-  }
-  console.log(xDomain);
-  console.log(yDomain);
-  if (yDomain === void 0) {
+    return extentIsDefined(xExtent) ? xExtent : [-10, 10];
+  })();
+  const defaultYDomain = (() => {
     const yExtent = extent(data.map(y2));
-    console.log(yExtent);
-    yDomain = extentIsDefined(yExtent) ? yExtent : [-10, 10];
-  }
-  console.log(yDomain);
-  const xScale = xType(xDomain, xRange);
-  const yScale = yType(yDomain, yRange);
+    return extentIsDefined(yExtent) ? yExtent : [-10, 10];
+  })();
+  const xScale = xType(xDomain != null ? xDomain : defaultXDomain, xRange);
+  const yScale = yType(yDomain != null ? yDomain : defaultYDomain, yRange);
   const xAxis = axisBottom(xScale).ticks(width / 80).tickSizeOuter(0).tickFormat((d) => format(xFormat)(d));
   const yAxis = axisLeft(yScale).ticks(height / 80).tickFormat((d) => format(yFormat)(d));
   const formatXValue = format(xFormat);
