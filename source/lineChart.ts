@@ -249,6 +249,8 @@ export const make = <T>(
   // points
   const points = (() => {
     const groupedData = Array.from(indicesGroupedByZ.values());
+    console.log(groupedData);
+
     if (drawPoints) {
       return groupedData.map((d) => {
         return (
