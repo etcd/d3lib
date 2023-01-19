@@ -4746,10 +4746,8 @@ var make = (data, {
     }
   })();
   const points = (() => {
-    const groupedData = Array.from(indicesGroupedByZ.values());
-    console.log(groupedData);
     if (drawPoints) {
-      return groupedData.map((d) => {
+      return Array.from(indicesGroupedByZ.values()).map((d) => {
         return svg.append("g").selectAll("circle").data(d).enter().append("circle").attr("fill", pointFillColor).attr("fill-opacity", pointFillOpacity).attr("cx", (d2, i) => {
           var _a;
           return (_a = xScale(x2(data[i]))) != null ? _a : 0;

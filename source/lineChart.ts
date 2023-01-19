@@ -240,7 +240,6 @@ export const make = <T>(
           .data(indicesGroupedByZ)
           .join("path")
           .style("mix-blend-mode", mixBlendMode)
-          // .attr("stroke", typeof color === "function" ? ([z]) => color(z) : null)
           .attr("d", ([, i]) => line(i ?? 0))
       );
     }
@@ -248,11 +247,8 @@ export const make = <T>(
 
   // points
   const points = (() => {
-    const groupedData = Array.from(indicesGroupedByZ.values());
-    console.log(groupedData);
-
     if (drawPoints) {
-      return groupedData.map((d) => {
+      return Array.from(indicesGroupedByZ.values()).map((d) => {
         return (
           svg
             .append("g")
