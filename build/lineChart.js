@@ -4702,16 +4702,16 @@ ${formatXValue(x2(dp))}, ${formatYValue(y2(dp))}`;
   const dataGroupsByZ = group(data, (dp) => z(dp));
   const path2 = (() => {
     if (drawLine) {
-      const makeLine = line_default().defined(([xVal, yVal]) => !isNaN(xVal) && !isNaN(yVal)).x(([xIdx]) => {
-        if (!x2(data[xIdx])) {
-          console.log("FOOx");
+      const makeLine = line_default().defined(([xVal, yVal]) => !isNaN(xVal) && !isNaN(yVal)).x(([xVal]) => {
+        if (!xVal) {
+          console.log("FOOx", xVal);
         }
-        return xScale(x2(data[xIdx]));
-      }).y(([xIdx, yIdx]) => {
-        if (!x2(data[yIdx])) {
-          console.log("FOOy", xIdx, yIdx);
+        return xScale(xVal);
+      }).y(([_xVal, yVal]) => {
+        if (!yVal) {
+          console.log("FOOy", _xVal, yVal);
         }
-        return yScale(y2(data[yIdx]));
+        return yScale(yVal);
       }).curve(linear_default);
       return svg.append("g").attr("fill", "none").attr("stroke", typeof color2 === "string" ? color2 : null).attr("stroke-linecap", strokeLinecap).attr("stroke-linejoin", strokeLinejoin).attr("stroke-width", strokeWidth).attr("stroke-opacity", strokeOpacity).selectAll("path").data(dataGroupsByZ).join("path").style("mix-blend-mode", mixBlendMode).attr("d", ([_z, dataGroup]) => {
         console.log(dataGroup);

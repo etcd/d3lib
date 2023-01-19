@@ -220,17 +220,17 @@ export const make = <T>(
         // ensure each point is valid
         .defined(([xVal, yVal]) => !isNaN(xVal) && !isNaN(yVal))
         // for each point on the line, scale its coordinates
-        .x(([xIdx]) => {
-          if (!x(data[xIdx]!)) {
-            console.log("FOOx");
+        .x(([xVal]) => {
+          if (!xVal) {
+            console.log("FOOx", xVal);
           }
-          return xScale(x(data[xIdx]!))!;
+          return xScale(xVal)!;
         })
-        .y(([xIdx, yIdx]) => {
-          if (!x(data[yIdx]!)) {
-            console.log("FOOy", xIdx, yIdx);
+        .y(([_xVal, yVal]) => {
+          if (!yVal) {
+            console.log("FOOy", _xVal, yVal);
           }
-          return yScale(y(data[yIdx]!))!;
+          return yScale(yVal)!;
         })
         // interpolation method
         .curve(d3.curveLinear);
