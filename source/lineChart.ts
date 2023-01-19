@@ -347,8 +347,10 @@ export const make = <T>(
         .raise();
     // points
     points &&
-      points.map((pointGroup) => {
-        const foo = pointGroup
+      points.map((svgPointGroup) => {
+        console.log(svgPointGroup);
+
+        const foo = svgPointGroup
           .selectAll("circle")
           .join("circle")
           .attr("r", 0)
