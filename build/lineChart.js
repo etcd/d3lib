@@ -4718,6 +4718,7 @@ var make = (data, {
     tooltipGroup.select("text").call(
       (text) => text.selectAll("tspan").data(makeTitle(closestDp)).join("tspan").attr("x", 0).attr("y", (_text, i) => `${(i - 3) * 1.2}em`).attr("font-weight", (_text, i) => i === 0 && "bold").text((text2) => text2)
     );
+    console.log("lines", lines);
     lines && lines.style(
       "stroke",
       ([zHovered]) => z(closestDp) === zHovered ? null : "#ddd"

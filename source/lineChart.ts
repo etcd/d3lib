@@ -337,7 +337,8 @@ export const make = <T>(
     );
 
     // emphasize hovered Z
-    // path
+    // lines
+    console.log("lines", lines);
     lines &&
       lines
         .style("stroke", ([zHovered]) =>
