@@ -4723,8 +4723,9 @@ var make = (data, {
       ([zHovered]) => z(closestDp) === zHovered ? null : "#ddd"
     ).filter(([zHovered]) => z(closestDp) === zHovered).raise();
     points && points.map((svgPointGroup) => {
-      console.log(svgPointGroup.enter());
-      console.log(svgPointGroup.selectAll("circle").enter());
+      console.log("1", svgPointGroup.enter());
+      console.log("2", svgPointGroup.selectAll("circle").enter());
+      console.log("3", svgPointGroup.selectAll("circle").enter().enter());
       const foo = svgPointGroup.selectAll("circle").enter().attr("r", 0);
     });
   }
