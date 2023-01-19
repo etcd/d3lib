@@ -4690,14 +4690,9 @@ var make = (data, {
       );
     }
   })();
-  const points = (() => {
-    if (drawPoints) {
-      return svg.append("g").classed(".circle-group", true).selectAll(".circle-z-group").data(dataGroupsByZ).join((enterSelection) => {
-        enterSelection.append("g").classed(".circle-z-group", true).join("circle").attr("fill", pointFillColor).attr("fill-opacity", pointFillOpacity).attr("cx", ([z2, dps]) => xScale(x2(dps[0]))).attr("cy", ([z2, dps]) => yScale(y2(dps[0]))).attr("stroke", pointStrokeColor).attr("stroke-opacity", pointStrokeOpacity).attr("r", pointRadius);
-        return enterSelection;
-      });
-    }
-  })();
+  const points = (() => drawPoints && Array.from(dataGroupsByZ.values()).map((dps) => {
+    return svg.append("g").selectAll("circle").data(dps).join("circle").attr("fill", pointFillColor).attr("fill-opacity", pointFillOpacity).attr("cx", (dp) => xScale(x2(dp))).attr("cy", (dp) => yScale(y2(dp))).attr("stroke", pointStrokeColor).attr("stroke-opacity", pointStrokeOpacity).attr("r", pointRadius);
+  }))();
   const tooltipGroup = svg.append("g").attr("display", "none");
   tooltipGroup.append("circle").attr("r", 2.5);
   const ttBgWidth = 120;
@@ -4723,6 +4718,9 @@ var make = (data, {
       "stroke",
       ([zHovered]) => z(closestDp) === zHovered ? null : "#ddd"
     ).filter(([zHovered]) => z(closestDp) === zHovered);
+    points && points.map((svgPointGroup) => {
+      svgPointGroup.attr("r", 0);
+    });
   }
   function pointerentered() {
     lines && lines.style("mix-blend-mode", null).style("stroke", "#ddd");
