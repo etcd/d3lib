@@ -4730,6 +4730,7 @@ var make = (data, {
   const zDomain = new InternSet(Z);
   const xScale = xType(xDomain, xRange);
   const yScale = yType(yDomain, yRange);
+  console.log("new chart");
   console.log(xScale(3));
   console.log(yScale(3));
   const xAxis = axisBottom(xScale).ticks(width / 80).tickSizeOuter(0).tickFormat((d) => format(xFormat)(d));
