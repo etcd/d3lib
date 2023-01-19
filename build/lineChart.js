@@ -253,16 +253,6 @@ function tickStep(start2, stop, count) {
   return stop < start2 ? -step1 : step1;
 }
 
-// node_modules/d3-array/src/range.js
-function range(start2, stop, step) {
-  start2 = +start2, stop = +stop, step = (n = arguments.length) < 2 ? (stop = start2, start2 = 0, 1) : n < 3 ? 1 : +step;
-  var i = -1, n = Math.max(0, Math.ceil((stop - start2) / step)) | 0, range2 = new Array(n);
-  while (++i < n) {
-    range2[i] = start2 + i * step;
-  }
-  return range2;
-}
-
 // node_modules/d3-array/src/least.js
 function least(values, compare = ascending) {
   let min2;
@@ -4673,6 +4663,9 @@ function transform(node) {
   return node.__zoom;
 }
 
+// source/utilities/Arrays.ts
+var range = (n) => [...Array(n).keys()];
+
 // source/lineChart.ts
 var extentIsDefined = (extent2) => extent2[0] === void 0 ? false : true;
 var make = (data, {
@@ -4712,7 +4705,6 @@ var make = (data, {
   color: color2 = "currentColor",
   mixBlendMode = "multiply"
 }) => {
-  const I = range(data.length);
   const D = map(data, (d, i) => !isNaN(x2(d)) && !isNaN(y2(d)));
   if (xDomain === void 0) {
     const xExtent = extent(data.map(x2));
@@ -4736,6 +4728,8 @@ var make = (data, {
   ).call(
     (g) => g.append("text").attr("transform", "rotate(270)").attr("x", -height / 2).attr("y", -marginLeft + 20).attr("fill", "currentColor").attr("text-anchor", "start").text(yLabel)
   );
+  const indices = range(data.length);
+  const indicesGroupedByZ = group(indices, (i) => z(data[i]));
   const path2 = (() => {
     if (drawLine) {
       const line = line_default().defined((r) => {
@@ -4748,13 +4742,11 @@ var make = (data, {
         var _a, _b;
         return (_b = yScale((_a = y2(data[i])) != null ? _a : 0)) != null ? _b : 0;
       });
-      const groupedData = group(I, (i) => z(data[i]));
-      return svg.append("g").attr("fill", "none").attr("stroke", typeof color2 === "string" ? color2 : null).attr("stroke-linecap", strokeLinecap).attr("stroke-linejoin", strokeLinejoin).attr("stroke-width", strokeWidth).attr("stroke-opacity", strokeOpacity).selectAll("path").data(groupedData).join("path").style("mix-blend-mode", mixBlendMode).attr("d", ([, i]) => line(i != null ? i : 0));
+      return svg.append("g").attr("fill", "none").attr("stroke", typeof color2 === "string" ? color2 : null).attr("stroke-linecap", strokeLinecap).attr("stroke-linejoin", strokeLinejoin).attr("stroke-width", strokeWidth).attr("stroke-opacity", strokeOpacity).selectAll("path").data(indicesGroupedByZ).join("path").style("mix-blend-mode", mixBlendMode).attr("d", ([, i]) => line(i != null ? i : 0));
     }
   })();
   const points = (() => {
-    const groupedDataMap = group(I, (i) => z(data[i]));
-    const groupedData = Array.from(groupedDataMap.values());
+    const groupedData = Array.from(indicesGroupedByZ.values());
     if (drawPoints) {
       return groupedData.map((d) => {
         return svg.append("g").selectAll("circle").data(d).enter().append("circle").attr("fill", pointFillColor).attr("fill-opacity", pointFillOpacity).attr("cx", (d2, i) => {
@@ -4779,7 +4771,7 @@ var make = (data, {
   function pointermoved(event) {
     const [xm, ym] = pointer_default(event);
     const ptIdx = least(
-      I,
+      indices,
       (i) => {
         var _a, _b;
         return Math.hypot((_a = xScale(x2(data[i]))) != null ? _a : 0 - xm, (_b = yScale(y2(data[i]))) != null ? _b : 0 - ym);

@@ -1,5 +1,7 @@
 import * as d3 from "d3";
 
+import * as Arrays from "./utilities/Arrays";
+
 const extentIsDefined = (
   extent: [number, number] | [undefined, undefined]
 ): extent is [number, number] => (extent[0] === undefined ? false : true);
@@ -121,9 +123,6 @@ export const make = <T>(
     mixBlendMode: string;
   }
 ) => {
-  // values
-  const I = d3.range(data.length);
-
   // prune invalid datapoints
   const D = d3.map(data, (d, i) => !isNaN(x(d)) && !isNaN(y(d)));
 
@@ -212,6 +211,12 @@ export const make = <T>(
         .text(yLabel)
     );
 
+  // get indices
+  const indices = Arrays.range(data.length);
+
+  // group indices by z
+  const indicesGroupedByZ = d3.group(indices, (i) => z(data[i]!));
+
   // line
   const path = (() => {
     if (drawLine) {
@@ -221,8 +226,6 @@ export const make = <T>(
         .curve(curve)
         .x(([i]) => xScale(x(data[i]!)) ?? 0)
         .y(([, i]) => yScale(y(data[i]!) ?? 0) ?? 0);
-
-      const groupedData = d3.group(I, (i) => z(data[i]!));
 
       return (
         svg
@@ -234,7 +237,7 @@ export const make = <T>(
           .attr("stroke-width", strokeWidth)
           .attr("stroke-opacity", strokeOpacity)
           .selectAll("path")
-          .data(groupedData)
+          .data(indicesGroupedByZ)
           .join("path")
           .style("mix-blend-mode", mixBlendMode)
           // .attr("stroke", typeof color === "function" ? ([z]) => color(z) : null)
@@ -245,8 +248,7 @@ export const make = <T>(
 
   // points
   const points = (() => {
-    const groupedDataMap = d3.group(I, (i) => z(data[i]!));
-    const groupedData = Array.from(groupedDataMap.values());
+    const groupedData = Array.from(indicesGroupedByZ.values());
     if (drawPoints) {
       return groupedData.map((d) => {
         return (
@@ -312,7 +314,7 @@ export const make = <T>(
   function pointermoved(event: PointerEvent) {
     const [xm, ym] = d3.pointer(event);
     // closest point
-    const ptIdx = d3.least(I, (i) =>
+    const ptIdx = d3.least(indices, (i) =>
       Math.hypot(xScale(x(data[i]!)) ?? 0 - xm, yScale(y(data[i]!)) ?? 0 - ym)
     );
 
