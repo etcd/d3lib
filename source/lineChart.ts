@@ -209,11 +209,11 @@ export const make = <T>(
         .text(yLabel)
     );
 
-  // get indices
-  const indices = Arrays.range(data.length);
+  // get indexes
+  const indexes = Arrays.range(data.length);
 
-  // group indices by z
-  const indicesGroupedByZ = d3.group(indices, (i) => z(data[i]!));
+  // group indexes by z
+  const indexGroupsByZ = d3.group(indexes, (i) => z(data[i]!));
 
   // line
   const path = (() => {
@@ -222,12 +222,12 @@ export const make = <T>(
       const isDefinedPoint = (index: number) =>
         !isNaN(x(data[index]!)) && !isNaN(y(data[index]!));
 
-      const line = d3
+      const makeLine = d3
         .line()
         .defined(([start, end]) => isDefinedPoint(start) && isDefinedPoint(end))
         .curve(d3.curveLinear)
-        .x(([i]) => xScale(x(data[i]!)) ?? 0)
-        .y(([, i]) => yScale(y(data[i]!) ?? 0) ?? 0);
+        .x(([xIdx]) => xScale(x(data[xIdx]!)) ?? 0)
+        .y(([, yIdx]) => yScale(y(data[yIdx]!) ?? 0) ?? 0);
 
       return svg
         .append("g")
@@ -238,17 +238,20 @@ export const make = <T>(
         .attr("stroke-width", strokeWidth)
         .attr("stroke-opacity", strokeOpacity)
         .selectAll("path")
-        .data(indicesGroupedByZ)
+        .data(indexGroupsByZ)
         .join("path")
         .style("mix-blend-mode", mixBlendMode)
-        .attr("d", ([, i]) => line(i ?? 0));
+        .attr("d", (indexGroup) => {
+          console.log(indexGroup);
+          // makeLine(indexGroup);
+        });
     }
   })();
 
   // points
   const points = (() => {
     if (drawPoints) {
-      return Array.from(indicesGroupedByZ.values()).map((d) => {
+      return Array.from(indexGroupsByZ.values()).map((d) => {
         return (
           svg
             .append("g")

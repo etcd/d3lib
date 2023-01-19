@@ -161,7 +161,7 @@ function identity(x2) {
 function group(values, ...keys) {
   return nest(values, identity, identity, keys);
 }
-function nest(values, map3, reduce, keys) {
+function nest(values, map2, reduce, keys) {
   return function regroup(values2, i) {
     if (i >= keys.length)
       return reduce(values2);
@@ -179,7 +179,7 @@ function nest(values, map3, reduce, keys) {
     for (const [key, values3] of groups2) {
       groups2.set(key, regroup(values3, i));
     }
-    return map3(groups2);
+    return map2(groups2);
   }(values, 0);
 }
 
@@ -258,15 +258,6 @@ function least(values, compare = ascending) {
     }
   }
   return min2;
-}
-
-// node_modules/d3-array/src/map.js
-function map(values, mapper) {
-  if (typeof values[Symbol.iterator] !== "function")
-    throw new TypeError("values is not iterable");
-  if (typeof mapper !== "function")
-    throw new TypeError("mapper is not a function");
-  return Array.from(values, (value, index2) => mapper(value, index2, values));
 }
 
 // node_modules/d3-axis/src/identity.js
@@ -3157,10 +3148,10 @@ function identity_default2(x2) {
 }
 
 // node_modules/d3-format/src/locale.js
-var map2 = Array.prototype.map;
+var map = Array.prototype.map;
 var prefixes = ["y", "z", "a", "f", "p", "n", "\xB5", "m", "", "k", "M", "G", "T", "P", "E", "Z", "Y"];
 function locale_default(locale3) {
-  var group2 = locale3.grouping === void 0 || locale3.thousands === void 0 ? identity_default2 : formatGroup_default(map2.call(locale3.grouping, Number), locale3.thousands + ""), currencyPrefix = locale3.currency === void 0 ? "" : locale3.currency[0] + "", currencySuffix = locale3.currency === void 0 ? "" : locale3.currency[1] + "", decimal = locale3.decimal === void 0 ? "." : locale3.decimal + "", numerals = locale3.numerals === void 0 ? identity_default2 : formatNumerals_default(map2.call(locale3.numerals, String)), percent = locale3.percent === void 0 ? "%" : locale3.percent + "", minus = locale3.minus === void 0 ? "\u2212" : locale3.minus + "", nan = locale3.nan === void 0 ? "NaN" : locale3.nan + "";
+  var group2 = locale3.grouping === void 0 || locale3.thousands === void 0 ? identity_default2 : formatGroup_default(map.call(locale3.grouping, Number), locale3.thousands + ""), currencyPrefix = locale3.currency === void 0 ? "" : locale3.currency[0] + "", currencySuffix = locale3.currency === void 0 ? "" : locale3.currency[1] + "", decimal = locale3.decimal === void 0 ? "." : locale3.decimal + "", numerals = locale3.numerals === void 0 ? identity_default2 : formatNumerals_default(map.call(locale3.numerals, String)), percent = locale3.percent === void 0 ? "%" : locale3.percent + "", minus = locale3.minus === void 0 ? "\u2212" : locale3.minus + "", nan = locale3.nan === void 0 ? "NaN" : locale3.nan + "";
   function newFormat(specifier) {
     specifier = formatSpecifier(specifier);
     var fill = specifier.fill, align = specifier.align, sign = specifier.sign, symbol = specifier.symbol, zero3 = specifier.zero, width = specifier.width, comma = specifier.comma, precision = specifier.precision, trim = specifier.trim, type2 = specifier.type;
@@ -4654,7 +4645,6 @@ var make = (data, {
   x: x2,
   y: y2,
   z,
-  curve = linear_default,
   marginTop = 20,
   marginRight = 30,
   marginBottom = 30,
@@ -4687,7 +4677,6 @@ var make = (data, {
   color: color2 = "currentColor",
   mixBlendMode = "multiply"
 }) => {
-  const D = map(data, (d, i) => !isNaN(x2(d)) && !isNaN(y2(d)));
   if (xDomain === void 0) {
     const xExtent = extent(data.map(x2));
     xDomain = extentIsDefined(xExtent) ? xExtent : [-10, 10];
@@ -4713,26 +4702,26 @@ ${formatXValue(x2(dp))}, ${formatYValue(y2(dp))}`;
   ).call(
     (g) => g.append("text").attr("transform", "rotate(270)").attr("x", -height / 2).attr("y", -marginLeft + 20).attr("fill", "currentColor").attr("text-anchor", "start").text(yLabel)
   );
-  const indices = range(data.length);
-  const indicesGroupedByZ = group(indices, (i) => z(data[i]));
+  const indexes2 = range(data.length);
+  const indexGroupsByZ = group(indexes2, (i) => z(data[i]));
   const path2 = (() => {
     if (drawLine) {
-      const line = line_default().defined((r) => {
+      const isDefinedPoint = (index2) => !isNaN(x2(data[index2])) && !isNaN(y2(data[index2]));
+      const makeLine = line_default().defined(([start2, end]) => isDefinedPoint(start2) && isDefinedPoint(end)).curve(linear_default).x(([xIdx]) => {
         var _a;
-        return (_a = D[r[0]]) != null ? _a : false;
-      }).curve(curve).x(([i]) => {
-        var _a;
-        return (_a = xScale(x2(data[i]))) != null ? _a : 0;
-      }).y(([, i]) => {
+        return (_a = xScale(x2(data[xIdx]))) != null ? _a : 0;
+      }).y(([, yIdx]) => {
         var _a, _b;
-        return (_b = yScale((_a = y2(data[i])) != null ? _a : 0)) != null ? _b : 0;
+        return (_b = yScale((_a = y2(data[yIdx])) != null ? _a : 0)) != null ? _b : 0;
       });
-      return svg.append("g").attr("fill", "none").attr("stroke", typeof color2 === "string" ? color2 : null).attr("stroke-linecap", strokeLinecap).attr("stroke-linejoin", strokeLinejoin).attr("stroke-width", strokeWidth).attr("stroke-opacity", strokeOpacity).selectAll("path").data(indicesGroupedByZ).join("path").style("mix-blend-mode", mixBlendMode).attr("d", ([, i]) => line(i != null ? i : 0));
+      return svg.append("g").attr("fill", "none").attr("stroke", typeof color2 === "string" ? color2 : null).attr("stroke-linecap", strokeLinecap).attr("stroke-linejoin", strokeLinejoin).attr("stroke-width", strokeWidth).attr("stroke-opacity", strokeOpacity).selectAll("path").data(indexGroupsByZ).join("path").style("mix-blend-mode", mixBlendMode).attr("d", (indexGroup) => {
+        console.log(indexGroup);
+      });
     }
   })();
   const points = (() => {
     if (drawPoints) {
-      return Array.from(indicesGroupedByZ.values()).map((d) => {
+      return Array.from(indexGroupsByZ.values()).map((d) => {
         return svg.append("g").selectAll("circle").data(d).enter().append("circle").attr("fill", pointFillColor).attr("fill-opacity", pointFillOpacity).attr("cx", (d2, i) => {
           var _a;
           return (_a = xScale(x2(data[i]))) != null ? _a : 0;
