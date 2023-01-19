@@ -10,7 +10,6 @@ export const make = <T>(
     x,
     y,
     z,
-    basis = 1,
     curve = d3.curveLinear,
     marginTop = 20,
     marginRight = 30,
@@ -53,8 +52,6 @@ export const make = <T>(
     y: (p: T) => number;
     /** given datapoint, returns the (categorical) z-value */
     z: (p: T) => number;
-    /** the basis value; defaults to the first y-value */
-    basis?: number;
     /** interpolation method between points */
     curve: d3.CurveFactory;
     /** top margin (px) */
@@ -125,27 +122,21 @@ export const make = <T>(
   }
 ) => {
   // values
-
-  const Y = d3.map(data, y);
-  const Z = d3.map(data, z);
   const I = d3.range(data.length);
 
   // prune invalid datapoints
   const D = d3.map(data, (d, i) => !isNaN(x(d)) && !isNaN(y(d)));
 
-  // Normalize the y-values against basis.
-  Y.forEach((y, i) => (Y[i] = y / basis));
-
   // Compute default domains
   if (xDomain === undefined) {
-    const xExtent = d3.extent(data.map((d) => x(d)));
+    const xExtent = d3.extent(data.map(x));
     xDomain = extentIsDefined(xExtent) ? xExtent : [-10, 10];
   }
   if (yDomain === undefined) {
-    const yExtent = d3.extent(Y);
+    const yExtent = d3.extent(data.map(y));
     yDomain = extentIsDefined(yExtent) ? yExtent : [-10, 10];
   }
-  const zDomain = new d3.InternSet(Z);
+  const zDomain = new d3.InternSet(data.map(z));
 
   // scales
   const xScale = xType(xDomain, xRange);
@@ -229,9 +220,9 @@ export const make = <T>(
         .defined((r) => D[r[0]] ?? false)
         .curve(curve)
         .x(([i]) => xScale(x(data[i]!)) ?? 0)
-        .y(([, i]) => yScale(Y[i] ?? 0) ?? 0);
+        .y(([, i]) => yScale(y(data[i]!) ?? 0) ?? 0);
 
-      const groupedData = d3.group(I, (i) => Z[i]);
+      const groupedData = d3.group(I, (i) => z(data[i]!));
 
       return (
         svg
@@ -254,7 +245,7 @@ export const make = <T>(
 
   // points
   const points = (() => {
-    const groupedDataMap = d3.group(I, (i) => Z[i]);
+    const groupedDataMap = d3.group(I, (i) => z(data[i]!));
     const groupedData = Array.from(groupedDataMap.values());
     if (drawPoints) {
       return groupedData.map((d) => {
@@ -268,8 +259,8 @@ export const make = <T>(
             .append("circle")
             .attr("fill", pointFillColor)
             .attr("fill-opacity", pointFillOpacity)
-            .attr("cx", (d, i) => xScale(x(data[i]!) ?? 0) ?? 0)
-            .attr("cy", (d, i) => yScale(Y[i] ?? 0) ?? 0)
+            .attr("cx", (d, i) => xScale(x(data[i]!)) ?? 0)
+            .attr("cy", (d, i) => yScale(y(data[i]!)) ?? 0)
             .attr("stroke", pointStrokeColor)
             .attr("stroke-opacity", pointStrokeOpacity)
             .attr("r", pointRadius)
@@ -322,13 +313,15 @@ export const make = <T>(
     const [xm, ym] = d3.pointer(event);
     // closest point
     const ptIdx = d3.least(I, (i) =>
-      Math.hypot(xScale(x(data[i]!)) ?? 0 - xm, yScale(Y[i] ?? 0) ?? 0 - ym)
+      Math.hypot(xScale(x(data[i]!)) ?? 0 - xm, yScale(y(data[i]!)) ?? 0 - ym)
     );
 
     // translate the tooltip
     tooltip.attr(
       "transform",
-      `translate(${xScale(x(data[ptIdx ?? 0]!))},${yScale(Y[ptIdx ?? 0] ?? 0)})`
+      `translate(${xScale(x(data[ptIdx ?? 0]!))},${yScale(
+        y(data[ptIdx ?? 0]!)
+      )})`
     );
 
     // add tooltip text
@@ -348,8 +341,10 @@ export const make = <T>(
     // path
     path &&
       path
-        .style("stroke", ([z]) => (Z[ptIdx ?? 0] === z ? null : "#ddd"))
-        .filter(([z]) => Z[ptIdx ?? 0] === z)
+        .style("stroke", ([zHovered]) =>
+          z(data[ptIdx ?? 0]!) === zHovered ? null : "#ddd"
+        )
+        .filter(([zHovered]) => z(data[ptIdx ?? 0]!) === zHovered)
         .raise();
     // points
     points &&

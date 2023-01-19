@@ -4679,7 +4679,6 @@ var make = (data, {
   x: x2,
   y: y2,
   z,
-  basis: basis2 = 1,
   curve = linear_default,
   marginTop = 20,
   marginRight = 30,
@@ -4713,20 +4712,17 @@ var make = (data, {
   color: color2 = "currentColor",
   mixBlendMode = "multiply"
 }) => {
-  const Y2 = map(data, y2);
-  const Z = map(data, z);
   const I = range(data.length);
   const D = map(data, (d, i) => !isNaN(x2(d)) && !isNaN(y2(d)));
-  Y2.forEach((y3, i) => Y2[i] = y3 / basis2);
   if (xDomain === void 0) {
-    const xExtent = extent(data.map((d) => x2(d)));
+    const xExtent = extent(data.map(x2));
     xDomain = extentIsDefined(xExtent) ? xExtent : [-10, 10];
   }
   if (yDomain === void 0) {
-    const yExtent = extent(Y2);
+    const yExtent = extent(data.map(y2));
     yDomain = extentIsDefined(yExtent) ? yExtent : [-10, 10];
   }
-  const zDomain = new InternSet(Z);
+  const zDomain = new InternSet(data.map(z));
   const xScale = xType(xDomain, xRange);
   const yScale = yType(yDomain, yRange);
   const xAxis = axisBottom(xScale).ticks(width / 80).tickSizeOuter(0).tickFormat((d) => format(xFormat)(d));
@@ -4750,23 +4746,23 @@ var make = (data, {
         return (_a = xScale(x2(data[i]))) != null ? _a : 0;
       }).y(([, i]) => {
         var _a, _b;
-        return (_b = yScale((_a = Y2[i]) != null ? _a : 0)) != null ? _b : 0;
+        return (_b = yScale((_a = y2(data[i])) != null ? _a : 0)) != null ? _b : 0;
       });
-      const groupedData = group(I, (i) => Z[i]);
+      const groupedData = group(I, (i) => z(data[i]));
       return svg.append("g").attr("fill", "none").attr("stroke", typeof color2 === "string" ? color2 : null).attr("stroke-linecap", strokeLinecap).attr("stroke-linejoin", strokeLinejoin).attr("stroke-width", strokeWidth).attr("stroke-opacity", strokeOpacity).selectAll("path").data(groupedData).join("path").style("mix-blend-mode", mixBlendMode).attr("d", ([, i]) => line(i != null ? i : 0));
     }
   })();
   const points = (() => {
-    const groupedDataMap = group(I, (i) => Z[i]);
+    const groupedDataMap = group(I, (i) => z(data[i]));
     const groupedData = Array.from(groupedDataMap.values());
     if (drawPoints) {
       return groupedData.map((d) => {
         return svg.append("g").selectAll("circle").data(d).enter().append("circle").attr("fill", pointFillColor).attr("fill-opacity", pointFillOpacity).attr("cx", (d2, i) => {
-          var _a, _b;
-          return (_b = xScale((_a = x2(data[i])) != null ? _a : 0)) != null ? _b : 0;
+          var _a;
+          return (_a = xScale(x2(data[i]))) != null ? _a : 0;
         }).attr("cy", (d2, i) => {
-          var _a, _b;
-          return (_b = yScale((_a = Y2[i]) != null ? _a : 0)) != null ? _b : 0;
+          var _a;
+          return (_a = yScale(y2(data[i]))) != null ? _a : 0;
         }).attr("stroke", pointStrokeColor).attr("stroke-opacity", pointStrokeOpacity).attr("r", pointRadius);
       });
     }
@@ -4781,20 +4777,24 @@ var make = (data, {
   );
   tooltip.append("text").attr("font-family", "sans-serif").attr("font-size", 12).attr("text-anchor", "middle").attr("y", -8);
   function pointermoved(event) {
-    var _a;
     const [xm, ym] = pointer_default(event);
     const ptIdx = least(
       I,
       (i) => {
-        var _a2, _b, _c;
-        return Math.hypot((_a2 = xScale(x2(data[i]))) != null ? _a2 : 0 - xm, (_c = yScale((_b = Y2[i]) != null ? _b : 0)) != null ? _c : 0 - ym);
+        var _a, _b;
+        return Math.hypot((_a = xScale(x2(data[i]))) != null ? _a : 0 - xm, (_b = yScale(y2(data[i]))) != null ? _b : 0 - ym);
       }
     );
     tooltip.attr(
       "transform",
-      `translate(${xScale(x2(data[ptIdx != null ? ptIdx : 0]))},${yScale((_a = Y2[ptIdx != null ? ptIdx : 0]) != null ? _a : 0)})`
+      `translate(${xScale(x2(data[ptIdx != null ? ptIdx : 0]))},${yScale(
+        y2(data[ptIdx != null ? ptIdx : 0])
+      )})`
     );
-    path2 && path2.style("stroke", ([z2]) => Z[ptIdx != null ? ptIdx : 0] === z2 ? null : "#ddd").filter(([z2]) => Z[ptIdx != null ? ptIdx : 0] === z2).raise();
+    path2 && path2.style(
+      "stroke",
+      ([zHovered]) => z(data[ptIdx != null ? ptIdx : 0]) === zHovered ? null : "#ddd"
+    ).filter(([zHovered]) => z(data[ptIdx != null ? ptIdx : 0]) === zHovered).raise();
     points && points.map((pointGroup) => {
       const foo = pointGroup.selectAll("circle").join("circle").attr("r", 0).attr("r", 0);
     });
