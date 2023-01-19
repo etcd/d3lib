@@ -4688,8 +4688,10 @@ var make = (data, {
   const yAxis = axisLeft(yScale).ticks(height / 80).tickFormat((d) => format(yFormat)(d));
   const formatXValue = format(xFormat);
   const formatYValue = format(yFormat);
-  const makeTitle = (dp) => `${z(dp)}
-${formatXValue(x2(dp))}, ${formatYValue(y2(dp))}`;
+  const makeTitle = (dp) => [
+    z(dp),
+    `${formatXValue(x2(dp))}, ${formatYValue(y2(dp))}`
+  ];
   const svg = create_default("svg").attr("width", width).attr("height", height).attr("viewBox", [0, 0, width, height]).attr("style", "max-width: 100%; height: auto; height: intrinsic;").on("pointerenter", pointerentered).on("pointermove", pointermoved).on("pointerleave", pointerleft).on("touchstart", (event) => event.preventDefault());
   svg.append("g").attr("transform", `translate(0,${yScale(xAxisOffset)})`).call(xAxis).call(
     (g) => g.append("text").attr("x", width / 2).attr("y", marginBottom).attr("fill", "currentColor").attr("text-anchor", "start").text(xLabel)
@@ -4735,7 +4737,7 @@ ${formatXValue(x2(dp))}, ${formatYValue(y2(dp))}`;
       `translate(${xScale(x2(closestDp))},${yScale(y2(closestDp))})`
     );
     tooltip.select("text").call(
-      (text) => text.selectAll("tspan").data(makeTitle(closestDp).split(/\n/)).join("tspan").attr("x", 0).attr("y", (_, i) => `${(i - 3) * 1.2}em`).attr("font-weight", (_, i) => i === 0 && "bold").text((d) => d)
+      (text) => text.selectAll("tspan").data(makeTitle(closestDp)).join("tspan").attr("x", 0).attr("y", (_, i) => `${(i - 3) * 1.2}em`).attr("font-weight", (_, i) => i === 0 && "bold").text((d) => d)
     );
     path2 && path2.style(
       "stroke",

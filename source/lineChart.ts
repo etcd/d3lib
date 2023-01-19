@@ -154,8 +154,10 @@ export const make = <T>(
   // titles (for tooltip)
   const formatXValue = d3.format(xFormat);
   const formatYValue = d3.format(yFormat);
-  const makeTitle = (dp: T) =>
-    `${z(dp)}\n${formatXValue(x(dp))}, ${formatYValue(y(dp))}`;
+  const makeTitle = (dp: T) => [
+    z(dp),
+    `${formatXValue(x(dp))}, ${formatYValue(y(dp))}`,
+  ];
 
   const svg = d3
     // dimensions
@@ -309,7 +311,8 @@ export const make = <T>(
 
   function pointermoved(event: PointerEvent) {
     const [pointerX, pointerY] = d3.pointer(event);
-    // closest point
+
+    // closest datapoint to pointer position
     const closestDp = d3.least(data, (dp) => {
       return Math.hypot(xScale(x(dp))! - pointerX, yScale(y(dp))! - pointerY);
     });
@@ -324,7 +327,7 @@ export const make = <T>(
     tooltip.select("text").call((text) =>
       text
         .selectAll("tspan")
-        .data(makeTitle(closestDp!).split(/\n/))
+        .data(makeTitle(closestDp!))
         .join("tspan")
         .attr("x", 0)
         .attr("y", (_, i) => `${(i - 3) * 1.2}em`)
