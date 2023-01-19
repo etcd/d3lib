@@ -232,6 +232,8 @@ export const make = <T>(
         .x(([i]) => xScale(X[i] ?? 0) ?? 0)
         .y(([, i]) => yScale(Y[i] ?? 0) ?? 0);
 
+      console.log(line);
+
       const groupedData = d3.group(I, (i) => Z[i]);
 
       return (

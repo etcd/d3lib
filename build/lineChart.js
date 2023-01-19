@@ -4753,6 +4753,7 @@ var make = (data, {
         var _a, _b;
         return (_b = yScale((_a = Y2[i]) != null ? _a : 0)) != null ? _b : 0;
       });
+      console.log(line);
       const groupedData = group(I, (i) => Z[i]);
       return svg.append("g").attr("fill", "none").attr("stroke", typeof color2 === "string" ? color2 : null).attr("stroke-linecap", strokeLinecap).attr("stroke-linejoin", strokeLinejoin).attr("stroke-width", strokeWidth).attr("stroke-opacity", strokeOpacity).selectAll("path").data(groupedData).join("path").style("mix-blend-mode", mixBlendMode).attr("d", ([, i]) => line(i != null ? i : 0));
     }
