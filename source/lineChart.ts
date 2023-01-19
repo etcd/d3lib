@@ -256,6 +256,7 @@ export const make = <T>(
         .append("g")
         .selectAll("circle")
         .data(dps)
+        .enter()
         .append("circle")
         .attr("fill", pointFillColor)
         .attr("fill-opacity", pointFillOpacity)

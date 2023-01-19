@@ -4691,7 +4691,7 @@ var make = (data, {
     }
   })();
   const points = (() => drawPoints && Array.from(dataGroupsByZ.values()).map(
-    (dps) => svg.append("g").selectAll("circle").data(dps).append("circle").attr("fill", pointFillColor).attr("fill-opacity", pointFillOpacity).attr("cx", (dp) => xScale(x2(dp))).attr("cy", (dp) => yScale(y2(dp))).attr("stroke", pointStrokeColor).attr("stroke-opacity", pointStrokeOpacity).attr("r", pointRadius)
+    (dps) => svg.append("g").selectAll("circle").data(dps).enter().append("circle").attr("fill", pointFillColor).attr("fill-opacity", pointFillOpacity).attr("cx", (dp) => xScale(x2(dp))).attr("cy", (dp) => yScale(y2(dp))).attr("stroke", pointStrokeColor).attr("stroke-opacity", pointStrokeOpacity).attr("r", pointRadius)
   ))();
   const tooltipGroup = svg.append("g").attr("display", "none");
   tooltipGroup.append("circle").attr("r", 2.5);
