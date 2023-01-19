@@ -130,10 +130,13 @@ export const make = <T>(
   // Compute default domains
   const defaultXDomain = (() => {
     const xExtent = Arrays.extent(data.map(x));
+    console.log("xmap", data.map(x));
     return extentIsDefined(xExtent) ? xExtent : [-10, 10];
   })();
   const defaultYDomain = (() => {
     const yExtent = Arrays.extent(data.map(y));
+    console.log("ymap", data.map(y));
+
     return extentIsDefined(yExtent) ? yExtent : [-10, 10];
   })();
 

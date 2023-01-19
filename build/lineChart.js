@@ -4655,10 +4655,12 @@ var make = (data, {
 }) => {
   const defaultXDomain = (() => {
     const xExtent = extent(data.map(x2));
+    console.log("xmap", data.map(x2));
     return extentIsDefined(xExtent) ? xExtent : [-10, 10];
   })();
   const defaultYDomain = (() => {
     const yExtent = extent(data.map(y2));
+    console.log("ymap", data.map(y2));
     return extentIsDefined(yExtent) ? yExtent : [-10, 10];
   })();
   const xScale = xType(xDomain != null ? xDomain : defaultXDomain, xRange);
