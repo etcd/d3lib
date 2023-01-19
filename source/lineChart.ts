@@ -314,7 +314,7 @@ export const make = <T>(
       Math.hypot(xScale(x(dp)) ?? 0 - xm, yScale(y(dp)) ?? 0 - ym)
     );
 
-    console.log(closestDp);
+    console.log(xm, ym, closestDp);
 
     // translate the tooltip
     tooltip.attr(

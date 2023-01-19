@@ -4734,7 +4734,7 @@ ${formatXValue(x2(dp))}, ${formatYValue(y2(dp))}`;
         return Math.hypot((_a = xScale(x2(dp))) != null ? _a : 0 - xm, (_b = yScale(y2(dp))) != null ? _b : 0 - ym);
       }
     );
-    console.log(closestDp);
+    console.log(xm, ym, closestDp);
     tooltip.attr(
       "transform",
       `translate(${xScale(x2(closestDp))},${yScale(y2(closestDp))})`
