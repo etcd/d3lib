@@ -6,6 +6,12 @@ const extentIsDefined = (
   extent: [number, number] | [undefined, undefined]
 ): extent is [number, number] => (extent[0] === undefined ? false : true);
 
+type TickFormattableScale<Rng, Out, Unk> =
+  | d3.ScaleContinuousNumeric<Rng, Out, Unk>
+  | d3.ScaleTime<Rng, Out, Unk>
+  | d3.ScaleQuantize<Rng, Unk>
+  | d3.ScaleQuantize<Rng, Unk>;
+
 export const make = <T>(
   data: T[],
   {
@@ -68,20 +74,26 @@ export const make = <T>(
     width: number;
     /** outer height of chart (px) */
     height: number;
-    /** the x-scale type */
+    /**
+     * Function to return the x-scale type. Valid scales
+     * are ones with the `tickFormat` property.
+     */
     xType: (
       domain: Iterable<d3.NumberValue>,
       range: Iterable<number>
-    ) => d3.AxisScale<Date | d3.NumberValue>;
+    ) => TickFormattableScale<number, number, number | undefined>;
     /** x domain min and max */
     xDomain?: [number, number];
     /** x range min and max */
     xRange: [number, number];
-    /** the y-scale type */
+    /**
+     * Function to return the y-scale type. Valid scales
+     * are ones with the `tickFormat` property.
+     */
     yType: (
       domain: Iterable<d3.NumberValue>,
       range: Iterable<number>
-    ) => d3.AxisScale<Date | d3.NumberValue>;
+    ) => TickFormattableScale<number, number, number | undefined>;
     /** y domain min and max */
     yDomain?: [number, number];
     /** y range min and max */
@@ -156,8 +168,13 @@ export const make = <T>(
 
   // const formatXValue = xScale.tickFormat(100, xFormat);
   // const formatYValue = yScale.tickFormat(100, yFormat);
-  // const makeTitle = (i: number) =>
-  // `${Z[i]}\n${formatXValue(X[i])}, ${formatYValue(Y[i])}`;
+
+  const formatXValue = d3.format(xFormat);
+  const formatYValue = d3.format(yFormat);
+  const makeTitle = (i: number) =>
+    `${z(data[i]!)}\n${formatXValue(x(data[i]!))}, ${formatYValue(
+      y(data[i]!)
+    )}`;
 
   const svg = d3
     // dimensions
@@ -227,21 +244,19 @@ export const make = <T>(
         .x(([i]) => xScale(x(data[i]!)) ?? 0)
         .y(([, i]) => yScale(y(data[i]!) ?? 0) ?? 0);
 
-      return (
-        svg
-          .append("g")
-          .attr("fill", "none")
-          .attr("stroke", typeof color === "string" ? color : null)
-          .attr("stroke-linecap", strokeLinecap)
-          .attr("stroke-linejoin", strokeLinejoin)
-          .attr("stroke-width", strokeWidth)
-          .attr("stroke-opacity", strokeOpacity)
-          .selectAll("path")
-          .data(indicesGroupedByZ)
-          .join("path")
-          .style("mix-blend-mode", mixBlendMode)
-          .attr("d", ([, i]) => line(i ?? 0))
-      );
+      return svg
+        .append("g")
+        .attr("fill", "none")
+        .attr("stroke", typeof color === "string" ? color : null)
+        .attr("stroke-linecap", strokeLinecap)
+        .attr("stroke-linejoin", strokeLinejoin)
+        .attr("stroke-width", strokeWidth)
+        .attr("stroke-opacity", strokeOpacity)
+        .selectAll("path")
+        .data(indicesGroupedByZ)
+        .join("path")
+        .style("mix-blend-mode", mixBlendMode)
+        .attr("d", ([, i]) => line(i ?? 0));
     }
   })();
 
@@ -325,17 +340,17 @@ export const make = <T>(
     );
 
     // add tooltip text
-    // if (title)
-    //   tooltip.select("text").call((text) =>
-    //     text
-    //       .selectAll("tspan")
-    //       .data(title(ptIdx).split(/\n/))
-    //       .join("tspan")
-    //       .attr("x", 0)
-    //       .attr("y", (_, i) => `${(i - 3) * 1.2}em`)
-    //       .attr("font-weight", (_, i) => i === 0 && "bold")
-    //       .text((d) => d)
-    //   );
+
+    tooltip.select("text").call((text) =>
+      text
+        .selectAll("tspan")
+        .data(makeTitle(ptIdx!).split(/\n/))
+        .join("tspan")
+        .attr("x", 0)
+        .attr("y", (_, i) => `${(i - 3) * 1.2}em`)
+        .attr("font-weight", (_, i) => i === 0 && "bold")
+        .text((d) => d)
+    );
 
     // emphasize hovered Z
     // path
