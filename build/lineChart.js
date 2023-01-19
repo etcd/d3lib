@@ -4676,6 +4676,7 @@ var make = (data, {
 }) => {
   if (xDomain === void 0) {
     const xExtent = extent(data.map(x2));
+    console.log(xExtent);
     xDomain = extentIsDefined(xExtent) ? xExtent : [-10, 10];
   }
   if (yDomain === void 0) {

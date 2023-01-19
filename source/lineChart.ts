@@ -129,6 +129,7 @@ export const make = <T>(
   // Compute default domains
   if (xDomain === undefined) {
     const xExtent = d3.extent(data.map(x));
+    console.log(xExtent)
     xDomain = extentIsDefined(xExtent) ? xExtent : [-10, 10];
   }
   if (yDomain === undefined) {
