@@ -4745,9 +4745,6 @@ ${formatXValue(x2(dp))}, ${formatYValue(y2(dp))}`;
       "stroke",
       ([zHovered]) => z(closestDp) === zHovered ? null : "#ddd"
     ).filter(([zHovered]) => z(closestDp) === zHovered).raise();
-    points && points.map((pointGroup) => {
-      const foo = pointGroup.selectAll("circle").join("circle").attr("r", 0).attr("r", 0);
-    });
   }
   function pointerentered() {
     path2 && path2.style("mix-blend-mode", null).style("stroke", "#ddd");

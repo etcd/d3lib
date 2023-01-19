@@ -342,21 +342,21 @@ export const make = <T>(
         .filter(([zHovered]) => z(closestDp!) === zHovered)
         .raise();
     // points
-    points &&
-      points.map((pointGroup) => {
-        const foo = pointGroup
-          .selectAll("circle")
-          .join("circle")
-          .attr("r", 0)
-          // .enter()
-          .attr("r", 0);
-        // .attr("r", (x) => {
-        //   console.log(x);
-        // })
-        // .raise();
+    // points &&
+    //   points.map((pointGroup) => {
+    //     const foo = pointGroup
+    //       .selectAll("circle")
+    //       .join("circle")
+    //       .attr("r", 0)
+    //       // .enter()
+    //       .attr("r", 0);
+    //     // .attr("r", (x) => {
+    //     //   console.log(x);
+    //     // })
+    //     // .raise();
 
-        // console.log(foo);
-      });
+    //     // console.log(foo);
+    //   });
     // groupedData.map((d) => {
     // svg
     //   .append("g")
