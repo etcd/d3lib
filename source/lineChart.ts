@@ -160,11 +160,13 @@ export const make = <T>(
   // `${Z[i]}\n${formatXValue(X[i])}, ${formatYValue(Y[i])}`;
 
   const svg = d3
+    // dimensions
     .create("svg")
     .attr("width", width)
     .attr("height", height)
     .attr("viewBox", [0, 0, width, height])
     .attr("style", "max-width: 100%; height: auto; height: intrinsic;")
+    // event handlers
     .on("pointerenter", pointerentered)
     .on("pointermove", pointermoved)
     .on("pointerleave", pointerleft)
@@ -175,7 +177,6 @@ export const make = <T>(
     .append("g")
     .attr("transform", `translate(0,${yScale(xAxisOffset)})`)
     .call(xAxis)
-    // x axis label
     .call((g) =>
       g
         .append("text")
@@ -199,7 +200,6 @@ export const make = <T>(
         .attr("x2", width - marginLeft - marginRight)
         .attr("stroke-opacity", 0.1)
     )
-    // y axis label
     .call((g) =>
       g
         .append("text")
