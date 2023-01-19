@@ -4690,13 +4690,9 @@ var make = (data, {
       );
     }
   })();
-  const points = (() => {
-    if (drawPoints) {
-      return Array.from(dataGroupsByZ.values()).map((dps) => {
-        return svg.append("g").selectAll("circle").data(dps).enter().append("circle").attr("fill", pointFillColor).attr("fill-opacity", pointFillOpacity).attr("cx", (dp) => xScale(x2(dp))).attr("cy", (dp) => yScale(y2(dp))).attr("stroke", pointStrokeColor).attr("stroke-opacity", pointStrokeOpacity).attr("r", pointRadius).raise();
-      });
-    }
-  })();
+  const points = (() => drawPoints && Array.from(dataGroupsByZ.values()).map(
+    (dps) => svg.append("g").selectAll("circle").data(dps).enter().append("circle").attr("fill", pointFillColor).attr("fill-opacity", pointFillOpacity).attr("cx", (dp) => xScale(x2(dp))).attr("cy", (dp) => yScale(y2(dp))).attr("stroke", pointStrokeColor).attr("stroke-opacity", pointStrokeOpacity).attr("r", pointRadius).raise()
+  ))();
   const tooltipGroup = svg.append("g").attr("display", "none");
   tooltipGroup.append("circle").attr("r", 2.5);
   const ttBgWidth = 120;
@@ -4724,11 +4720,7 @@ var make = (data, {
       ([zHovered]) => z(closestDp) === zHovered ? null : "#ddd"
     ).filter(([zHovered]) => z(closestDp) === zHovered).raise();
     points && points.map((svgPointGroup) => {
-      console.log("0", svgPointGroup);
-      console.log("1", svgPointGroup.enter());
-      console.log("2", svgPointGroup.selectAll("circle"));
-      console.log("3", svgPointGroup.selectAll("circle").enter());
-      const foo = svgPointGroup.attr("r", 0);
+      svgPointGroup.attr("r", 0);
     });
   }
   function pointerentered() {

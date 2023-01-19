@@ -249,40 +249,24 @@ export const make = <T>(
   })();
 
   // points
-  const points = (() => {
-    if (drawPoints) {
-      return Array.from(dataGroupsByZ.values()).map((dps) => {
-        return svg
-          .append("g")
-          .selectAll("circle")
-          .data(dps)
-          .enter()
-          .append("circle")
-          .attr("fill", pointFillColor)
-          .attr("fill-opacity", pointFillOpacity)
-          .attr("cx", (dp) => xScale(x(dp))!)
-          .attr("cy", (dp) => yScale(y(dp))!)
-          .attr("stroke", pointStrokeColor)
-          .attr("stroke-opacity", pointStrokeOpacity)
-          .attr("r", pointRadius)
-          .raise();
-      });
-
-      // .each((x, i) => {
-      //   return x
-      //     .enter()
-      //     .append("circle")
-      //     .attr("fill", pointFillColor)
-      //     .attr("fill-opacity", pointFillOpacity)
-      //     .attr("cx", (d, i) => xScale(X[i]))
-      //     .attr("cy", (d, i) => yScale(Y[i]))
-      //     .attr("stroke", pointStrokeColor)
-      //     .attr("stroke-opacity", pointStrokeOpacity)
-      //     .attr("r", pointRadius)
-      //     .raise();
-      // });
-    }
-  })();
+  const points = (() =>
+    drawPoints &&
+    Array.from(dataGroupsByZ.values()).map((dps) =>
+      svg
+        .append("g")
+        .selectAll("circle")
+        .data(dps)
+        .enter()
+        .append("circle")
+        .attr("fill", pointFillColor)
+        .attr("fill-opacity", pointFillOpacity)
+        .attr("cx", (dp) => xScale(x(dp))!)
+        .attr("cy", (dp) => yScale(y(dp))!)
+        .attr("stroke", pointStrokeColor)
+        .attr("stroke-opacity", pointStrokeOpacity)
+        .attr("r", pointRadius)
+        .raise()
+    ))();
 
   // tooltip
   const tooltipGroup = svg.append("g").attr("display", "none");
@@ -349,57 +333,8 @@ export const make = <T>(
     // points
     points &&
       points.map((svgPointGroup) => {
-        console.log("0", svgPointGroup);
-        console.log("1", svgPointGroup.enter());
-        console.log("2", svgPointGroup.selectAll("circle"));
-        console.log("3", svgPointGroup.selectAll("circle").enter());
-
-        const foo = svgPointGroup
-          // .selectAll("circle")
-          // .enter()
-          // .enter()
-          .attr("r", 0);
-        // .attr("r", (x) => {
-        //   console.log(x);
-        // })
-        // .raise();
-
-        // console.log(foo);
+        svgPointGroup.attr("r", 0);
       });
-    // groupedData.map((d) => {
-    // svg
-    //   .append("g")
-    //   .selectAll("circle")
-    //   .data(d)
-    //   .filter((d) => {
-    //     console.log(d);
-    //     return d.z === Z[pt];
-    //   })
-    //   .enter()
-    //   .node().value = null;
-
-    // .attr("fill", pointFillColor)
-    // .attr("fill-opacity", pointFillOpacity)
-    // .attr("cx", (d, i) => xScale(X[i]))
-    // .attr("cy", (d, i) => yScale(Y[i]))
-    // .attr("stroke", pointStrokeColor)
-    // .attr("stroke-opacity", pointStrokeOpacity)
-    // .attr("r", pointRadius)
-    // .raise();
-    // });
-
-    // svg
-    //   .selectAll("circle")
-    //   .join()
-    //   .style("stroke", (z) => {
-    //     console.log(z);
-    //     return Z[pt] === z ? null : "#ddd";
-    //   });
-
-    // .style("stroke", ([z]) => (Z[i] === z ? null : "#ddd"))
-    // .filter(([z]) => Z[i] === z)
-
-    // svg.property("value", O[i]).dispatch("input", { bubbles: true });
   }
 
   function pointerentered() {
