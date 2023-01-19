@@ -292,7 +292,7 @@ function entering() {
 function axis(orient, scale) {
   var tickArguments = [], tickValues = null, tickFormat = null, tickSizeInner = 6, tickSizeOuter = 6, tickPadding = 3, offset = typeof window !== "undefined" && window.devicePixelRatio > 1 ? 0 : 0.5, k = orient === top || orient === left ? -1 : 1, x2 = orient === left || orient === right ? "x" : "y", transform2 = orient === top || orient === bottom ? translateX : translateY;
   function axis2(context) {
-    var values = tickValues == null ? scale.ticks ? scale.ticks.apply(scale, tickArguments) : scale.domain() : tickValues, format2 = tickFormat == null ? scale.tickFormat ? scale.tickFormat.apply(scale, tickArguments) : identity_default : tickFormat, spacing = Math.max(tickSizeInner, 0) + tickPadding, range2 = scale.range(), range0 = +range2[0] + offset, range1 = +range2[range2.length - 1] + offset, position = (scale.bandwidth ? center : number2)(scale.copy(), offset), selection2 = context.selection ? context.selection() : context, path2 = selection2.selectAll(".domain").data([null]), tick = selection2.selectAll(".tick").data(values, scale).order(), tickExit = tick.exit(), tickEnter = tick.enter().append("g").attr("class", "tick"), line = tick.select("line"), text = tick.select("text");
+    var values = tickValues == null ? scale.ticks ? scale.ticks.apply(scale, tickArguments) : scale.domain() : tickValues, format2 = tickFormat == null ? scale.tickFormat ? scale.tickFormat.apply(scale, tickArguments) : identity_default : tickFormat, spacing = Math.max(tickSizeInner, 0) + tickPadding, range = scale.range(), range0 = +range[0] + offset, range1 = +range[range.length - 1] + offset, position = (scale.bandwidth ? center : number2)(scale.copy(), offset), selection2 = context.selection ? context.selection() : context, path2 = selection2.selectAll(".domain").data([null]), tick = selection2.selectAll(".tick").data(values, scale).order(), tickExit = tick.exit(), tickEnter = tick.enter().append("g").attr("class", "tick"), line = tick.select("line"), text = tick.select("text");
     path2 = path2.merge(path2.enter().insert("path", ".tick").attr("class", "domain").attr("stroke", "currentColor"));
     tick = tick.merge(tickEnter);
     line = line.merge(tickEnter.append("line").attr("stroke", "currentColor").attr(x2 + "2", k * tickSizeInner));
@@ -3245,7 +3245,7 @@ function defaultLocale(definition) {
 }
 
 // node_modules/d3-scale/src/init.js
-function initRange(domain, range2) {
+function initRange(domain, range) {
   switch (arguments.length) {
     case 0:
       break;
@@ -3253,7 +3253,7 @@ function initRange(domain, range2) {
       this.range(domain);
       break;
     default:
-      this.range(range2).domain(domain);
+      this.range(range).domain(domain);
       break;
   }
   return this;
@@ -3289,8 +3289,8 @@ function clamper(a, b) {
     return Math.max(a, Math.min(b, x2));
   };
 }
-function bimap(domain, range2, interpolate) {
-  var d0 = domain[0], d1 = domain[1], r0 = range2[0], r1 = range2[1];
+function bimap(domain, range, interpolate) {
+  var d0 = domain[0], d1 = domain[1], r0 = range[0], r1 = range[1];
   if (d1 < d0)
     d0 = normalize(d1, d0), r0 = interpolate(r1, r0);
   else
@@ -3299,15 +3299,15 @@ function bimap(domain, range2, interpolate) {
     return r0(d0(x2));
   };
 }
-function polymap(domain, range2, interpolate) {
-  var j = Math.min(domain.length, range2.length) - 1, d = new Array(j), r = new Array(j), i = -1;
+function polymap(domain, range, interpolate) {
+  var j = Math.min(domain.length, range.length) - 1, d = new Array(j), r = new Array(j), i = -1;
   if (domain[j] < domain[0]) {
     domain = domain.slice().reverse();
-    range2 = range2.slice().reverse();
+    range = range.slice().reverse();
   }
   while (++i < j) {
     d[i] = normalize(domain[i], domain[i + 1]);
-    r[i] = interpolate(range2[i], range2[i + 1]);
+    r[i] = interpolate(range[i], range[i + 1]);
   }
   return function(x2) {
     var i2 = bisect_default(domain, x2, 1, j) - 1;
@@ -3318,9 +3318,9 @@ function copy(source, target) {
   return target.domain(source.domain()).range(source.range()).interpolate(source.interpolate()).clamp(source.clamp()).unknown(source.unknown());
 }
 function transformer() {
-  var domain = unit, range2 = unit, interpolate = value_default, transform2, untransform, unknown, clamp = identity3, piecewise, output, input;
+  var domain = unit, range = unit, interpolate = value_default, transform2, untransform, unknown, clamp = identity3, piecewise, output, input;
   function rescale() {
-    var n = Math.min(domain.length, range2.length);
+    var n = Math.min(domain.length, range.length);
     if (clamp !== identity3)
       clamp = clamper(domain[0], domain[n - 1]);
     piecewise = n > 2 ? polymap : bimap;
@@ -3328,19 +3328,19 @@ function transformer() {
     return scale;
   }
   function scale(x2) {
-    return x2 == null || isNaN(x2 = +x2) ? unknown : (output || (output = piecewise(domain.map(transform2), range2, interpolate)))(transform2(clamp(x2)));
+    return x2 == null || isNaN(x2 = +x2) ? unknown : (output || (output = piecewise(domain.map(transform2), range, interpolate)))(transform2(clamp(x2)));
   }
   scale.invert = function(y2) {
-    return clamp(untransform((input || (input = piecewise(range2, domain.map(transform2), number_default)))(y2)));
+    return clamp(untransform((input || (input = piecewise(range, domain.map(transform2), number_default)))(y2)));
   };
   scale.domain = function(_) {
     return arguments.length ? (domain = Array.from(_, number3), rescale()) : domain.slice();
   };
   scale.range = function(_) {
-    return arguments.length ? (range2 = Array.from(_), rescale()) : range2.slice();
+    return arguments.length ? (range = Array.from(_), rescale()) : range.slice();
   };
   scale.rangeRound = function(_) {
-    return range2 = Array.from(_), interpolate = round_default, rescale();
+    return range = Array.from(_), interpolate = round_default, rescale();
   };
   scale.clamp = function(_) {
     return arguments.length ? (clamp = _ ? true : identity3, rescale()) : clamp !== identity3;
@@ -3520,16 +3520,16 @@ function timeInterval(floori, offseti, count, field) {
     return offseti(date2 = new Date(+date2), step == null ? 1 : Math.floor(step)), date2;
   };
   interval2.range = (start2, stop, step) => {
-    const range2 = [];
+    const range = [];
     start2 = interval2.ceil(start2);
     step = step == null ? 1 : Math.floor(step);
     if (!(start2 < stop) || !(step > 0))
-      return range2;
+      return range;
     let previous;
     do
-      range2.push(previous = new Date(+start2)), offseti(start2, step), floori(start2);
+      range.push(previous = new Date(+start2)), offseti(start2, step), floori(start2);
     while (previous < start2 && start2 < stop);
-    return range2;
+    return range;
   };
   interval2.filter = (test) => {
     return timeInterval((date2) => {
@@ -4636,9 +4636,6 @@ function transform(node) {
   return node.__zoom;
 }
 
-// source/utilities/Arrays.ts
-var range = (n) => [...Array(n).keys()];
-
 // source/lineChart.ts
 var extentIsDefined = (extent2) => extent2[0] === void 0 ? false : true;
 var make = (data, {
@@ -4702,33 +4699,20 @@ ${formatXValue(x2(dp))}, ${formatYValue(y2(dp))}`;
   ).call(
     (g) => g.append("text").attr("transform", "rotate(270)").attr("x", -height / 2).attr("y", -marginLeft + 20).attr("fill", "currentColor").attr("text-anchor", "start").text(yLabel)
   );
-  const indexes2 = range(data.length);
-  const indexGroupsByZ = group(indexes2, (i) => z(data[i]));
+  const dataGroupsByZ = group(data, (dp) => z(dp));
   const path2 = (() => {
     if (drawLine) {
-      const isDefinedPoint = (index2) => !isNaN(x2(data[index2])) && !isNaN(y2(data[index2]));
-      const makeLine = line_default().defined(([start2, end]) => isDefinedPoint(start2) && isDefinedPoint(end)).curve(linear_default).x(([xIdx]) => {
-        var _a;
-        return (_a = xScale(x2(data[xIdx]))) != null ? _a : 0;
-      }).y(([, yIdx]) => {
-        var _a, _b;
-        return (_b = yScale((_a = y2(data[yIdx])) != null ? _a : 0)) != null ? _b : 0;
-      });
-      return svg.append("g").attr("fill", "none").attr("stroke", typeof color2 === "string" ? color2 : null).attr("stroke-linecap", strokeLinecap).attr("stroke-linejoin", strokeLinejoin).attr("stroke-width", strokeWidth).attr("stroke-opacity", strokeOpacity).selectAll("path").data(indexGroupsByZ).join("path").style("mix-blend-mode", mixBlendMode).attr("d", (indexGroup) => {
-        console.log(indexGroup);
+      const makeLine = line_default().defined(([xVal, yVal]) => !isNaN(xVal) && !isNaN(yVal)).x(([xIdx]) => xScale(x2(data[xIdx]))).y(([, yIdx]) => yScale(y2(data[yIdx]))).curve(linear_default);
+      return svg.append("g").attr("fill", "none").attr("stroke", typeof color2 === "string" ? color2 : null).attr("stroke-linecap", strokeLinecap).attr("stroke-linejoin", strokeLinejoin).attr("stroke-width", strokeWidth).attr("stroke-opacity", strokeOpacity).selectAll("path").data(dataGroupsByZ).join("path").style("mix-blend-mode", mixBlendMode).attr("d", ([_z, dataGroup]) => {
+        console.log(dataGroup);
+        return makeLine(dataGroup.map((dp) => [x2(dp), y2(dp)]));
       });
     }
   })();
   const points = (() => {
     if (drawPoints) {
-      return Array.from(indexGroupsByZ.values()).map((d) => {
-        return svg.append("g").selectAll("circle").data(d).enter().append("circle").attr("fill", pointFillColor).attr("fill-opacity", pointFillOpacity).attr("cx", (d2, i) => {
-          var _a;
-          return (_a = xScale(x2(data[i]))) != null ? _a : 0;
-        }).attr("cy", (d2, i) => {
-          var _a;
-          return (_a = yScale(y2(data[i]))) != null ? _a : 0;
-        }).attr("stroke", pointStrokeColor).attr("stroke-opacity", pointStrokeOpacity).attr("r", pointRadius);
+      return Array.from(dataGroupsByZ.values()).map((dp) => {
+        return svg.append("g").selectAll("circle").data(dp).enter().append("circle").attr("fill", pointFillColor).attr("fill-opacity", pointFillOpacity).attr("cx", (dp2) => xScale(x2(dp2))).attr("cy", (dp2) => yScale(y2(dp2))).attr("stroke", pointStrokeColor).attr("stroke-opacity", pointStrokeOpacity).attr("r", pointRadius);
       });
     }
   })();

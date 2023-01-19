@@ -209,25 +209,21 @@ export const make = <T>(
         .text(yLabel)
     );
 
-  // get indexes
-  const indexes = Arrays.range(data.length);
-
-  // group indexes by z
-  const indexGroupsByZ = d3.group(indexes, (i) => z(data[i]!));
+  // group data by z
+  const dataGroupsByZ = d3.group(data, (dp) => z(dp));
 
   // line
   const path = (() => {
     if (drawLine) {
-      // returns whether a point is defined at a given index
-      const isDefinedPoint = (index: number) =>
-        !isNaN(x(data[index]!)) && !isNaN(y(data[index]!));
-
       const makeLine = d3
         .line()
-        .defined(([start, end]) => isDefinedPoint(start) && isDefinedPoint(end))
-        .curve(d3.curveLinear)
-        .x(([xIdx]) => xScale(x(data[xIdx]!)) ?? 0)
-        .y(([, yIdx]) => yScale(y(data[yIdx]!) ?? 0) ?? 0);
+        // ensure each point is valid
+        .defined(([xVal, yVal]) => !isNaN(xVal) && !isNaN(yVal))
+        // for each point on the line, scale its coordinates
+        .x(([xIdx]) => xScale(x(data[xIdx]!))!)
+        .y(([, yIdx]) => yScale(y(data[yIdx]!))!)
+        // interpolation method
+        .curve(d3.curveLinear);
 
       return svg
         .append("g")
@@ -238,12 +234,12 @@ export const make = <T>(
         .attr("stroke-width", strokeWidth)
         .attr("stroke-opacity", strokeOpacity)
         .selectAll("path")
-        .data(indexGroupsByZ)
+        .data(dataGroupsByZ)
         .join("path")
         .style("mix-blend-mode", mixBlendMode)
-        .attr("d", (indexGroup) => {
-          console.log(indexGroup);
-          // makeLine(indexGroup);
+        .attr("d", ([_z, dataGroup]) => {
+          console.log(dataGroup);
+          return makeLine(dataGroup.map((dp) => [x(dp), y(dp)]));
         });
     }
   })();
@@ -251,19 +247,19 @@ export const make = <T>(
   // points
   const points = (() => {
     if (drawPoints) {
-      return Array.from(indexGroupsByZ.values()).map((d) => {
+      return Array.from(dataGroupsByZ.values()).map((dp) => {
         return (
           svg
             .append("g")
             .selectAll("circle")
-            .data(d)
+            .data(dp)
             // .data(d3.group(I, (i) => Z[i]))
             .enter()
             .append("circle")
             .attr("fill", pointFillColor)
             .attr("fill-opacity", pointFillOpacity)
-            .attr("cx", (d, i) => xScale(x(data[i]!)) ?? 0)
-            .attr("cy", (d, i) => yScale(y(data[i]!)) ?? 0)
+            .attr("cx", (dp) => xScale(x(dp))!)
+            .attr("cy", (dp) => yScale(y(dp))!)
             .attr("stroke", pointStrokeColor)
             .attr("stroke-opacity", pointStrokeOpacity)
             .attr("r", pointRadius)
