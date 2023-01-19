@@ -4729,19 +4729,18 @@ ${formatXValue(x2(dp))}, ${formatYValue(y2(dp))}`;
     var _a, _b;
     const [pointerX, pointerY] = pointer_default(event);
     const closestDp = least(data, (dp) => {
-      var _a2, _b2, _c, _d;
-      console.log((_a2 = xScale(x2(dp))) != null ? _a2 : 0 - pointerX, (_b2 = yScale(y2(dp))) != null ? _b2 : 0 - pointerY);
+      var _a2, _b2;
       return Math.hypot(
-        (_c = xScale(x2(dp))) != null ? _c : 0 - pointerX,
-        (_d = yScale(y2(dp))) != null ? _d : 0 - pointerY
+        (_a2 = xScale(x2(dp))) != null ? _a2 : 0 - pointerX,
+        (_b2 = yScale(y2(dp))) != null ? _b2 : 0 - pointerY
       );
     });
     console.log(
-      closestDp,
       Math.hypot(
         (_a = xScale(x2(closestDp))) != null ? _a : 0 - pointerX,
         (_b = yScale(y2(closestDp))) != null ? _b : 0 - pointerY
-      )
+      ),
+      closestDp
     );
     tooltip.attr(
       "transform",
