@@ -4692,8 +4692,8 @@ var make = (data, {
   })();
   const points = (() => {
     if (drawPoints) {
-      return Array.from(dataGroupsByZ.values()).map((dp) => {
-        return svg.append("g").selectAll("circle").data(dp).enter().append("circle").attr("fill", pointFillColor).attr("fill-opacity", pointFillOpacity).attr("cx", (dp2) => xScale(x2(dp2))).attr("cy", (dp2) => yScale(y2(dp2))).attr("stroke", pointStrokeColor).attr("stroke-opacity", pointStrokeOpacity).attr("r", pointRadius);
+      return Array.from(dataGroupsByZ.values()).map((dps) => {
+        return svg.append("g").selectAll("circle").data(dps).enter().append("circle").attr("fill", pointFillColor).attr("fill-opacity", pointFillOpacity).attr("cx", (dp) => xScale(x2(dp))).attr("cy", (dp) => yScale(y2(dp))).attr("stroke", pointStrokeColor).attr("stroke-opacity", pointStrokeOpacity).attr("r", pointRadius);
       });
     }
   })();
@@ -4703,7 +4703,7 @@ var make = (data, {
   const ttBgHeight = 45;
   tooltipGroup.append("rect").attr("width", ttBgWidth).attr("height", ttBgHeight).attr("x", -ttBgWidth / 2).attr("y", -ttBgHeight - 17).attr(
     "style",
-    "fill:#fff; fill-opacity:0.5; stroke:#000; stroke-opacity:0.5;"
+    "fill:#fff; fill-opacity:0.6; stroke:#000; stroke-opacity:0.5;"
   );
   tooltipGroup.append("text").attr("font-family", "sans-serif").attr("font-size", 12).attr("text-anchor", "middle").attr("y", -8);
   function pointermoved(event) {

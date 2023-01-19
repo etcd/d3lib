@@ -251,12 +251,12 @@ export const make = <T>(
   // points
   const points = (() => {
     if (drawPoints) {
-      return Array.from(dataGroupsByZ.values()).map((dp) => {
+      return Array.from(dataGroupsByZ.values()).map((dps) => {
         return (
           svg
             .append("g")
             .selectAll("circle")
-            .data(dp)
+            .data(dps)
             // .data(d3.group(I, (i) => Z[i]))
             .enter()
             .append("circle")
@@ -302,7 +302,7 @@ export const make = <T>(
     .attr("y", -ttBgHeight - 17)
     .attr(
       "style",
-      "fill:#fff; fill-opacity:0.5; stroke:#000; stroke-opacity:0.5;"
+      "fill:#fff; fill-opacity:0.6; stroke:#000; stroke-opacity:0.5;"
     );
   // tooltip text
   tooltipGroup
