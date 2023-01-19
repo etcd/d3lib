@@ -4728,7 +4728,7 @@ var make = (data, {
       console.log("1", svgPointGroup.enter());
       console.log("2", svgPointGroup.selectAll("circle"));
       console.log("3", svgPointGroup.selectAll("circle").enter());
-      const foo = svgPointGroup.enter().attr("r", 0);
+      const foo = svgPointGroup.attr("r", 0);
     });
   }
   function pointerentered() {

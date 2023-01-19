@@ -356,7 +356,7 @@ export const make = <T>(
 
         const foo = svgPointGroup
           // .selectAll("circle")
-          .enter()
+          // .enter()
           // .enter()
           .attr("r", 0);
         // .attr("r", (x) => {
