@@ -256,8 +256,8 @@ export const make = <T>(
         .append("g")
         .selectAll("circle")
         .data(dps)
+        .enter()
         .append("circle")
-        .join("circle")
         .attr("fill", pointFillColor)
         .attr("fill-opacity", pointFillOpacity)
         .attr("cx", (dp) => xScale(x(dp))!)
@@ -265,6 +265,7 @@ export const make = <T>(
         .attr("stroke", pointStrokeColor)
         .attr("stroke-opacity", pointStrokeOpacity)
         .attr("r", pointRadius)
+        .raise()
     ))();
 
   // tooltip
@@ -321,14 +322,13 @@ export const make = <T>(
 
     // emphasize hovered Z
     // lines
-    console.log("lines", lines);
     lines &&
       lines
         .style("stroke", ([zHovered]) =>
           z(closestDp!) === zHovered ? null : "#ddd"
         )
-        .filter(([zHovered]) => z(closestDp!) === zHovered)
-        .raise();
+        .filter(([zHovered]) => z(closestDp!) === zHovered);
+
     // points
     points &&
       points.map((svgPointGroup) => {

@@ -4691,7 +4691,7 @@ var make = (data, {
     }
   })();
   const points = (() => drawPoints && Array.from(dataGroupsByZ.values()).map(
-    (dps) => svg.append("g").selectAll("circle").data(dps).append("circle").join("circle").attr("fill", pointFillColor).attr("fill-opacity", pointFillOpacity).attr("cx", (dp) => xScale(x2(dp))).attr("cy", (dp) => yScale(y2(dp))).attr("stroke", pointStrokeColor).attr("stroke-opacity", pointStrokeOpacity).attr("r", pointRadius)
+    (dps) => svg.append("g").selectAll("circle").data(dps).enter().append("circle").attr("fill", pointFillColor).attr("fill-opacity", pointFillOpacity).attr("cx", (dp) => xScale(x2(dp))).attr("cy", (dp) => yScale(y2(dp))).attr("stroke", pointStrokeColor).attr("stroke-opacity", pointStrokeOpacity).attr("r", pointRadius).raise()
   ))();
   const tooltipGroup = svg.append("g").attr("display", "none");
   tooltipGroup.append("circle").attr("r", 2.5);
@@ -4714,11 +4714,10 @@ var make = (data, {
     tooltipGroup.select("text").call(
       (text) => text.selectAll("tspan").data(makeTitle(closestDp)).join("tspan").attr("x", 0).attr("y", (_text, i) => `${(i - 3) * 1.2}em`).attr("font-weight", (_text, i) => i === 0 && "bold").text((text2) => text2)
     );
-    console.log("lines", lines);
     lines && lines.style(
       "stroke",
       ([zHovered]) => z(closestDp) === zHovered ? null : "#ddd"
-    ).filter(([zHovered]) => z(closestDp) === zHovered).raise();
+    ).filter(([zHovered]) => z(closestDp) === zHovered);
     points && points.map((svgPointGroup) => {
       svgPointGroup.attr("r", 0);
     });
