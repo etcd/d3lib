@@ -12,7 +12,6 @@ export const make = <T>(
     x,
     y,
     z,
-    curve = d3.curveLinear,
     marginTop = 20,
     marginRight = 30,
     marginBottom = 30,
@@ -54,8 +53,6 @@ export const make = <T>(
     y: (p: T) => number;
     /** given datapoint, returns the (categorical) z-value */
     z: (p: T) => number;
-    /** interpolation method between points */
-    curve: d3.CurveFactory;
     /** top margin (px) */
     marginTop: number;
     /** right margin (px) */
@@ -129,9 +126,6 @@ export const make = <T>(
     mixBlendMode: string;
   }
 ) => {
-  // prune invalid datapoints
-  const D = d3.map(data, (d, i) => !isNaN(x(d)) && !isNaN(y(d)));
-
   // Compute default domains
   if (xDomain === undefined) {
     const xExtent = d3.extent(data.map(x));
@@ -224,10 +218,14 @@ export const make = <T>(
   // line
   const path = (() => {
     if (drawLine) {
+      // returns whether a point is defined at a given index
+      const isDefinedPoint = (index: number) =>
+        !isNaN(x(data[index]!)) && !isNaN(y(data[index]!));
+
       const line = d3
         .line()
-        .defined((r) => D[r[0]] ?? false)
-        .curve(curve)
+        .defined(([start, end]) => isDefinedPoint(start) && isDefinedPoint(end))
+        .curve(d3.curveLinear)
         .x(([i]) => xScale(x(data[i]!)) ?? 0)
         .y(([, i]) => yScale(y(data[i]!) ?? 0) ?? 0);
 
