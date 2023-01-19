@@ -264,8 +264,8 @@ export const make = <T>(
           .attr("cy", (dp) => yScale(y(dp))!)
           .attr("stroke", pointStrokeColor)
           .attr("stroke-opacity", pointStrokeOpacity)
-          .attr("r", pointRadius);
-        // .raise()
+          .attr("r", pointRadius)
+          .raise();
       });
 
       // .each((x, i) => {
@@ -349,12 +349,13 @@ export const make = <T>(
     // points
     points &&
       points.map((svgPointGroup) => {
+        console.log("0", svgPointGroup);
         console.log("1", svgPointGroup.enter());
         console.log("2", svgPointGroup.selectAll("circle"));
         console.log("3", svgPointGroup.selectAll("circle").enter());
 
         const foo = svgPointGroup
-          .selectAll("circle")
+          // .selectAll("circle")
           .enter()
           // .enter()
           .attr("r", 0);
