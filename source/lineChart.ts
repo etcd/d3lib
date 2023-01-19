@@ -214,6 +214,7 @@ export const make = <T>(
         .text(yLabel)
     );
 
+  // TODO: this shouldn't be typed as [number, T[]]
   // group data by z
   const dataGroupsByZ = d3.group(data, (dp) => z(dp));
 
@@ -249,22 +250,44 @@ export const make = <T>(
   })();
 
   // points
-  const points = (() =>
-    drawPoints &&
-    Array.from(dataGroupsByZ.values()).map((dps) =>
-      svg
+  const points = (() => {
+    if (drawPoints) {
+      return svg
         .append("g")
-        .selectAll("circle")
-        .data(dps)
-        .join("circle")
-        .attr("fill", pointFillColor)
-        .attr("fill-opacity", pointFillOpacity)
-        .attr("cx", (dp) => xScale(x(dp))!)
-        .attr("cy", (dp) => yScale(y(dp))!)
-        .attr("stroke", pointStrokeColor)
-        .attr("stroke-opacity", pointStrokeOpacity)
-        .attr("r", pointRadius)
-    ))();
+        .classed(".circle-group", true)
+        .selectAll(".circle-z-group")
+        .data(dataGroupsByZ)
+        .join((enterSelection) => {
+          enterSelection
+            .append("g")
+            .classed(".circle-z-group", true)
+            .join("circle")
+            .attr("fill", pointFillColor)
+            .attr("fill-opacity", pointFillOpacity)
+            .attr("cx", ([z, dps]) => xScale(x(dps[0]!))!)
+            .attr("cy", ([z, dps]) => yScale(y(dps[0]!))!)
+            .attr("stroke", pointStrokeColor)
+            .attr("stroke-opacity", pointStrokeOpacity)
+            .attr("r", pointRadius);
+          return enterSelection;
+        });
+    }
+  })();
+  // .map(
+  // Array.from(dataGroupsByZ.values()).map((dps) =>
+  //   svg
+  //     .append("g")
+  //     .selectAll("circle")
+  //     .data(dps)
+  //     .join("circle")
+  //     .attr("fill", pointFillColor)
+  //     .attr("fill-opacity", pointFillOpacity)
+  //     .attr("cx", (dp) => xScale(x(dp))!)
+  //     .attr("cy", (dp) => yScale(y(dp))!)
+  //     .attr("stroke", pointStrokeColor)
+  //     .attr("stroke-opacity", pointStrokeOpacity)
+  //     .attr("r", pointRadius)
+  // )
 
   // tooltip
   const tooltipGroup = svg.append("g").attr("display", "none");
@@ -328,10 +351,10 @@ export const make = <T>(
         .filter(([zHovered]) => z(closestDp!) === zHovered);
 
     // points
-    points &&
-      points.map((svgPointGroup) => {
-        svgPointGroup.attr("r", 0);
-      });
+    // points &&
+    //   points.map((svgPointGroup) => {
+    //     svgPointGroup.attr("r", 0);
+    //   });
   }
 
   function pointerentered() {
