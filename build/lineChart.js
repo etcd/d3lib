@@ -4702,21 +4702,11 @@ ${formatXValue(x2(dp))}, ${formatYValue(y2(dp))}`;
   const dataGroupsByZ = group(data, (dp) => z(dp));
   const path2 = (() => {
     if (drawLine) {
-      const makeLine = line_default().defined(([xVal, yVal]) => !isNaN(xVal) && !isNaN(yVal)).x(([xVal]) => {
-        if (!xVal) {
-          console.log("FOOx", xVal);
-        }
-        return xScale(xVal);
-      }).y(([_xVal, yVal]) => {
-        if (!yVal) {
-          console.log("FOOy", _xVal, yVal);
-        }
-        return yScale(yVal);
-      }).curve(linear_default);
-      return svg.append("g").attr("fill", "none").attr("stroke", typeof color2 === "string" ? color2 : null).attr("stroke-linecap", strokeLinecap).attr("stroke-linejoin", strokeLinejoin).attr("stroke-width", strokeWidth).attr("stroke-opacity", strokeOpacity).selectAll("path").data(dataGroupsByZ).join("path").style("mix-blend-mode", mixBlendMode).attr("d", ([_z, dataGroup]) => {
-        console.log(dataGroup);
-        return makeLine(dataGroup.map((dp) => [x2(dp), y2(dp)]));
-      });
+      const makeLine = line_default().defined(([xVal, yVal]) => !isNaN(xVal) && !isNaN(yVal)).x(([xVal]) => xScale(xVal)).y(([_xVal, yVal]) => yScale(yVal)).curve(linear_default);
+      return svg.append("g").attr("fill", "none").attr("stroke", typeof color2 === "string" ? color2 : null).attr("stroke-linecap", strokeLinecap).attr("stroke-linejoin", strokeLinejoin).attr("stroke-width", strokeWidth).attr("stroke-opacity", strokeOpacity).selectAll("path").data(dataGroupsByZ).join("path").style("mix-blend-mode", mixBlendMode).attr(
+        "d",
+        ([_z, dataGroup]) => makeLine(dataGroup.map((dp) => [x2(dp), y2(dp)]))
+      );
     }
   })();
   const points = (() => {
