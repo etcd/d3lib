@@ -4726,15 +4726,23 @@ ${formatXValue(x2(dp))}, ${formatYValue(y2(dp))}`;
   );
   tooltip.append("text").attr("font-family", "sans-serif").attr("font-size", 12).attr("text-anchor", "middle").attr("y", -8);
   function pointermoved(event) {
+    var _a, _b;
     const [pointerX, pointerY] = pointer_default(event);
     const closestDp = least(data, (dp) => {
-      var _a, _b;
-      console.log(xScale(x2(dp)), yScale(y2(dp)));
+      var _a2, _b2, _c, _d;
+      console.log((_a2 = xScale(x2(dp))) != null ? _a2 : 0 - pointerX, (_b2 = yScale(y2(dp))) != null ? _b2 : 0 - pointerY);
       return Math.hypot(
-        (_a = xScale(x2(dp))) != null ? _a : 0 - pointerX,
-        (_b = yScale(y2(dp))) != null ? _b : 0 - pointerY
+        (_c = xScale(x2(dp))) != null ? _c : 0 - pointerX,
+        (_d = yScale(y2(dp))) != null ? _d : 0 - pointerY
       );
     });
+    console.log(
+      closestDp,
+      Math.hypot(
+        (_a = xScale(x2(closestDp))) != null ? _a : 0 - pointerX,
+        (_b = yScale(y2(closestDp))) != null ? _b : 0 - pointerY
+      )
+    );
     tooltip.attr(
       "transform",
       `translate(${xScale(x2(closestDp))},${yScale(y2(closestDp))})`
