@@ -308,13 +308,16 @@ export const make = <T>(
     .attr("y", -8);
 
   function pointermoved(event: PointerEvent) {
-    const [xm, ym] = d3.pointer(event);
+    const [pointerX, pointerY] = d3.pointer(event);
     // closest point
-    const closestDp = d3.least(data, (dp) =>
-      Math.hypot(xScale(x(dp)) ?? 0 - xm, yScale(y(dp)) ?? 0 - ym)
-    );
+    const closestDp = d3.least(data, (dp) => {
+      console.log(xScale(x(dp)), yScale(y(dp)));
 
-    console.log(xm, ym, closestDp);
+      return Math.hypot(
+        xScale(x(dp)) ?? 0 - pointerX,
+        yScale(y(dp)) ?? 0 - pointerY
+      );
+    });
 
     // translate the tooltip
     tooltip.attr(
