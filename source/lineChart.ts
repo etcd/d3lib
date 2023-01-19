@@ -184,6 +184,7 @@ export const make = <T>(
         .attr("y", marginBottom)
         .attr("fill", "currentColor")
         .attr("text-anchor", "start")
+        .attr("font-weight", "bold")
         .text(xLabel)
     );
 
@@ -208,6 +209,7 @@ export const make = <T>(
         .attr("y", -marginLeft + 20)
         .attr("fill", "currentColor")
         .attr("text-anchor", "start")
+        .attr("font-weight", "bold")
         .text(yLabel)
     );
 

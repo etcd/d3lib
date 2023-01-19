@@ -4694,12 +4694,12 @@ var make = (data, {
   ];
   const svg = create_default("svg").attr("width", width).attr("height", height).attr("viewBox", [0, 0, width, height]).attr("style", "max-width: 100%; height: auto; height: intrinsic;").on("pointerenter", pointerentered).on("pointermove", pointermoved).on("pointerleave", pointerleft).on("touchstart", (event) => event.preventDefault());
   svg.append("g").attr("transform", `translate(0,${yScale(xAxisOffset)})`).call(xAxis).call(
-    (g) => g.append("text").attr("x", width / 2).attr("y", marginBottom).attr("fill", "currentColor").attr("text-anchor", "start").text(xLabel)
+    (g) => g.append("text").attr("x", width / 2).attr("y", marginBottom).attr("fill", "currentColor").attr("text-anchor", "start").attr("font-weight", "bold").text(xLabel)
   );
   svg.append("g").attr("transform", `translate(${marginLeft},0)`).call(yAxis).call((g) => g.select(".domain").remove()).call(
     (g) => g.selectAll(".tick line").clone().attr("x2", width - marginLeft - marginRight).attr("stroke-opacity", 0.1)
   ).call(
-    (g) => g.append("text").attr("transform", "rotate(270)").attr("x", -height / 2).attr("y", -marginLeft + 20).attr("fill", "currentColor").attr("text-anchor", "start").text(yLabel)
+    (g) => g.append("text").attr("transform", "rotate(270)").attr("x", -height / 2).attr("y", -marginLeft + 20).attr("fill", "currentColor").attr("text-anchor", "start").attr("font-weight", "bold").text(yLabel)
   );
   const dataGroupsByZ = group(data, (dp) => z(dp));
   const lines = (() => {
