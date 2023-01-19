@@ -141,7 +141,6 @@ export const make = <T>(
     const yExtent = d3.extent(data.map(y));
     yDomain = extentIsDefined(yExtent) ? yExtent : [-10, 10];
   }
-  const zDomain = new d3.InternSet(data.map(z));
 
   // scales
   const xScale = xType(xDomain, xRange);
@@ -159,16 +158,10 @@ export const make = <T>(
     .tickFormat((d) => d3.format(yFormat)(d));
 
   // titles (for tooltip)
-
-  // const formatXValue = xScale.tickFormat(100, xFormat);
-  // const formatYValue = yScale.tickFormat(100, yFormat);
-
   const formatXValue = d3.format(xFormat);
   const formatYValue = d3.format(yFormat);
-  const makeTitle = (i: number) =>
-    `${z(data[i]!)}\n${formatXValue(x(data[i]!))}, ${formatYValue(
-      y(data[i]!)
-    )}`;
+  const makeTitle = (dp: T) =>
+    `${z(dp!)}\n${formatXValue(x(dp!))}, ${formatYValue(y(dp!))}`;
 
   const svg = d3
     // dimensions
@@ -321,24 +314,21 @@ export const make = <T>(
   function pointermoved(event: PointerEvent) {
     const [xm, ym] = d3.pointer(event);
     // closest point
-    const ptIdx = d3.least(indices, (i) =>
-      Math.hypot(xScale(x(data[i]!)) ?? 0 - xm, yScale(y(data[i]!)) ?? 0 - ym)
+    const closestDp = d3.least(data, (dp) =>
+      Math.hypot(xScale(x(dp)) ?? 0 - xm, yScale(y(dp)) ?? 0 - ym)
     );
 
     // translate the tooltip
     tooltip.attr(
       "transform",
-      `translate(${xScale(x(data[ptIdx ?? 0]!))},${yScale(
-        y(data[ptIdx ?? 0]!)
-      )})`
+      `translate(${xScale(x(closestDp!))},${yScale(y(closestDp!))})`
     );
 
     // add tooltip text
-
     tooltip.select("text").call((text) =>
       text
         .selectAll("tspan")
-        .data(makeTitle(ptIdx!).split(/\n/))
+        .data(makeTitle(closestDp!).split(/\n/))
         .join("tspan")
         .attr("x", 0)
         .attr("y", (_, i) => `${(i - 3) * 1.2}em`)
@@ -351,9 +341,9 @@ export const make = <T>(
     path &&
       path
         .style("stroke", ([zHovered]) =>
-          z(data[ptIdx ?? 0]!) === zHovered ? null : "#ddd"
+          z(closestDp!) === zHovered ? null : "#ddd"
         )
-        .filter(([zHovered]) => z(data[ptIdx ?? 0]!) === zHovered)
+        .filter(([zHovered]) => z(closestDp!) === zHovered)
         .raise();
     // points
     points &&

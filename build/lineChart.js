@@ -129,24 +129,6 @@ var InternMap = class extends Map {
     return super.delete(intern_delete(this, key));
   }
 };
-var InternSet = class extends Set {
-  constructor(values, key = keyof) {
-    super();
-    Object.defineProperties(this, { _intern: { value: /* @__PURE__ */ new Map() }, _key: { value: key } });
-    if (values != null)
-      for (const value of values)
-        this.add(value);
-  }
-  has(value) {
-    return super.has(intern_get(this, value));
-  }
-  add(value) {
-    return super.add(intern_set(this, value));
-  }
-  delete(value) {
-    return super.delete(intern_delete(this, value));
-  }
-};
 function intern_get({ _intern, _key }, value) {
   const key = _key(value);
   return _intern.has(key) ? _intern.get(key) : value;
@@ -4714,17 +4696,14 @@ var make = (data, {
     const yExtent = extent(data.map(y2));
     yDomain = extentIsDefined(yExtent) ? yExtent : [-10, 10];
   }
-  const zDomain = new InternSet(data.map(z));
   const xScale = xType(xDomain, xRange);
   const yScale = yType(yDomain, yRange);
   const xAxis = axisBottom(xScale).ticks(width / 80).tickSizeOuter(0).tickFormat((d) => format(xFormat)(d));
   const yAxis = axisLeft(yScale).ticks(height / 80).tickFormat((d) => format(yFormat)(d));
   const formatXValue = format(xFormat);
   const formatYValue = format(yFormat);
-  const makeTitle = (i) => `${z(data[i])}
-${formatXValue(x2(data[i]))}, ${formatYValue(
-    y2(data[i])
-  )}`;
+  const makeTitle = (dp) => `${z(dp)}
+${formatXValue(x2(dp))}, ${formatYValue(y2(dp))}`;
   const svg = create_default("svg").attr("width", width).attr("height", height).attr("viewBox", [0, 0, width, height]).attr("style", "max-width: 100%; height: auto; height: intrinsic;").on("pointerenter", pointerentered).on("pointermove", pointermoved).on("pointerleave", pointerleft).on("touchstart", (event) => event.preventDefault());
   svg.append("g").attr("transform", `translate(0,${yScale(xAxisOffset)})`).call(xAxis).call(
     (g) => g.append("text").attr("x", width / 2).attr("y", marginBottom).attr("fill", "currentColor").attr("text-anchor", "start").text(xLabel)
@@ -4775,26 +4754,24 @@ ${formatXValue(x2(data[i]))}, ${formatYValue(
   tooltip.append("text").attr("font-family", "sans-serif").attr("font-size", 12).attr("text-anchor", "middle").attr("y", -8);
   function pointermoved(event) {
     const [xm, ym] = pointer_default(event);
-    const ptIdx = least(
-      indices,
-      (i) => {
+    const closestDp = least(
+      data,
+      (dp) => {
         var _a, _b;
-        return Math.hypot((_a = xScale(x2(data[i]))) != null ? _a : 0 - xm, (_b = yScale(y2(data[i]))) != null ? _b : 0 - ym);
+        return Math.hypot((_a = xScale(x2(dp))) != null ? _a : 0 - xm, (_b = yScale(y2(dp))) != null ? _b : 0 - ym);
       }
     );
     tooltip.attr(
       "transform",
-      `translate(${xScale(x2(data[ptIdx != null ? ptIdx : 0]))},${yScale(
-        y2(data[ptIdx != null ? ptIdx : 0])
-      )})`
+      `translate(${xScale(x2(closestDp))},${yScale(y2(closestDp))})`
     );
     tooltip.select("text").call(
-      (text) => text.selectAll("tspan").data(makeTitle(ptIdx).split(/\n/)).join("tspan").attr("x", 0).attr("y", (_, i) => `${(i - 3) * 1.2}em`).attr("font-weight", (_, i) => i === 0 && "bold").text((d) => d)
+      (text) => text.selectAll("tspan").data(makeTitle(closestDp).split(/\n/)).join("tspan").attr("x", 0).attr("y", (_, i) => `${(i - 3) * 1.2}em`).attr("font-weight", (_, i) => i === 0 && "bold").text((d) => d)
     );
     path2 && path2.style(
       "stroke",
-      ([zHovered]) => z(data[ptIdx != null ? ptIdx : 0]) === zHovered ? null : "#ddd"
-    ).filter(([zHovered]) => z(data[ptIdx != null ? ptIdx : 0]) === zHovered).raise();
+      ([zHovered]) => z(closestDp) === zHovered ? null : "#ddd"
+    ).filter(([zHovered]) => z(closestDp) === zHovered).raise();
     points && points.map((pointGroup) => {
       const foo = pointGroup.selectAll("circle").join("circle").attr("r", 0).attr("r", 0);
     });
