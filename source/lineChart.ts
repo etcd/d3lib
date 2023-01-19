@@ -6,12 +6,6 @@ const extentIsDefined = (
   extent: [number, number] | [undefined, undefined]
 ): extent is [number, number] => (extent[0] === undefined ? false : true);
 
-type TickFormattableScale<Rng, Out, Unk> =
-  | d3.ScaleContinuousNumeric<Rng, Out, Unk>
-  | d3.ScaleTime<Rng, Out, Unk>
-  | d3.ScaleQuantize<Rng, Unk>
-  | d3.ScaleQuantize<Rng, Unk>;
-
 export const make = <T>(
   data: T[],
   {
@@ -81,7 +75,7 @@ export const make = <T>(
     xType: (
       domain: Iterable<d3.NumberValue>,
       range: Iterable<number>
-    ) => TickFormattableScale<number, number, number | undefined>;
+    ) => d3.AxisScale<Date | d3.NumberValue>;
     /** x domain min and max */
     xDomain?: [number, number];
     /** x range min and max */
@@ -93,7 +87,7 @@ export const make = <T>(
     yType: (
       domain: Iterable<d3.NumberValue>,
       range: Iterable<number>
-    ) => TickFormattableScale<number, number, number | undefined>;
+    ) => d3.AxisScale<Date | d3.NumberValue>;
     /** y domain min and max */
     yDomain?: [number, number];
     /** y range min and max */
