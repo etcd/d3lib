@@ -399,13 +399,13 @@ export const make = <T>(
   }
 
   function pointerentered() {
-    // lines && lines.style("mix-blend-mode", null).style("stroke", "#ddd");
+    lines && lines.style("mix-blend-mode", null).style("stroke", "#ddd");
     tooltipGroup.attr("display", null);
   }
 
   function pointerleft() {
     tooltipGroup.attr("display", "none");
-    // lines && lines.style("mix-blend-mode", mixBlendMode).style("stroke", null);
+    lines && lines.style("mix-blend-mode", mixBlendMode).style("stroke", null);
     // svg.node().value = null;
     // svg.dispatch("input", { bubbles: true });
   }

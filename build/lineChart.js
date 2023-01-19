@@ -4728,10 +4728,12 @@ var make = (data, {
     });
   }
   function pointerentered() {
+    lines && lines.style("mix-blend-mode", null).style("stroke", "#ddd");
     tooltipGroup.attr("display", null);
   }
   function pointerleft() {
     tooltipGroup.attr("display", "none");
+    lines && lines.style("mix-blend-mode", mixBlendMode).style("stroke", null);
   }
   return svg.node();
 };
