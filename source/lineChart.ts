@@ -39,7 +39,7 @@ export const make = <T>(
 
     drawLine = true,
     drawPoints = true,
-    pointRadius = 1.5,
+    pointRadius = 0.5,
     pointFillColor = "#202020",
     pointFillOpacity = 0,
     pointStrokeColor = "#202020",
@@ -233,7 +233,7 @@ export const make = <T>(
       return svg
         .append("g")
         .attr("fill", "none")
-        .attr("stroke", typeof color === "string" ? color : null)
+        .attr("stroke", lineColor)
         .attr("stroke-linecap", strokeLinecap)
         .attr("stroke-linejoin", strokeLinejoin)
         .attr("stroke-width", strokeWidth)
@@ -252,23 +252,20 @@ export const make = <T>(
   const points = (() => {
     if (drawPoints) {
       return Array.from(dataGroupsByZ.values()).map((dps) => {
-        return (
-          svg
-            .append("g")
-            .selectAll("circle")
-            .data(dps)
-            // .data(d3.group(I, (i) => Z[i]))
-            .enter()
-            .append("circle")
-            .attr("fill", pointFillColor)
-            .attr("fill-opacity", pointFillOpacity)
-            .attr("cx", (dp) => xScale(x(dp))!)
-            .attr("cy", (dp) => yScale(y(dp))!)
-            .attr("stroke", pointStrokeColor)
-            .attr("stroke-opacity", pointStrokeOpacity)
-            .attr("r", pointRadius)
-          // .raise()
-        );
+        return svg
+          .append("g")
+          .selectAll("circle")
+          .data(dps)
+          .enter()
+          .append("circle")
+          .attr("fill", pointFillColor)
+          .attr("fill-opacity", pointFillOpacity)
+          .attr("cx", (dp) => xScale(x(dp))!)
+          .attr("cy", (dp) => yScale(y(dp))!)
+          .attr("stroke", pointStrokeColor)
+          .attr("stroke-opacity", pointStrokeOpacity)
+          .attr("r", pointRadius);
+        // .raise()
       });
 
       // .each((x, i) => {

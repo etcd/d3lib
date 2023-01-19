@@ -4645,7 +4645,7 @@ var make = (data, {
   xAxisOffset = 1,
   drawLine = true,
   drawPoints = true,
-  pointRadius = 1.5,
+  pointRadius = 0.5,
   pointFillColor = "#202020",
   pointFillOpacity = 0,
   pointStrokeColor = "#202020",
@@ -4684,7 +4684,7 @@ var make = (data, {
   const lines = (() => {
     if (drawLine) {
       const makeLine = line_default().defined(([xVal, yVal]) => !isNaN(xVal) && !isNaN(yVal)).x(([xVal]) => xScale(xVal)).y(([_xVal, yVal]) => yScale(yVal)).curve(linear_default);
-      return svg.append("g").attr("fill", "none").attr("stroke", typeof color2 === "string" ? color2 : null).attr("stroke-linecap", strokeLinecap).attr("stroke-linejoin", strokeLinejoin).attr("stroke-width", strokeWidth).attr("stroke-opacity", strokeOpacity).selectAll("path").data(dataGroupsByZ).join("path").style("mix-blend-mode", mixBlendMode).attr(
+      return svg.append("g").attr("fill", "none").attr("stroke", lineColor).attr("stroke-linecap", strokeLinecap).attr("stroke-linejoin", strokeLinejoin).attr("stroke-width", strokeWidth).attr("stroke-opacity", strokeOpacity).selectAll("path").data(dataGroupsByZ).join("path").style("mix-blend-mode", mixBlendMode).attr(
         "d",
         ([_z, dataGroup]) => makeLine(dataGroup.map((dp) => [x2(dp), y2(dp)]))
       );
