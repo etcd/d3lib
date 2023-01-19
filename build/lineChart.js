@@ -4730,6 +4730,8 @@ var make = (data, {
   const zDomain = new InternSet(Z);
   const xScale = xType(xDomain, xRange);
   const yScale = yType(yDomain, yRange);
+  console.log(xScale(3));
+  console.log(yScale(3));
   const xAxis = axisBottom(xScale).ticks(width / 80).tickSizeOuter(0).tickFormat((d) => format(xFormat)(d));
   const yAxis = axisLeft(yScale).ticks(height / 80).tickFormat((d) => format(yFormat)(d));
   const svg = create_default("svg").attr("width", width).attr("height", height).attr("viewBox", [0, 0, width, height]).attr("style", "max-width: 100%; height: auto; height: intrinsic;").on("pointerenter", pointerentered).on("pointermove", pointermoved).on("pointerleave", pointerleft).on("touchstart", (event) => event.preventDefault());
