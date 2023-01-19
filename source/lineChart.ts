@@ -218,6 +218,8 @@ export const make = <T>(
   // group data by z
   const dataGroupsByZ = d3.group(data, (dp) => z(dp));
 
+  console.log(dataGroupsByZ);
+
   // line
   const lines = (() => {
     if (drawLine) {
