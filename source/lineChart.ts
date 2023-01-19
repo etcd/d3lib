@@ -314,24 +314,6 @@ export const make = <T>(
       return Math.hypot(xScale(x(dp))! - pointerX, yScale(y(dp))! - pointerY);
     });
 
-    console.log(
-      pointerX,
-      pointerY,
-      x(closestDp!),
-      y(closestDp!),
-      // closestDp,
-      xScale(x(closestDp!)),
-      yScale(y(closestDp!))
-    );
-
-    // console.log(
-    //   Math.hypot(
-    //     xScale(x(closestDp!)) ?? 0 - pointerX,
-    //     yScale(y(closestDp!)) ?? 0 - pointerY
-    //   ),
-    //   closestDp
-    // );
-
     // translate the tooltip
     tooltip.attr(
       "transform",

@@ -4730,15 +4730,6 @@ ${formatXValue(x2(dp))}, ${formatYValue(y2(dp))}`;
     const closestDp = least(data, (dp) => {
       return Math.hypot(xScale(x2(dp)) - pointerX, yScale(y2(dp)) - pointerY);
     });
-    console.log(
-      pointerX,
-      pointerY,
-      x2(closestDp),
-      y2(closestDp),
-      // closestDp,
-      xScale(x2(closestDp)),
-      yScale(y2(closestDp))
-    );
     tooltip.attr(
       "transform",
       `translate(${xScale(x2(closestDp))},${yScale(y2(closestDp))})`
