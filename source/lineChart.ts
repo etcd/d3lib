@@ -256,7 +256,7 @@ export const make = <T>(
         .append("g")
         .selectAll("circle")
         .data(dps)
-        .enter()
+        .join("circle")
         .append("circle")
         .attr("fill", pointFillColor)
         .attr("fill-opacity", pointFillOpacity)
@@ -265,7 +265,6 @@ export const make = <T>(
         .attr("stroke", pointStrokeColor)
         .attr("stroke-opacity", pointStrokeOpacity)
         .attr("r", pointRadius)
-        .raise()
     ))();
 
   // tooltip
