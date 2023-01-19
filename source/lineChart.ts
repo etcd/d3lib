@@ -220,18 +220,8 @@ export const make = <T>(
         // ensure each point is valid
         .defined(([xVal, yVal]) => !isNaN(xVal) && !isNaN(yVal))
         // for each point on the line, scale its coordinates
-        .x(([xVal]) => {
-          if (!xVal) {
-            console.log("FOOx", xVal);
-          }
-          return xScale(xVal)!;
-        })
-        .y(([_xVal, yVal]) => {
-          if (!yVal) {
-            console.log("FOOy", _xVal, yVal);
-          }
-          return yScale(yVal)!;
-        })
+        .x(([xVal]) => xScale(xVal)!)
+        .y(([_xVal, yVal]) => yScale(yVal)!)
         // interpolation method
         .curve(d3.curveLinear);
 
@@ -247,10 +237,9 @@ export const make = <T>(
         .data(dataGroupsByZ)
         .join("path")
         .style("mix-blend-mode", mixBlendMode)
-        .attr("d", ([_z, dataGroup]) => {
-          console.log(dataGroup);
-          return makeLine(dataGroup.map((dp) => [x(dp), y(dp)]));
-        });
+        .attr("d", ([_z, dataGroup]) =>
+          makeLine(dataGroup.map((dp) => [x(dp), y(dp)]))
+        );
     }
   })();
 
