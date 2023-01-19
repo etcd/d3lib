@@ -155,7 +155,7 @@ export const make = <T>(
   const formatXValue = d3.format(xFormat);
   const formatYValue = d3.format(yFormat);
   const makeTitle = (dp: T) =>
-    `${z(dp!)}\n${formatXValue(x(dp!))}, ${formatYValue(y(dp!))}`;
+    `${z(dp)}\n${formatXValue(x(dp))}, ${formatYValue(y(dp))}`;
 
   const svg = d3
     // dimensions
@@ -220,8 +220,18 @@ export const make = <T>(
         // ensure each point is valid
         .defined(([xVal, yVal]) => !isNaN(xVal) && !isNaN(yVal))
         // for each point on the line, scale its coordinates
-        .x(([xIdx]) => xScale(x(data[xIdx]!))!)
-        .y(([, yIdx]) => yScale(y(data[yIdx]!))!)
+        .x(([xIdx]) => {
+          if (!x(data[xIdx]!)) {
+            console.log("FOOx");
+          }
+          return xScale(x(data[xIdx]!))!;
+        })
+        .y(([, yIdx]) => {
+          if (!x(data[yIdx]!)) {
+            console.log("FOOy");
+          }
+          return yScale(y(data[yIdx]!))!;
+        })
         // interpolation method
         .curve(d3.curveLinear);
 
