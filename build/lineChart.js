@@ -4724,16 +4724,14 @@ var make = (data, {
     ).filter(([zHovered]) => z(closestDp) === zHovered).raise();
     points && points.map((svgPointGroup) => {
       console.log(svgPointGroup);
-      const foo = svgPointGroup.selectAll("circle").join("circle").attr("r", 0).attr("r", 0);
+      const foo = svgPointGroup.selectAll("circle").enter().attr("r", 0);
     });
   }
   function pointerentered() {
-    lines && lines.style("mix-blend-mode", null).style("stroke", "#ddd");
     tooltipGroup.attr("display", null);
   }
   function pointerleft() {
     tooltipGroup.attr("display", "none");
-    lines && lines.style("mix-blend-mode", mixBlendMode).style("stroke", null);
   }
   return svg.node();
 };
