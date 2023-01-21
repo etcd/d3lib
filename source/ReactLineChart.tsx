@@ -40,7 +40,7 @@ const Chart = <T,>({
     padding: 0.3,
   });
   const yScale = scaleLinear({
-    range: [0, yRangeMax],
+    range: [yRangeMax, 0],
     round: true,
     domain: [0, Math.max(...data.map(getY))],
   });
