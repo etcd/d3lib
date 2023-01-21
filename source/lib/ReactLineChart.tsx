@@ -23,12 +23,12 @@ interface Props<T> {
   getZ: (p: T) => number | string;
   xAxisLabel?: string;
   yAxisLabel?: string;
-
+  xTickSpacing?: number;
+  yTickSpacing?: number;
   // dimensions
   height: number;
   margins?: Margins;
   axisWidth?: number;
-
   // colors
   axisColor?: string;
   datapointColor?: string;
@@ -44,12 +44,12 @@ export const ReactLineChart = <T,>(props: Props<T>) => {
     getZ,
     xAxisLabel,
     yAxisLabel,
-
+    xTickSpacing = 50,
+    yTickSpacing = 100,
     // dimensions
     height,
     margins = { left: 0, top: 0, right: 0, bottom: 0 },
     axisWidth = 50,
-
     // colors
     axisColor = "#000000",
     datapointColor = "#888888",
@@ -64,19 +64,34 @@ export const ReactLineChart = <T,>(props: Props<T>) => {
   const yRangeMax =
     height - (margins.top ?? 0) - (margins.bottom ?? 0) - axisWidth;
 
+  // maxs
+  const xMax = Math.max(...data.map(getX));
+  const yMax = Math.max(...data.map(getY));
+
   // scales
   const xScale = scaleLinear({
-    // domain: data.map(getX),
-    domain: [0, Math.max(...data.map(getX))],
+    domain: [0, xMax],
     range: [axisWidth, xRangeMax + axisWidth],
     round: true,
     // padding: 0.2,
   });
   const yScale = scaleLinear({
-    domain: [0, Math.max(...data.map(getY))],
+    domain: [0, yMax],
     range: [yRangeMax, 0],
     round: true,
   });
+
+  // tick values (undefined if log or time)
+  const xNumTicks = width / xTickSpacing;
+  const yNumTicks = width / yTickSpacing;
+  const xTickValues = Array.from(
+    { length: xNumTicks },
+    (_, i) => (i / xNumTicks) * xMax
+  );
+  const yTickValues = Array.from(
+    { length: yNumTicks },
+    (_, i) => (i / yNumTicks) * yMax
+  );
 
   // chart
   const chart = (
@@ -125,7 +140,7 @@ export const ReactLineChart = <T,>(props: Props<T>) => {
         scale={xScale}
         stroke={axisColor}
         tickStroke={axisColor}
-        tickValues={data.map(getX)} // undefined if log or time
+        tickValues={xTickValues}
         // tickFormat={tickFormat}
         // tickLabelProps={tickLabelProps}
         label={xAxisLabel}
@@ -144,7 +159,7 @@ export const ReactLineChart = <T,>(props: Props<T>) => {
         scale={yScale}
         stroke={axisColor}
         tickStroke={axisColor}
-        tickValues={data.map(getY)} // undefined if log or time
+        tickValues={yTickValues}
         label={yAxisLabel}
         labelProps={{
           y: -22,
