@@ -1,14 +1,14 @@
 import React from "react";
 import * as ReactDOM from "react-dom";
 
-const MyChart = () => {
+const Chart = () => {
   return <div>hello world</div>;
 };
 
-export const renderMyChart = (target: HTMLElement) => {
+export const render = (target: HTMLElement) => {
   ReactDOM.render(
     <React.StrictMode>
-      <MyChart />
+      <Chart />
     </React.StrictMode>,
     target
   );
