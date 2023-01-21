@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "esbuild source/*.ts source/*.tsx --bundle --outdir=build --format=esm  --minify",
-    "dev": "vite serve ./index.html",
+    "dev": "vite serve",
     "typecheck": "tsc --noEmit --listFiles",
     "clean:build": "rimraf build",
     "clean:node_modules": "rimraf node_modules"
