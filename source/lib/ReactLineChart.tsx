@@ -45,7 +45,7 @@ export const ReactLineChart = <T,>(props: Props<T>) => {
     xAxisLabel,
     yAxisLabel,
     xTickSpacing = 50,
-    yTickSpacing = 100,
+    yTickSpacing = 50,
     // dimensions
     height,
     margins = { left: 0, top: 0, right: 0, bottom: 0 },
@@ -83,7 +83,7 @@ export const ReactLineChart = <T,>(props: Props<T>) => {
 
   // tick values (undefined if log or time)
   const xNumTicks = width / xTickSpacing;
-  const yNumTicks = width / yTickSpacing;
+  const yNumTicks = height / yTickSpacing;
   const xTickValues = Array.from(
     { length: xNumTicks },
     (_, i) => (i / xNumTicks) * xMax
