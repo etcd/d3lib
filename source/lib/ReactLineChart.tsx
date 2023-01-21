@@ -1,5 +1,3 @@
-import React from "react";
-import * as ReactDOM from "react-dom/client";
 // import { Group } from "@visx/group";
 import { Axis, Orientation } from "@visx/axis";
 import { Bar } from "@visx/shape";
@@ -32,9 +30,7 @@ interface Props<T> {
   datapointColor?: string;
 }
 
-export const ReactLineChart = <T,>(
-  props: Props<T>
-): JSX.Element & { render: (target: HTMLElement) => void } => {
+export const ReactLineChart = <T,>(props: Props<T>) => {
   const {
     // data
     data,
@@ -132,15 +128,5 @@ export const ReactLineChart = <T,>(
     </svg>
   );
 
-  return {
-    ...chart,
-    render: (target: HTMLElement) => {
-      const root = ReactDOM.createRoot(target);
-      root.render(
-        <React.StrictMode>
-          <ReactLineChart {...props} />
-        </React.StrictMode>
-      );
-    },
-  };
+  return chart;
 };
