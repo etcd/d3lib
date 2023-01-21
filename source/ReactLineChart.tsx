@@ -12,6 +12,17 @@ interface Margins {
   right?: number;
 }
 
+interface Props<T> {
+  data: T[];
+  getX: (p: T) => number;
+  getY: (p: T) => number;
+  getZ: (p: T) => number | string;
+  width: number;
+  height: number;
+  margins: Margins;
+  axisColor: string;
+}
+
 export const ReactLineChart = <T,>({
   data,
   getX,
@@ -20,15 +31,8 @@ export const ReactLineChart = <T,>({
   width,
   height,
   margins,
-}: {
-  data: T[];
-  getX: (p: T) => number;
-  getY: (p: T) => number;
-  getZ: (p: T) => number | string;
-  width: number;
-  height: number;
-  margins: Margins;
-}) => {
+  axisColor,
+}: Props<T>): JSX.Element & { render: (target: HTMLElement) => void } => {
   // bounds
   const xRangeMax = width - (margins?.left ?? 0) - (margins?.right ?? 0);
   const yRangeMax = height - (margins?.top ?? 0) - (margins?.bottom ?? 0);
@@ -50,7 +54,7 @@ export const ReactLineChart = <T,>({
   const xPoint = (dp: T) => xScale(getX(dp));
   const yPoint = (dp: T) => yScale(getY(dp));
 
-  return (
+  const chart = (
     <svg width={width} height={height}>
       {data.map((dp, i) => {
         return (
@@ -65,19 +69,19 @@ export const ReactLineChart = <T,>({
       })}
       {/* x axis */}
       <Axis
-        orientation={Orientation.bottom}
-        top={150} // scale height?
+        orientation={Orientation.top}
+        top={yRangeMax}
         scale={xScale}
         // tickFormat={tickFormat}
-        // stroke={axisColor}
-        // tickStroke={axisColor}
+        stroke={axisColor}
+        tickStroke={axisColor}
         // tickLabelProps={tickLabelProps}
         tickValues={data.map(getX)} // undefined if log or time
-        label={"x axis label"}
+        // label={"x axis label"}
         labelProps={{
           x: width + 30,
-          y: -10,
-          fill: "#aaa",
+          // y: -100,
+          fill: "#000",
           fontSize: 18,
           strokeWidth: 0,
           stroke: "#fff",
@@ -88,40 +92,25 @@ export const ReactLineChart = <T,>({
       />
     </svg>
   );
-};
 
-export const render =
-  <T,>({
-    data,
-    getX,
-    getY,
-    getZ,
-    width,
-    height,
-    margins,
-  }: {
-    data: T[];
-    getX: (p: T) => number;
-    getY: (p: T) => number;
-    getZ: (p: T) => number | string;
-    width: number;
-    height: number;
-    margins: Margins;
-  }) =>
-  (target: HTMLElement) => {
-    const root = ReactDOM.createRoot(target);
-
-    root.render(
-      <React.StrictMode>
-        <ReactLineChart
-          data={data}
-          getX={getX}
-          getY={getY}
-          getZ={getZ}
-          width={width}
-          height={height}
-          margins={margins}
-        />
-      </React.StrictMode>
-    );
+  return {
+    ...chart,
+    render: (target: HTMLElement) => {
+      const root = ReactDOM.createRoot(target);
+      root.render(
+        <React.StrictMode>
+          <ReactLineChart
+            data={data}
+            getX={getX}
+            getY={getY}
+            getZ={getZ}
+            width={width}
+            height={height}
+            margins={margins}
+            axisColor={axisColor}
+          />
+        </React.StrictMode>
+      );
+    },
   };
+};

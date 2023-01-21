@@ -1,15 +1,16 @@
 import testSimData from "./constants/testSimData.json";
-import { render } from "./ReactLineChart";
+import { ReactLineChart } from "./ReactLineChart";
 
 const target = document.getElementById("root");
 
 target &&
-  render({
-    data: testSimData.slice(0, 10),
+  ReactLineChart({
+    data: testSimData.slice(0, 75),
     getX: (dp) => dp.x,
     getY: (dp) => dp.startingBalance,
     getZ: (dp) => dp.name,
-    width: 100,
+    width: 1000,
     height: 300,
     margins: { left: 0, top: 0, right: 0, bottom: 0 },
-  })(target);
+    axisColor: "#000000",
+  }).render(target);
