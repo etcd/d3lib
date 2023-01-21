@@ -12,7 +12,7 @@ interface Margins {
   right?: number;
 }
 
-const Chart = <T,>({
+export const ReactLineChart = <T,>({
   data,
   getX,
   getY,
@@ -113,7 +113,7 @@ export const render =
 
     root.render(
       <React.StrictMode>
-        <Chart
+        <ReactLineChart
           data={data}
           getX={getX}
           getY={getY}
