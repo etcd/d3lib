@@ -13,33 +13,57 @@ interface Margins {
 }
 
 interface Props<T> {
+  // data
   data: T[];
   getX: (p: T) => number;
   getY: (p: T) => number;
   getZ: (p: T) => number | string;
+  xAxisLabel?: string;
+  yAxisLabel?: string;
+
+  // dimensions
   width: number;
   height: number;
-  margins: Margins;
-  axisColor: string;
+  margins?: Margins;
+  axisWidth?: number;
+
+  // colors
+  axisColor?: string;
+  datapointColor?: string;
 }
 
-export const ReactLineChart = <T,>({
-  data,
-  getX,
-  getY,
-  getZ,
-  width,
-  height,
-  margins,
-  axisColor,
-}: Props<T>): JSX.Element & { render: (target: HTMLElement) => void } => {
-  // bounds
-  const xRangeMax = width - (margins?.left ?? 0) - (margins?.right ?? 0);
-  const yRangeMax = height - (margins?.top ?? 0) - (margins?.bottom ?? 0);
+export const ReactLineChart = <T,>(
+  props: Props<T>
+): JSX.Element & { render: (target: HTMLElement) => void } => {
+  const {
+    // data
+    data,
+    getX,
+    getY,
+    getZ,
+    xAxisLabel,
+    yAxisLabel,
 
-  // scale the graph by our data
+    // dimensions
+    width,
+    height,
+    margins,
+    axisWidth = 80,
+
+    // colors
+    axisColor = "#000000",
+    datapointColor = "#888888",
+  } = props;
+
+  // bounds
+  const xRangeMax =
+    width - (margins?.left ?? 0) - (margins?.right ?? 0) - axisWidth;
+  const yRangeMax =
+    height - (margins?.top ?? 0) - (margins?.bottom ?? 0) - axisWidth;
+
+  // scales
   const xScale = scaleBand({
-    range: [0, xRangeMax],
+    range: [axisWidth, xRangeMax + axisWidth],
     round: true,
     domain: data.map(getX),
     padding: 0.3,
@@ -50,26 +74,29 @@ export const ReactLineChart = <T,>({
     domain: [0, Math.max(...data.map(getY))],
   });
 
-  // compose the scale and accessor functions to get point functions
-  const xPoint = (dp: T) => xScale(getX(dp));
-  const yPoint = (dp: T) => yScale(getY(dp));
-
+  // chart
   const chart = (
     <svg width={width} height={height}>
-      {data.map((dp, i) => {
+      {/* bars */}
+      {data.map((dp) => {
+        // points
+        const xPoint = xScale(getX(dp));
+        const yPoint = yScale(getY(dp));
+
         return (
           <Bar
-            x={xPoint(dp)}
-            y={yPoint(dp)}
-            height={yRangeMax - yPoint(dp)}
+            x={xPoint}
+            y={yPoint}
+            height={yRangeMax - yPoint}
             width={xScale.bandwidth()}
-            fill="#fc2e1c"
+            fill={datapointColor}
           />
         );
       })}
+
       {/* x axis */}
       <Axis
-        orientation={Orientation.top}
+        orientation={Orientation.bottom}
         top={yRangeMax}
         scale={xScale}
         // tickFormat={tickFormat}
@@ -77,15 +104,28 @@ export const ReactLineChart = <T,>({
         tickStroke={axisColor}
         // tickLabelProps={tickLabelProps}
         tickValues={data.map(getX)} // undefined if log or time
-        // label={"x axis label"}
+        label={xAxisLabel}
         labelProps={{
-          x: width + 30,
-          // y: -100,
-          fill: "#000",
-          fontSize: 18,
-          strokeWidth: 0,
-          stroke: "#fff",
-          paintOrder: "stroke",
+          y: 36,
+          fontSize: 12,
+          fontFamily: "sans-serif",
+        }}
+      />
+
+      {/* y axis */}
+      <Axis
+        orientation={Orientation.left}
+        left={axisWidth}
+        scale={yScale}
+        // tickFormat={tickFormat}
+        stroke={axisColor}
+        tickStroke={axisColor}
+        // tickLabelProps={tickLabelProps}
+        tickValues={data.map(getY)} // undefined if log or time
+        label={yAxisLabel}
+        labelProps={{
+          y: -24,
+          fontSize: 12,
           fontFamily: "sans-serif",
           textAnchor: "start",
         }}
@@ -99,16 +139,7 @@ export const ReactLineChart = <T,>({
       const root = ReactDOM.createRoot(target);
       root.render(
         <React.StrictMode>
-          <ReactLineChart
-            data={data}
-            getX={getX}
-            getY={getY}
-            getZ={getZ}
-            width={width}
-            height={height}
-            margins={margins}
-            axisColor={axisColor}
-          />
+          <ReactLineChart {...props} />
         </React.StrictMode>
       );
     },

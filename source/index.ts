@@ -5,12 +5,15 @@ const target = document.getElementById("root");
 
 target &&
   ReactLineChart({
+    // data
     data: testSimData.slice(0, 75),
     getX: (dp) => dp.x,
     getY: (dp) => dp.startingBalance,
     getZ: (dp) => dp.name,
+    xAxisLabel: "x axis",
+    yAxisLabel: " y axis",
+
+    // dimensions
     width: 1000,
     height: 300,
-    margins: { left: 0, top: 0, right: 0, bottom: 0 },
-    axisColor: "#000000",
   }).render(target);
