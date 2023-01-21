@@ -15,8 +15,6 @@ export interface ChartProps<T> {
   getZ: (p: T) => number | string;
   xAxisLabel?: string;
   yAxisLabel?: string;
-  xTickSpacing?: number;
-  yTickSpacing?: number;
   // styles
   height: number;
   axisWidth?: number;
@@ -27,7 +25,7 @@ export interface ChartProps<T> {
   lineColor?: string;
 }
 
-export const ReactLineChart = <T,>(props: ChartProps<T>) => {
+export const Chart = <T,>(props: ChartProps<T>) => {
   // get props
   const {
     // data
@@ -37,8 +35,6 @@ export const ReactLineChart = <T,>(props: ChartProps<T>) => {
     getZ,
     xAxisLabel,
     yAxisLabel,
-    xTickSpacing = 50,
-    yTickSpacing = 50,
     // styles
     height,
     axisWidth = 50,
@@ -70,18 +66,6 @@ export const ReactLineChart = <T,>(props: ChartProps<T>) => {
     range: [yRangeMax, 0],
   });
 
-  // ticks (undefined if log or time)
-  const xNumTicks = width / xTickSpacing;
-  const yNumTicks = height / yTickSpacing;
-  const xTickValues = Array.from(
-    { length: xNumTicks },
-    (_, i) => (i / xNumTicks) * xMax
-  );
-  const yTickValues = Array.from(
-    { length: yNumTicks },
-    (_, i) => (i / yNumTicks) * yMax
-  );
-
   // chart
   const chart = (
     <svg height={height} style={{ width: "100%" }} ref={ref}>
@@ -89,18 +73,18 @@ export const ReactLineChart = <T,>(props: ChartProps<T>) => {
       <Group>
         {/* points */}
         {data.map((dp, i) => {
-          const pointX = xScale(getX(dp));
-          const pointY = yScale(getY(dp));
-
           return (
             <circle
               key={i}
-              cx={pointX}
-              cy={pointY}
+              cx={xScale(getX(dp))}
+              cy={yScale(getY(dp))}
               r={pointRadius}
               fill={pointColor}
             />
           );
+          // const pointX = xScale(getX(dp));
+          // const pointY = yScale(getY(dp));
+          //
           // return (
           //   <Bar
           //     key={i}
@@ -129,9 +113,6 @@ export const ReactLineChart = <T,>(props: ChartProps<T>) => {
         scale={xScale}
         stroke={axisColor}
         tickStroke={axisColor}
-        tickValues={xTickValues}
-        // tickFormat={tickFormat}
-        // tickLabelProps={tickLabelProps}
         label={xAxisLabel}
         labelProps={{
           y: 36,
@@ -148,7 +129,6 @@ export const ReactLineChart = <T,>(props: ChartProps<T>) => {
         scale={yScale}
         stroke={axisColor}
         tickStroke={axisColor}
-        tickValues={yTickValues}
         label={yAxisLabel}
         labelProps={{
           y: -22,
@@ -166,7 +146,5 @@ export const ReactLineChart = <T,>(props: ChartProps<T>) => {
 export const render =
   <T,>(props: ChartProps<T>) =>
   (target: HTMLElement) => {
-    const root = ReactDOM.createRoot(target);
-
-    root.render(<ReactLineChart {...props} />);
+    ReactDOM.createRoot(target).render(<Chart {...props} />);
   };

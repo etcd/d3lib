@@ -2,7 +2,7 @@ import React from "react";
 import * as ReactDOM from "react-dom/client";
 
 import testSimData from "./source/constants/testSimData.json";
-import { ReactLineChart } from "./source/lib/ReactLineChart";
+import { Chart as ReactLineChart } from "./source/lib/ReactLineChart";
 
 import "./global.css";
 
@@ -14,7 +14,7 @@ rootElement &&
       <div className="m-5">
         <ReactLineChart
           // data
-          data={testSimData.slice(0, 200)}
+          data={testSimData.slice(0, 2000)}
           getX={(dp) => dp.x}
           getY={(dp) => dp.startingBalance}
           getZ={(dp) => dp.name}
