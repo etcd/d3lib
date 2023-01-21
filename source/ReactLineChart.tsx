@@ -66,7 +66,7 @@ const Chart = <T,>({
       {/* x axis */}
       <Axis
         orientation={Orientation.bottom}
-        top={500} // scale height?
+        top={150} // scale height?
         scale={xScale}
         // tickFormat={tickFormat}
         // stroke={axisColor}
