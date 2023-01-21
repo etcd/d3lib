@@ -55,8 +55,8 @@ const Chart = <T,>({
         return (
           <Bar
             x={xPoint(dp)}
-            y={yPoint(dp)}
-            height={yRangeMax - yPoint(dp)}
+            y={0}
+            height={yPoint(dp)}
             width={xScale.bandwidth()}
             fill="#fc2e1c"
           />
