@@ -40,7 +40,7 @@ const Chart = <T,>({
     padding: 0.3,
   });
   const yScale = scaleLinear({
-    range: [0, -yRangeMax],
+    range: [yRangeMax, 0],
     round: true,
     domain: [0, Math.max(...data.map(getY))],
   });
@@ -55,8 +55,8 @@ const Chart = <T,>({
         return (
           <Bar
             x={xPoint(dp)}
-            y={0}
-            height={-yPoint(dp)}
+            y={yPoint(dp)}
+            height={yRangeMax - yPoint(dp)}
             width={xScale.bandwidth()}
             fill="#fc2e1c"
           />
