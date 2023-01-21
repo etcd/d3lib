@@ -16,12 +16,14 @@ interface Props<T> {
   yAxisLabel?: string;
   xTickSpacing?: number;
   yTickSpacing?: number;
-  // dimensions
+  // styles
   height: number;
   axisWidth?: number;
-  // colors
   axisColor?: string;
-  datapointColor?: string;
+  pointRadius?: number;
+  pointColor?: string;
+  lineWidth?: number;
+  lineColor?: string;
 }
 
 export const ReactLineChart = <T,>(props: Props<T>) => {
@@ -36,12 +38,14 @@ export const ReactLineChart = <T,>(props: Props<T>) => {
     yAxisLabel,
     xTickSpacing = 50,
     yTickSpacing = 50,
-    // dimensions
+    // styles
     height,
     axisWidth = 50,
-    // colors
     axisColor = "#000000",
-    datapointColor = "#888888",
+    pointRadius = 1.5,
+    pointColor = "#303030",
+    lineWidth = 1,
+    lineColor = "#303030",
   } = props;
 
   // hooks
@@ -67,7 +71,7 @@ export const ReactLineChart = <T,>(props: Props<T>) => {
     round: true,
   });
 
-  // tick values (undefined if log or time)
+  // ticks (undefined if log or time)
   const xNumTicks = width / xTickSpacing;
   const yNumTicks = height / yTickSpacing;
   const xTickValues = Array.from(
@@ -94,8 +98,8 @@ export const ReactLineChart = <T,>(props: Props<T>) => {
               key={i}
               cx={pointX}
               cy={pointY}
-              r={3}
-              fill={datapointColor}
+              r={pointRadius}
+              fill={pointColor}
             />
           );
           // return (
@@ -114,8 +118,8 @@ export const ReactLineChart = <T,>(props: Props<T>) => {
           data={data}
           x={(dp) => xScale(getX(dp))}
           y={(dp) => yScale(getY(dp))}
-          stroke="#333"
-          strokeWidth={1}
+          stroke={lineColor}
+          strokeWidth={lineWidth}
         />
       </Group>
 
