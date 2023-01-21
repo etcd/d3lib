@@ -52,12 +52,12 @@ const Chart = <T,>({
   return (
     <svg width={width} height={height}>
       {data.map((dp, i) => {
-        const barHeight = yRangeMax - yPoint(dp);
+        const barHeight = yPoint(dp);
         return (
           <Group key={`bar-${i}`}>
             <Bar
               x={xPoint(dp)}
-              y={yRangeMax - barHeight}
+              y={barHeight}
               height={barHeight}
               width={xScale.bandwidth()}
               fill="#fc2e1c"
