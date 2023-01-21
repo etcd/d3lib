@@ -1,28 +1,38 @@
 import React from "react";
+import * as ReactDOM from "react-dom/client";
 
 import testSimData from "./source/constants/testSimData.json";
 import { ReactLineChart } from "./source/lib/ReactLineChart";
-import { renderElementTo } from "./source/lib/utils";
+import { renderChartTo } from "./source/lib/utils";
 
 import "./global.css";
 
-const target = document.getElementById("root");
+const rootElement = document.getElementById("root");
 
-target &&
-  renderElementTo(
-    <React.StrictMode>
-      <div className="m-5">
-        <ReactLineChart
-          // data
-          data={testSimData.slice(0, 200)}
-          getX={(dp) => dp.x}
-          getY={(dp) => dp.startingBalance}
-          getZ={(dp) => dp.name}
-          xAxisLabel={"x axis"}
-          yAxisLabel={" y axis"}
-          // dimensions
-          height={300}
-        />
-      </div>
-    </React.StrictMode>
-  )(target);
+// rootElement &&
+//   ReactDOM.createRoot(rootElement).render(
+//     <React.StrictMode>
+//       <div className="m-5">
+//         <ReactLineChart
+//           // data
+//           data={testSimData.slice(0, 200)}
+//           getX={(dp) => dp.x}
+//           getY={(dp) => dp.startingBalance}
+//           getZ={(dp) => dp.name}
+//           xAxisLabel={"x axis"}
+//           yAxisLabel={"y axis"}
+//           // dimensions
+//           height={300}
+//         />
+//       </div>
+//     </React.StrictMode>
+//   );
+
+rootElement &&
+  renderChartTo(ReactLineChart, {
+    data: testSimData.slice(0, 200),
+    getX: (dp) => dp.x,
+    getY: (dp) => dp.startingBalance,
+    getZ: (dp) => dp.name,
+    height: 300,
+  })(rootElement);

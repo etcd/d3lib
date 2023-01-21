@@ -6,7 +6,7 @@ import { useMeasure } from "react-use";
 import { Group } from "@visx/group";
 import { curveLinear } from "d3";
 
-interface Props<T> {
+export interface ChartProps<T> {
   // data
   data: T[];
   getX: (p: T) => number;
@@ -26,7 +26,7 @@ interface Props<T> {
   lineColor?: string;
 }
 
-export const ReactLineChart = <T,>(props: Props<T>) => {
+export const ReactLineChart = <T,>(props: ChartProps<T>) => {
   // get props
   const {
     // data
