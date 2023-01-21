@@ -40,7 +40,7 @@ const Chart = <T,>({
     padding: 0.3,
   });
   const yScale = scaleLinear({
-    range: [0, yRangeMax],
+    range: [yRangeMax, 0],
     round: true,
     domain: [0, Math.max(...data.map(getY))],
   });
@@ -52,12 +52,12 @@ const Chart = <T,>({
   return (
     <svg width={width} height={height}>
       {data.map((dp, i) => {
-        const barHeight = yPoint(dp);
+        const barHeight = yRangeMax - yPoint(dp);
         return (
-          <Group key={`bar-${i}`}>
+          <Group key={i}>
             <Bar
               x={xPoint(dp)}
-              y={barHeight}
+              y={yRangeMax - barHeight}
               height={barHeight}
               width={xScale.bandwidth()}
               fill="#fc2e1c"
