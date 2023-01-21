@@ -31854,7 +31854,7 @@ var ReactLineChart = (props) => {
     { length: yNumTicks },
     (_, i) => i / yNumTicks * yMax
   );
-  const chart = /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("svg", { height, className: "w-full", ref, children: [
+  const chart = /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("svg", { height, style: { width: "100%" }, ref, children: [
     /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Group, { children: [
       data.map((dp, i) => {
         const pointX = xScale(getX(dp));

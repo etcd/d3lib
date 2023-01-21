@@ -7,8 +7,6 @@ import { Group } from "@visx/group";
 import { curveLinear } from "d3";
 import ReactDOM from "react-dom/client";
 
-import "./ReactLineChart.css";
-
 export interface ChartProps<T> {
   // data
   data: T[];
@@ -88,7 +86,7 @@ export const ReactLineChart = <T,>(props: ChartProps<T>) => {
 
   // chart
   const chart = (
-    <svg height={height} className="w-full" ref={ref}>
+    <svg height={height} style={{ width: "100%" }} ref={ref}>
       {/* data */}
       <Group>
         {/* points */}
