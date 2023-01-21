@@ -47,8 +47,8 @@ export const ReactLineChart = <T,>(
     // dimensions
     width,
     height,
-    margins,
-    axisWidth = 80,
+    margins = { left: 0, top: 0, right: 0, bottom: 0 },
+    axisWidth = 50,
 
     // colors
     axisColor = "#000000",
@@ -57,21 +57,21 @@ export const ReactLineChart = <T,>(
 
   // bounds
   const xRangeMax =
-    width - (margins?.left ?? 0) - (margins?.right ?? 0) - axisWidth;
+    width - (margins.left ?? 0) - (margins.right ?? 0) - axisWidth;
   const yRangeMax =
-    height - (margins?.top ?? 0) - (margins?.bottom ?? 0) - axisWidth;
+    height - (margins.top ?? 0) - (margins.bottom ?? 0) - axisWidth;
 
   // scales
   const xScale = scaleBand({
+    domain: data.map(getX),
     range: [axisWidth, xRangeMax + axisWidth],
     round: true,
-    domain: data.map(getX),
-    padding: 0.3,
+    padding: 0.2,
   });
   const yScale = scaleLinear({
+    domain: [0, Math.max(...data.map(getY))],
     range: [yRangeMax, 0],
     round: true,
-    domain: [0, Math.max(...data.map(getY))],
   });
 
   // chart
@@ -99,15 +99,16 @@ export const ReactLineChart = <T,>(
         orientation={Orientation.bottom}
         top={yRangeMax}
         scale={xScale}
-        // tickFormat={tickFormat}
         stroke={axisColor}
         tickStroke={axisColor}
-        // tickLabelProps={tickLabelProps}
         tickValues={data.map(getX)} // undefined if log or time
+        // tickFormat={tickFormat}
+        // tickLabelProps={tickLabelProps}
         label={xAxisLabel}
         labelProps={{
           y: 36,
           fontSize: 12,
+          fontWeight: "bold",
           fontFamily: "sans-serif",
         }}
       />
@@ -117,17 +118,15 @@ export const ReactLineChart = <T,>(
         orientation={Orientation.left}
         left={axisWidth}
         scale={yScale}
-        // tickFormat={tickFormat}
         stroke={axisColor}
         tickStroke={axisColor}
-        // tickLabelProps={tickLabelProps}
         tickValues={data.map(getY)} // undefined if log or time
         label={yAxisLabel}
         labelProps={{
-          y: -24,
+          y: -22,
           fontSize: 12,
+          fontWeight: "bold",
           fontFamily: "sans-serif",
-          textAnchor: "start",
         }}
       />
     </svg>
