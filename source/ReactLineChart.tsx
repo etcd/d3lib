@@ -29,18 +29,18 @@ const Chart = <T,>({
   margins: Margins;
 }) => {
   // bounds
-  const xMax = width - (margins?.left ?? 0) - (margins?.right ?? 0);
-  const yMax = height - (margins?.top ?? 0) - (margins?.bottom ?? 0);
+  const xRangeMax = width - (margins?.left ?? 0) - (margins?.right ?? 0);
+  const yRangeMax = height - (margins?.top ?? 0) - (margins?.bottom ?? 0);
 
   // scale the graph by our data
   const xScale = scaleBand({
-    range: [0, xMax],
+    range: [0, xRangeMax],
     round: true,
     domain: data.map(getX),
-    padding: 0.4,
+    padding: 0.3,
   });
   const yScale = scaleLinear({
-    range: [yMax, 0],
+    range: [0, yRangeMax],
     round: true,
     domain: [0, Math.max(...data.map(getY))],
   });
@@ -52,12 +52,12 @@ const Chart = <T,>({
   return (
     <svg width={width} height={height}>
       {data.map((dp, i) => {
-        const barHeight = yMax - yPoint(dp);
+        const barHeight = yRangeMax - yPoint(dp);
         return (
           <Group key={`bar-${i}`}>
             <Bar
               x={xPoint(dp)}
-              y={yMax - barHeight}
+              y={yRangeMax - barHeight}
               height={barHeight}
               width={xScale.bandwidth()}
               fill="#fc2e1c"
