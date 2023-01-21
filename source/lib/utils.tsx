@@ -1,18 +1,13 @@
 import React from "react";
-// import * as ReactDOM from "react-dom/client";
-import * as ReactDOM from "react-dom";
+import * as ReactDOM from "react-dom/client";
 import { ChartProps } from "./ReactLineChart";
 
 export const renderChartTo =
   <T,>(
-    Component: (props: ChartProps<T>) => JSX.Element,
+    component: (props: ChartProps<T>) => JSX.Element,
     props: ChartProps<T>
   ) =>
   (target: HTMLElement) => {
-    const targetDom = ReactDOM.render(
-      <React.StrictMode>
-        <Component {...props} />
-      </React.StrictMode>,
-      target
-    );
+    const targetDom = ReactDOM.createRoot(target);
+    targetDom.render(React.createElement(component, props));
   };
