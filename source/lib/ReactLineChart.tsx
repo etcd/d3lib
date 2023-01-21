@@ -7,6 +7,8 @@ import { Group } from "@visx/group";
 import { curveLinear } from "d3";
 import ReactDOM from "react-dom/client";
 
+import "./ReactLineChart.css";
+
 export interface ChartProps<T> {
   // data
   data: T[];
