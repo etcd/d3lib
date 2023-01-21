@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build:lib": "esbuild source/lib/*.ts source/lib/*.tsx --bundle --outdir=build --format=esm  --minify",
+    "build": "esbuild source/lib/*.ts source/lib/*.tsx --bundle --outdir=build --format=esm  --minify",
     "dev": "vite serve",
     "typecheck": "tsc --noEmit --listFiles",
     "clean:build": "rimraf build",
