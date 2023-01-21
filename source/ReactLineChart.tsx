@@ -1,5 +1,5 @@
 import React from "react";
-import * as ReactDOM from "react-dom";
+import * as ReactDOM from "react-dom/client";
 import { Group } from "@visx/group";
 import { Bar } from "@visx/shape";
 import { scaleLinear, scaleBand } from "@visx/scale";
@@ -88,7 +88,9 @@ export const render =
     margins: Margins;
   }) =>
   (target: HTMLElement) => {
-    ReactDOM.render(
+    const root = ReactDOM.createRoot(target);
+
+    root.render(
       <React.StrictMode>
         <Chart
           data={data}
@@ -99,7 +101,6 @@ export const render =
           height={height}
           margins={margins}
         />
-      </React.StrictMode>,
-      target
+      </React.StrictMode>
     );
   };
