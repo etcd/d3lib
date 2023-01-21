@@ -1,15 +1,19 @@
 // import { Group } from "@visx/group";
 import { Axis, Orientation } from "@visx/axis";
-import { Bar } from "@visx/shape";
+import { Bar, LinePath } from "@visx/shape";
 import { scaleLinear, scaleBand } from "@visx/scale";
 import { useMeasure } from "react-use";
+import { Group } from "@visx/group";
+import { curveLinear } from "d3";
 
 interface Margins {
   top?: number;
+  right?: number;
   bottom?: number;
   left?: number;
-  right?: number;
 }
+
+const DEFAULT_MARGINS: Margins = {};
 
 interface Props<T> {
   // data
@@ -61,11 +65,12 @@ export const ReactLineChart = <T,>(props: Props<T>) => {
     height - (margins.top ?? 0) - (margins.bottom ?? 0) - axisWidth;
 
   // scales
-  const xScale = scaleBand({
-    domain: data.map(getX),
+  const xScale = scaleLinear({
+    // domain: data.map(getX),
+    domain: [0, Math.max(...data.map(getX))],
     range: [axisWidth, xRangeMax + axisWidth],
     round: true,
-    padding: 0.2,
+    // padding: 0.2,
   });
   const yScale = scaleLinear({
     domain: [0, Math.max(...data.map(getY))],
@@ -76,23 +81,42 @@ export const ReactLineChart = <T,>(props: Props<T>) => {
   // chart
   const chart = (
     <svg height={height} className="w-full" ref={ref}>
-      {/* bars */}
-      {data.map((dp, i) => {
-        // points
-        const xPoint = xScale(getX(dp));
-        const yPoint = yScale(getY(dp));
+      {/* data */}
+      <Group>
+        {/* points */}
+        {data.map((dp, i) => {
+          const pointX = xScale(getX(dp));
+          const pointY = yScale(getY(dp));
 
-        return (
-          <Bar
-            key={i}
-            x={xPoint}
-            y={yPoint}
-            height={yRangeMax - yPoint}
-            width={xScale.bandwidth()}
-            fill={datapointColor}
-          />
-        );
-      })}
+          return (
+            <circle
+              key={i}
+              cx={pointX}
+              cy={pointY}
+              r={3}
+              fill={datapointColor}
+            />
+          );
+          // return (
+          //   <Bar
+          //     key={i}
+          //     x={pointX}
+          //     y={pointY}
+          //     height={yRangeMax - pointY}
+          //     width={4}
+          //     fill={datapointColor}
+          //   />
+          // );
+        })}
+        <LinePath<T>
+          curve={curveLinear}
+          data={data}
+          x={(dp) => xScale(getX(dp))}
+          y={(dp) => yScale(getY(dp))}
+          stroke="#333"
+          strokeWidth={1}
+        />
+      </Group>
 
       {/* x axis */}
       <Axis
