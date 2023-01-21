@@ -1,7 +1,7 @@
 // import { Group } from "@visx/group";
 import { Axis, Orientation } from "@visx/axis";
-import { Bar, LinePath } from "@visx/shape";
-import { scaleLinear, scaleBand } from "@visx/scale";
+import { LinePath } from "@visx/shape";
+import { scaleLinear } from "@visx/scale";
 import { useMeasure } from "react-use";
 import { Group } from "@visx/group";
 import { curveLinear } from "d3";
@@ -64,12 +64,10 @@ export const ReactLineChart = <T,>(props: ChartProps<T>) => {
   const xScale = scaleLinear({
     domain: [0, xMax],
     range: [axisWidth, xRangeMax + axisWidth],
-    round: true,
   });
   const yScale = scaleLinear({
     domain: [0, yMax],
     range: [yRangeMax, 0],
-    round: true,
   });
 
   // ticks (undefined if log or time)
