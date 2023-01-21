@@ -603,7 +603,7 @@
     classnames "^2.3.1"
     prop-types "^15.6.0"
 
-"@visx/curve@3.0.0":
+"@visx/curve@3.0.0", "@visx/curve@^3.0.0":
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/@visx/curve/-/curve-3.0.0.tgz#c54568472e00a38483c58cf52e4a6ddb2887c2d4"
   integrity sha512-kvHJDLBeczTQ87ZExSTfRxej06l6o6UiQ0NHf9+xpAin06y6Qk1ThOHHWJTGM6KGzwlu7jEauJGHwZs6nMhDvA==

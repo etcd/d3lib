@@ -36,6 +36,7 @@
   },
   "dependencies": {
     "@visx/axis": "^3.0.0",
+    "@visx/curve": "^3.0.0",
     "@visx/group": "^3.0.0",
     "@visx/scale": "^3.0.0",
     "@visx/shape": "^3.0.0",
