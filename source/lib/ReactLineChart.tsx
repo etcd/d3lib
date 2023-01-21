@@ -5,6 +5,7 @@ import { scaleLinear, scaleBand } from "@visx/scale";
 import { useMeasure } from "react-use";
 import { Group } from "@visx/group";
 import { curveLinear } from "d3";
+import ReactDOM from "react-dom/client";
 
 export interface ChartProps<T> {
   // data
@@ -163,3 +164,11 @@ export const ReactLineChart = <T,>(props: ChartProps<T>) => {
 
   return chart;
 };
+
+export const render =
+  <T,>(props: ChartProps<T>) =>
+  (target: HTMLElement) => {
+    const root = ReactDOM.createRoot(target);
+
+    root.render(<ReactLineChart {...props} />);
+  };
