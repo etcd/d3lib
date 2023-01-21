@@ -2,6 +2,7 @@
 import { Axis, Orientation } from "@visx/axis";
 import { Bar } from "@visx/shape";
 import { scaleLinear, scaleBand } from "@visx/scale";
+import { useMeasure } from "react-use";
 
 interface Margins {
   top?: number;
@@ -20,7 +21,6 @@ interface Props<T> {
   yAxisLabel?: string;
 
   // dimensions
-  width: number;
   height: number;
   margins?: Margins;
   axisWidth?: number;
@@ -31,6 +31,7 @@ interface Props<T> {
 }
 
 export const ReactLineChart = <T,>(props: Props<T>) => {
+  // get props
   const {
     // data
     data,
@@ -41,7 +42,6 @@ export const ReactLineChart = <T,>(props: Props<T>) => {
     yAxisLabel,
 
     // dimensions
-    width,
     height,
     margins = { left: 0, top: 0, right: 0, bottom: 0 },
     axisWidth = 50,
@@ -50,6 +50,9 @@ export const ReactLineChart = <T,>(props: Props<T>) => {
     axisColor = "#000000",
     datapointColor = "#888888",
   } = props;
+
+  // hooks
+  const [ref, { width }] = useMeasure<SVGSVGElement>();
 
   // bounds
   const xRangeMax =
@@ -72,7 +75,7 @@ export const ReactLineChart = <T,>(props: Props<T>) => {
 
   // chart
   const chart = (
-    <svg>
+    <svg height={height} className="w-full" ref={ref}>
       {/* bars */}
       {data.map((dp, i) => {
         // points
