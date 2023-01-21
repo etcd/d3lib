@@ -3,8 +3,11 @@ import * as ReactDOM from "react-dom/client";
 import { ChartProps } from "./ReactLineChart";
 
 export const renderChartTo =
-  <T>(component: (props: ChartProps<T>) => JSX.Element, props: ChartProps<T>) =>
+  <T,>(
+    Component: (props: ChartProps<T>) => JSX.Element,
+    props: ChartProps<T>
+  ) =>
   (target: HTMLElement) => {
     const targetDom = ReactDOM.createRoot(target);
-    targetDom.render(React.createElement(component, props));
+    targetDom.render(<Component {...props} />);
   };
