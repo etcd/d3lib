@@ -1,11 +1,11 @@
 // import { Group } from "@visx/group";
 import { Axis, Orientation } from "@visx/axis";
 import { LinePath } from "@visx/shape";
-import { scaleLinear } from "@visx/scale";
+import { scaleLinear, scaleLog } from "@visx/scale";
 import { useMeasure } from "react-use";
 import { Group } from "@visx/group";
-import { curveLinear } from "d3";
 import ReactDOM from "react-dom/client";
+import { curveLinear } from "@visx/curve";
 
 export interface ChartProps<T> {
   // data
