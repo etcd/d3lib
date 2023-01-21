@@ -1,5 +1,5 @@
-import testSimData from "./constants/testSimData.json";
-import { ReactLineChart } from "./ReactLineChart";
+import testSimData from "./source/constants/testSimData.json";
+import { ReactLineChart } from "./source/ReactLineChart";
 
 const target = document.getElementById("root");
 
