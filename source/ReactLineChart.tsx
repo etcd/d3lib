@@ -54,15 +54,16 @@ const Chart = <T,>({
       {data.map((dp, i) => {
         const barHeight = yRangeMax - yPoint(dp);
         return (
-          <Group key={i}>
-            <Bar
-              x={xPoint(dp)}
-              y={yRangeMax - barHeight}
-              height={barHeight}
-              width={xScale.bandwidth()}
-              fill="#fc2e1c"
-            />
-          </Group>
+          // <Group >
+          <Bar
+            // key={i}
+            x={xPoint(dp)}
+            y={yRangeMax - barHeight}
+            height={barHeight}
+            width={xScale.bandwidth()}
+            fill="#fc2e1c"
+          />
+          // </Group>
         );
       })}
     </svg>
