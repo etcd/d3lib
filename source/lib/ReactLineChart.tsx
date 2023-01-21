@@ -6,15 +6,6 @@ import { useMeasure } from "react-use";
 import { Group } from "@visx/group";
 import { curveLinear } from "d3";
 
-interface Margins {
-  top?: number;
-  right?: number;
-  bottom?: number;
-  left?: number;
-}
-
-const DEFAULT_MARGINS: Margins = {};
-
 interface Props<T> {
   // data
   data: T[];
@@ -27,7 +18,6 @@ interface Props<T> {
   yTickSpacing?: number;
   // dimensions
   height: number;
-  margins?: Margins;
   axisWidth?: number;
   // colors
   axisColor?: string;
@@ -48,7 +38,6 @@ export const ReactLineChart = <T,>(props: Props<T>) => {
     yTickSpacing = 50,
     // dimensions
     height,
-    margins = { left: 0, top: 0, right: 0, bottom: 0 },
     axisWidth = 50,
     // colors
     axisColor = "#000000",
@@ -59,10 +48,8 @@ export const ReactLineChart = <T,>(props: Props<T>) => {
   const [ref, { width }] = useMeasure<SVGSVGElement>();
 
   // bounds
-  const xRangeMax =
-    width - (margins.left ?? 0) - (margins.right ?? 0) - axisWidth;
-  const yRangeMax =
-    height - (margins.top ?? 0) - (margins.bottom ?? 0) - axisWidth;
+  const xRangeMax = width - axisWidth;
+  const yRangeMax = height - axisWidth;
 
   // maxs
   const xMax = Math.max(...data.map(getX));
@@ -73,7 +60,6 @@ export const ReactLineChart = <T,>(props: Props<T>) => {
     domain: [0, xMax],
     range: [axisWidth, xRangeMax + axisWidth],
     round: true,
-    // padding: 0.2,
   });
   const yScale = scaleLinear({
     domain: [0, yMax],

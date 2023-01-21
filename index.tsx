@@ -11,16 +11,18 @@ const target = document.getElementById("root");
 target &&
   renderElementTo(
     <React.StrictMode>
-      <ReactLineChart
-        // data
-        data={testSimData.slice(0, 200)}
-        getX={(dp) => dp.x}
-        getY={(dp) => dp.startingBalance}
-        getZ={(dp) => dp.name}
-        xAxisLabel={"x axis"}
-        yAxisLabel={" y axis"}
-        // dimensions
-        height={300}
-      />
+      <div className="m-5">
+        <ReactLineChart
+          // data
+          data={testSimData.slice(0, 200)}
+          getX={(dp) => dp.x}
+          getY={(dp) => dp.startingBalance}
+          getZ={(dp) => dp.name}
+          xAxisLabel={"x axis"}
+          yAxisLabel={" y axis"}
+          // dimensions
+          height={300}
+        />
+      </div>
     </React.StrictMode>
   )(target);
