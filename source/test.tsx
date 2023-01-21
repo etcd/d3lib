@@ -5,11 +5,11 @@ const MyChart = () => {
   return <div>hello world</div>;
 };
 
-export const renderMyChart = () => {
+export const renderMyChart = (target: HTMLElement) => {
   ReactDOM.render(
     <React.StrictMode>
       <MyChart />
     </React.StrictMode>,
-    document.getElementById("root")
+    target
   );
 };

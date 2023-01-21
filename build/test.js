@@ -24372,10 +24372,10 @@ var import_jsx_runtime = __toESM(require_jsx_runtime());
 var MyChart = () => {
   return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { children: "hello world" });
 };
-var renderMyChart = () => {
+var renderMyChart = (target) => {
   ReactDOM.render(
     /* @__PURE__ */ (0, import_jsx_runtime.jsx)(import_react.default.StrictMode, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(MyChart, {}) }),
-    document.getElementById("root")
+    target
   );
 };
 export {
