@@ -9,5 +9,10 @@ export const renderChartTo =
     props: ChartProps<T>
   ) =>
   (target: HTMLElement) => {
-    const targetDom = ReactDOM.render(<Component {...props} />, target);
+    const targetDom = ReactDOM.render(
+      <React.StrictMode>
+        <Component {...props} />
+      </React.StrictMode>,
+      target
+    );
   };

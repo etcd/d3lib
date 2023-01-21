@@ -2395,9 +2395,9 @@ var require_react_dom_development = __commonJS({
         if (typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ !== "undefined" && typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart === "function") {
           __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(new Error());
         }
-        var React = require_react();
+        var React2 = require_react();
         var Scheduler = require_scheduler();
-        var ReactSharedInternals = React.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+        var ReactSharedInternals = React2.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
         var suppressWarning = false;
         function setSuppressWarning(newSuppressWarning) {
           {
@@ -4002,7 +4002,7 @@ var require_react_dom_development = __commonJS({
           {
             if (props.value == null) {
               if (typeof props.children === "object" && props.children !== null) {
-                React.Children.forEach(props.children, function(child) {
+                React2.Children.forEach(props.children, function(child) {
                   if (child == null) {
                     return;
                   }
@@ -12449,7 +12449,7 @@ var require_react_dom_development = __commonJS({
           }
         }
         var fakeInternalInstance = {};
-        var emptyRefsObject = new React.Component().refs;
+        var emptyRefsObject = new React2.Component().refs;
         var didWarnAboutStateAssignmentForComponent;
         var didWarnAboutUninitializedState;
         var didWarnAboutGetSnapshotBeforeUpdateWithoutDidUpdate;
@@ -23496,7 +23496,7 @@ var require_react_jsx_runtime_development = __commonJS({
     if (true) {
       (function() {
         "use strict";
-        var React = require_react();
+        var React2 = require_react();
         var REACT_ELEMENT_TYPE = Symbol.for("react.element");
         var REACT_PORTAL_TYPE = Symbol.for("react.portal");
         var REACT_FRAGMENT_TYPE = Symbol.for("react.fragment");
@@ -23522,7 +23522,7 @@ var require_react_jsx_runtime_development = __commonJS({
           }
           return null;
         }
-        var ReactSharedInternals = React.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+        var ReactSharedInternals = React2.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
         function error(format) {
           {
             {
@@ -24380,10 +24380,14 @@ var require_jsx_runtime = __commonJS({
 });
 
 // source/lib/utils.tsx
+var import_react = __toESM(require_react());
 var ReactDOM = __toESM(require_react_dom());
 var import_jsx_runtime = __toESM(require_jsx_runtime());
 var renderChartTo = (Component, props) => (target) => {
-  const targetDom = ReactDOM.render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Component, __spreadValues({}, props)), target);
+  const targetDom = ReactDOM.render(
+    /* @__PURE__ */ (0, import_jsx_runtime.jsx)(import_react.default.StrictMode, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Component, __spreadValues({}, props)) }),
+    target
+  );
 };
 export {
   renderChartTo
