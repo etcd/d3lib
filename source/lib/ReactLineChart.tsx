@@ -72,15 +72,16 @@ export const ReactLineChart = <T,>(props: Props<T>) => {
 
   // chart
   const chart = (
-    <svg width={width} height={height}>
+    <svg>
       {/* bars */}
-      {data.map((dp) => {
+      {data.map((dp, i) => {
         // points
         const xPoint = xScale(getX(dp));
         const yPoint = yScale(getY(dp));
 
         return (
           <Bar
+            key={i}
             x={xPoint}
             y={yPoint}
             height={yRangeMax - yPoint}
