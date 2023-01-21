@@ -1,5 +1,6 @@
 import React from "react";
-import * as ReactDOM from "react-dom/client";
+// import * as ReactDOM from "react-dom/client";
+import * as ReactDOM from "react-dom";
 import { ChartProps } from "./ReactLineChart";
 
 export const renderChartTo =
@@ -8,6 +9,5 @@ export const renderChartTo =
     props: ChartProps<T>
   ) =>
   (target: HTMLElement) => {
-    const targetDom = ReactDOM.createRoot(target);
-    targetDom.render(<Component {...props} />);
+    const targetDom = ReactDOM.render(<Component {...props} />, target);
   };

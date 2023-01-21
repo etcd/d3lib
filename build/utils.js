@@ -984,26 +984,26 @@ var require_react_development = __commonJS({
           }
           return lazyType;
         }
-        function forwardRef(render) {
+        function forwardRef(render2) {
           {
-            if (render != null && render.$$typeof === REACT_MEMO_TYPE) {
+            if (render2 != null && render2.$$typeof === REACT_MEMO_TYPE) {
               error("forwardRef requires a render function but received a `memo` component. Instead of forwardRef(memo(...)), use memo(forwardRef(...)).");
-            } else if (typeof render !== "function") {
-              error("forwardRef requires a render function but was given %s.", render === null ? "null" : typeof render);
+            } else if (typeof render2 !== "function") {
+              error("forwardRef requires a render function but was given %s.", render2 === null ? "null" : typeof render2);
             } else {
-              if (render.length !== 0 && render.length !== 2) {
-                error("forwardRef render functions accept exactly two parameters: props and ref. %s", render.length === 1 ? "Did you forget to use the ref parameter?" : "Any additional parameter will be undefined.");
+              if (render2.length !== 0 && render2.length !== 2) {
+                error("forwardRef render functions accept exactly two parameters: props and ref. %s", render2.length === 1 ? "Did you forget to use the ref parameter?" : "Any additional parameter will be undefined.");
               }
             }
-            if (render != null) {
-              if (render.defaultProps != null || render.propTypes != null) {
+            if (render2 != null) {
+              if (render2.defaultProps != null || render2.propTypes != null) {
                 error("forwardRef render functions do not support propTypes or defaultProps. Did you accidentally pass a React component?");
               }
             }
           }
           var elementType = {
             $$typeof: REACT_FORWARD_REF_TYPE,
-            render
+            render: render2
           };
           {
             var ownName;
@@ -1015,8 +1015,8 @@ var require_react_development = __commonJS({
               },
               set: function(name) {
                 ownName = name;
-                if (!render.name && !render.displayName) {
-                  render.displayName = name;
+                if (!render2.name && !render2.displayName) {
+                  render2.displayName = name;
                 }
               }
             });
@@ -16231,7 +16231,7 @@ var require_react_dom_development = __commonJS({
               }
             }
           }
-          var render2 = Component.render;
+          var render3 = Component.render;
           var ref = workInProgress2.ref;
           var nextChildren;
           var hasId;
@@ -16242,12 +16242,12 @@ var require_react_dom_development = __commonJS({
           {
             ReactCurrentOwner$1.current = workInProgress2;
             setIsRendering(true);
-            nextChildren = renderWithHooks(current2, workInProgress2, render2, nextProps, ref, renderLanes2);
+            nextChildren = renderWithHooks(current2, workInProgress2, render3, nextProps, ref, renderLanes2);
             hasId = checkDidRenderIdHook();
             if (workInProgress2.mode & StrictLegacyMode) {
               setIsStrictModeForDevtools(true);
               try {
-                nextChildren = renderWithHooks(current2, workInProgress2, render2, nextProps, ref, renderLanes2);
+                nextChildren = renderWithHooks(current2, workInProgress2, render3, nextProps, ref, renderLanes2);
                 hasId = checkDidRenderIdHook();
               } finally {
                 setIsStrictModeForDevtools(false);
@@ -17587,9 +17587,9 @@ var require_react_dom_development = __commonJS({
             }
           }
           var newProps = workInProgress2.pendingProps;
-          var render2 = newProps.children;
+          var render3 = newProps.children;
           {
-            if (typeof render2 !== "function") {
+            if (typeof render3 !== "function") {
               error("A context consumer was rendered with multiple children, or a child that isn't a function. A context consumer expects a single child that is a function. If you did pass a function, make sure there is no trailing or leading whitespace around it.");
             }
           }
@@ -17602,7 +17602,7 @@ var require_react_dom_development = __commonJS({
           {
             ReactCurrentOwner$1.current = workInProgress2;
             setIsRendering(true);
-            newChildren = render2(newValue);
+            newChildren = render3(newValue);
             setIsRendering(false);
           }
           {
@@ -23051,7 +23051,7 @@ var require_react_dom_development = __commonJS({
             unmarkContainerAsRoot(container);
           }
         };
-        function createRoot2(container, options2) {
+        function createRoot(container, options2) {
           if (!isValidContainer(container)) {
             throw new Error("createRoot(...): Target container is not a DOM element.");
           }
@@ -23322,7 +23322,7 @@ var require_react_dom_development = __commonJS({
           }
           return legacyRenderSubtreeIntoContainer(null, element, container, true, callback);
         }
-        function render(element, container, callback) {
+        function render2(element, container, callback) {
           {
             error("ReactDOM.render is no longer supported in React 18. Use createRoot instead. Until you switch to the new API, your app will behave as if it's running React 17. Learn more: https://reactjs.org/link/switch-to-createroot");
           }
@@ -23422,7 +23422,7 @@ var require_react_dom_development = __commonJS({
               error('You are importing createRoot from "react-dom" which is not supported. You should instead import it from "react-dom/client".');
             }
           }
-          return createRoot2(container, options2);
+          return createRoot(container, options2);
         }
         function hydrateRoot$1(container, initialChildren, options2) {
           {
@@ -23463,7 +23463,7 @@ var require_react_dom_development = __commonJS({
         exports.flushSync = flushSync$1;
         exports.hydrate = hydrate;
         exports.hydrateRoot = hydrateRoot$1;
-        exports.render = render;
+        exports.render = render2;
         exports.unmountComponentAtNode = unmountComponentAtNode;
         exports.unstable_batchedUpdates = batchedUpdates$1;
         exports.unstable_renderSubtreeIntoContainer = renderSubtreeIntoContainer;
@@ -23486,37 +23486,6 @@ var require_react_dom = __commonJS({
     } else {
       module.exports = require_react_dom_development();
     }
-  }
-});
-
-// node_modules/react-dom/client.js
-var require_client = __commonJS({
-  "node_modules/react-dom/client.js"(exports) {
-    "use strict";
-    var m = require_react_dom();
-    if (false) {
-      exports.createRoot = m.createRoot;
-      exports.hydrateRoot = m.hydrateRoot;
-    } else {
-      i = m.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
-      exports.createRoot = function(c, o) {
-        i.usingClientEntryPoint = true;
-        try {
-          return m.createRoot(c, o);
-        } finally {
-          i.usingClientEntryPoint = false;
-        }
-      };
-      exports.hydrateRoot = function(c, h, o) {
-        i.usingClientEntryPoint = true;
-        try {
-          return m.hydrateRoot(c, h, o);
-        } finally {
-          i.usingClientEntryPoint = false;
-        }
-      };
-    }
-    var i;
   }
 });
 
@@ -24411,11 +24380,10 @@ var require_jsx_runtime = __commonJS({
 });
 
 // source/lib/utils.tsx
-var ReactDOM = __toESM(require_client());
+var ReactDOM = __toESM(require_react_dom());
 var import_jsx_runtime = __toESM(require_jsx_runtime());
 var renderChartTo = (Component, props) => (target) => {
-  const targetDom = ReactDOM.createRoot(target);
-  targetDom.render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Component, __spreadValues({}, props)));
+  const targetDom = ReactDOM.render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Component, __spreadValues({}, props)), target);
 };
 export {
   renderChartTo
