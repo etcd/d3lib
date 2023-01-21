@@ -1,6 +1,7 @@
 import React from "react";
 import * as ReactDOM from "react-dom/client";
-import { Group } from "@visx/group";
+// import { Group } from "@visx/group";
+import { Axis, Orientation } from "@visx/axis";
 import { Bar } from "@visx/shape";
 import { scaleLinear, scaleBand } from "@visx/scale";
 
@@ -62,6 +63,29 @@ const Chart = <T,>({
           />
         );
       })}
+      {/* x axis */}
+      <Axis
+        orientation={Orientation.bottom}
+        top={500} // scale height?
+        scale={xScale}
+        // tickFormat={tickFormat}
+        // stroke={axisColor}
+        // tickStroke={axisColor}
+        // tickLabelProps={tickLabelProps}
+        tickValues={data.map(getX)} // undefined if log or time
+        label={"x axis label"}
+        labelProps={{
+          x: width + 30,
+          y: -10,
+          fill: "#aaa",
+          fontSize: 18,
+          strokeWidth: 0,
+          stroke: "#fff",
+          paintOrder: "stroke",
+          fontFamily: "sans-serif",
+          textAnchor: "start",
+        }}
+      />
     </svg>
   );
 };
