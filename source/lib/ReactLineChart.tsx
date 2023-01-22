@@ -7,6 +7,9 @@ import { Group } from "@visx/group";
 import ReactDOM from "react-dom/client";
 import { curveLinear } from "@visx/curve";
 import { groupBy } from "../utilities/Arrays";
+import { useState } from "react";
+
+import "./ReactLineChart.css";
 
 export interface ChartProps<T> {
   // data
@@ -29,6 +32,9 @@ export interface ChartProps<T> {
 export const Chart = <T,>(props: ChartProps<T>) => {
   // hooks
   const [ref, { width }] = useMeasure<SVGSVGElement>();
+  const [hoveredBarIndex, setHoveredBarIndex] = useState<number | undefined>(
+    undefined
+  );
 
   // props
   const {
@@ -105,7 +111,13 @@ export const Chart = <T,>(props: ChartProps<T>) => {
             x={(dp) => xScale(getX(dp))}
             y={(dp) => yScale(getY(dp))}
             stroke={lineColor}
-            strokeWidth={lineWidth}
+            strokeWidth={hoveredBarIndex === i ? 2 : lineWidth}
+            onPointerOver={() => {
+              setHoveredBarIndex(i);
+            }}
+            onPointerOut={() => {
+              setHoveredBarIndex(undefined);
+            }}
           />
         ))}
       </Group>
