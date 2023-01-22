@@ -6,7 +6,7 @@ export default defineConfig({
     lib: {
       // Could also be a dictionary or array of multiple entry points
       entry: resolve(__dirname, "source/lib/ReactLineChart.tsx"),
-      name: "MyChartLib",
+      name: "Chart",
     },
     rollupOptions: {
       // make sure to externalize deps that shouldn't be bundled
