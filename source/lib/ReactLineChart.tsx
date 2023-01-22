@@ -6,13 +6,14 @@ import { useMeasure } from "react-use";
 import { Group } from "@visx/group";
 import ReactDOM from "react-dom/client";
 import { curveLinear } from "@visx/curve";
+import { groupBy } from "../utilities/Arrays";
 
 export interface ChartProps<T> {
   // data
   data: T[];
   getX: (p: T) => number;
   getY: (p: T) => number;
-  getZ: (p: T) => number | string;
+  getZ: (p: T) => string;
   xAxisLabel?: string;
   yAxisLabel?: string;
   // styles
@@ -26,7 +27,10 @@ export interface ChartProps<T> {
 }
 
 export const Chart = <T,>(props: ChartProps<T>) => {
-  // get props
+  // hooks
+  const [ref, { width }] = useMeasure<SVGSVGElement>();
+
+  // props
   const {
     // data
     data,
@@ -45,8 +49,8 @@ export const Chart = <T,>(props: ChartProps<T>) => {
     lineColor = "#303030",
   } = props;
 
-  // hooks
-  const [ref, { width }] = useMeasure<SVGSVGElement>();
+  // group data by z
+  const dataGroups = groupBy(data, getZ);
 
   // bounds
   const xRangeMax = width - axisWidth;
