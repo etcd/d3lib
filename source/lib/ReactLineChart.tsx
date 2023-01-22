@@ -100,6 +100,18 @@ export const Chart = <T,>(props: ChartProps<T>) => {
       }}
       ref={ref}
     >
+      {/* tooltip */}
+      <Group>
+        {closestDp && (
+          <circle
+            cx={xScale(getX(closestDp))}
+            cy={yScale(getY(closestDp))}
+            r={3}
+            fill={pointColor}
+          />
+        )}
+      </Group>
+
       {/* data */}
       <Group>
         {/* points */}
