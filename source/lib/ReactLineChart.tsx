@@ -30,10 +30,12 @@ export interface ChartProps<T> {
 
 export const Chart = <T,>(props: ChartProps<T>) => {
   // hooks
+  const ref = useRef<SVGSVGElement>(null);
   const [width, setWidth] = useState(0);
   const [top, setTop] = useState(0);
   const [left, setLeft] = useState(0);
-  const ref = useRef<SVGSVGElement>(null);
+
+  const [closestDp, setClosestDp] = useState<T | undefined>(undefined);
 
   useEffect(() => {
     const current = ref.current;
@@ -84,10 +86,17 @@ export const Chart = <T,>(props: ChartProps<T>) => {
       height={height}
       style={{ width: "100%" }}
       onPointerMove={(e) => {
-        const localX = e.clientX - left;
-        const localY = e.clientY - top;
+        // get mouse coordinates relative to top left of chart
+        const [localX, localY] = [e.clientX - left, e.clientY - top];
 
-        console.log("local", localX, localY);
+        // get closest datapoint
+        const dpDistances = data.map((dp) =>
+          Math.hypot(xScale(getX(dp))! - localX, yScale(getY(dp))! - localY)
+        );
+        const minDistance = Math.min(...dpDistances);
+        const minDistanceIdx = dpDistances.indexOf(minDistance);
+
+        setClosestDp(data[minDistanceIdx]);
       }}
       ref={ref}
     >
