@@ -14,7 +14,7 @@ rootElement &&
       <div className="m-5">
         <ReactLineChart
           // data
-          data={testSimData.slice(0, 6000)}
+          data={testSimData}
           getX={(dp) => dp.x}
           getY={(dp) => dp.startingBalance}
           getZ={(dp) => dp.name}

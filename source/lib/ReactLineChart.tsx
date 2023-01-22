@@ -52,22 +52,14 @@ export const Chart = <T,>(props: ChartProps<T>) => {
   // group data by z
   const dataGroups = groupBy(data, getZ);
 
-  // bounds
-  const xRangeMax = width - axisWidth;
-  const yRangeMax = height - axisWidth;
-
-  // maxs
-  const xMax = Math.max(...data.map(getX));
-  const yMax = Math.max(...data.map(getY));
-
   // scales
   const xScale = scaleLinear({
-    domain: [0, xMax],
-    range: [axisWidth, xRangeMax + axisWidth],
+    domain: [0, Math.max(...data.map(getX))],
+    range: [axisWidth, width],
   });
   const yScale = scaleLinear({
-    domain: [0, yMax],
-    range: [yRangeMax, 0],
+    domain: [0, Math.max(...data.map(getY))],
+    range: [height - axisWidth, 0],
   });
 
   // chart
@@ -76,16 +68,19 @@ export const Chart = <T,>(props: ChartProps<T>) => {
       {/* data */}
       <Group>
         {/* points */}
-        {data.map((dp, i) => {
-          return (
-            <circle
-              key={i}
-              cx={xScale(getX(dp))}
-              cy={yScale(getY(dp))}
-              r={pointRadius}
-              fill={pointColor}
-            />
-          );
+        {Object.values(dataGroups).map(
+          (dg) =>
+            dg.map((dp, i) => {
+              return (
+                <circle
+                  key={i}
+                  cx={xScale(getX(dp))}
+                  cy={yScale(getY(dp))}
+                  r={pointRadius}
+                  fill={pointColor}
+                />
+              );
+            })
           // const pointX = xScale(getX(dp));
           // const pointY = yScale(getY(dp));
           //
@@ -99,21 +94,26 @@ export const Chart = <T,>(props: ChartProps<T>) => {
           //     fill={datapointColor}
           //   />
           // );
-        })}
-        <LinePath<T>
-          curve={curveLinear}
-          data={data}
-          x={(dp) => xScale(getX(dp))}
-          y={(dp) => yScale(getY(dp))}
-          stroke={lineColor}
-          strokeWidth={lineWidth}
-        />
+        )}
+
+        {/* lines */}
+        {Object.values(dataGroups).map((dg, i) => (
+          <LinePath<T>
+            key={i}
+            curve={curveLinear}
+            data={dg}
+            x={(dp) => xScale(getX(dp))}
+            y={(dp) => yScale(getY(dp))}
+            stroke={lineColor}
+            strokeWidth={lineWidth}
+          />
+        ))}
       </Group>
 
       {/* x axis */}
       <Axis
         orientation={Orientation.bottom}
-        top={yRangeMax}
+        top={height - axisWidth}
         scale={xScale}
         stroke={axisColor}
         tickStroke={axisColor}
