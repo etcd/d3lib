@@ -2,12 +2,11 @@
 import { Axis, Orientation } from "@visx/axis";
 import { LinePath } from "@visx/shape";
 import { scaleLinear, scaleLog } from "@visx/scale";
-import { useMeasure } from "react-use";
 import { Group } from "@visx/group";
 import ReactDOM from "react-dom/client";
 import { curveLinear } from "@visx/curve";
 import { groupBy } from "../utilities/Arrays";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import "./ReactLineChart.css";
 
@@ -31,10 +30,21 @@ export interface ChartProps<T> {
 
 export const Chart = <T,>(props: ChartProps<T>) => {
   // hooks
-  const [ref, { width }] = useMeasure<SVGSVGElement>();
-  const [hoveredBarIndex, setHoveredBarIndex] = useState<number | undefined>(
-    undefined
-  );
+  const [width, setWidth] = useState(0);
+  const [top, setTop] = useState(0);
+  const [left, setLeft] = useState(0);
+  const ref = useRef<SVGSVGElement>(null);
+
+  useEffect(() => {
+    const current = ref.current;
+    if (!current) return;
+
+    const boundingRect = current.getBoundingClientRect();
+
+    setTop(boundingRect.top);
+    setLeft(boundingRect.left);
+    setWidth(current.clientWidth);
+  }, []);
 
   // props
   const {
@@ -70,7 +80,17 @@ export const Chart = <T,>(props: ChartProps<T>) => {
 
   // chart
   const chart = (
-    <svg height={height} style={{ width: "100%" }} ref={ref}>
+    <svg
+      height={height}
+      style={{ width: "100%" }}
+      onPointerMove={(e) => {
+        const localX = e.clientX - left;
+        const localY = e.clientY - top;
+
+        console.log("local", localX, localY);
+      }}
+      ref={ref}
+    >
       {/* data */}
       <Group>
         {/* points */}
@@ -111,13 +131,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
             x={(dp) => xScale(getX(dp))}
             y={(dp) => yScale(getY(dp))}
             stroke={lineColor}
-            strokeWidth={hoveredBarIndex === i ? 2 : lineWidth}
-            onPointerOver={() => {
-              setHoveredBarIndex(i);
-            }}
-            onPointerOut={() => {
-              setHoveredBarIndex(undefined);
-            }}
+            strokeWidth={lineWidth}
           />
         ))}
       </Group>
