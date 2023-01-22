@@ -29,26 +29,7 @@ export interface ChartProps<T> {
 }
 
 export const Chart = <T,>(props: ChartProps<T>) => {
-  // hooks
-  const ref = useRef<SVGSVGElement>(null);
-  const [width, setWidth] = useState(0);
-  const [top, setTop] = useState(0);
-  const [left, setLeft] = useState(0);
-
-  const [closestDp, setClosestDp] = useState<T | undefined>(undefined);
-
-  useEffect(() => {
-    const current = ref.current;
-    if (!current) return;
-
-    const boundingRect = current.getBoundingClientRect();
-
-    setTop(boundingRect.top);
-    setLeft(boundingRect.left);
-    setWidth(current.clientWidth);
-  }, []);
-
-  // props
+  // destructure props
   const {
     // data
     data,
@@ -66,6 +47,28 @@ export const Chart = <T,>(props: ChartProps<T>) => {
     lineWidth = 1,
     lineColor = "#303030",
   } = props;
+
+  // dimensions
+  const ref = useRef<SVGSVGElement>(null);
+  const [width, setWidth] = useState(0);
+  const [top, setTop] = useState(0);
+  const [left, setLeft] = useState(0);
+
+  // closest datapoint
+  const [closestDp, setClosestDp] = useState<T | undefined>(undefined);
+  const closestDpGroup = closestDp ? getZ(closestDp) : undefined;
+
+  // get dimensions
+  useEffect(() => {
+    const current = ref.current;
+    if (!current) return;
+
+    const boundingRect = current.getBoundingClientRect();
+
+    setTop(boundingRect.top);
+    setLeft(boundingRect.left);
+    setWidth(current.clientWidth);
+  }, []);
 
   // group data by z
   const dataGroups = groupBy(data, getZ);
@@ -98,6 +101,9 @@ export const Chart = <T,>(props: ChartProps<T>) => {
 
         setClosestDp(data[minDistanceIdx]);
       }}
+      onPointerOut={() => {
+        setClosestDp(undefined);
+      }}
       ref={ref}
     >
       {/* tooltip */}
@@ -115,9 +121,12 @@ export const Chart = <T,>(props: ChartProps<T>) => {
       {/* data */}
       <Group>
         {/* points */}
-        {Object.values(dataGroups).map(
-          (dg) =>
-            dg.map((dp, i) => {
+        {Object.entries(dataGroups).map(
+          ([dgName, dg]) => {
+            if (closestDpGroup !== undefined && closestDpGroup !== dgName)
+              return;
+
+            return dg.map((dp, i) => {
               return (
                 <circle
                   key={i}
@@ -127,7 +136,8 @@ export const Chart = <T,>(props: ChartProps<T>) => {
                   fill={pointColor}
                 />
               );
-            })
+            });
+          }
           // const pointX = xScale(getX(dp));
           // const pointY = yScale(getY(dp));
           //
@@ -144,17 +154,24 @@ export const Chart = <T,>(props: ChartProps<T>) => {
         )}
 
         {/* lines */}
-        {Object.values(dataGroups).map((dg, i) => (
-          <LinePath<T>
-            key={i}
-            curve={curveLinear}
-            data={dg}
-            x={(dp) => xScale(getX(dp))}
-            y={(dp) => yScale(getY(dp))}
-            stroke={lineColor}
-            strokeWidth={lineWidth}
-          />
-        ))}
+        {Object.entries(dataGroups).map(([dgName, dg], i) => {
+          return (
+            <LinePath<T>
+              key={i}
+              curve={curveLinear}
+              data={dg}
+              x={(dp) => xScale(getX(dp))}
+              y={(dp) => yScale(getY(dp))}
+              stroke={lineColor}
+              strokeWidth={lineWidth}
+              strokeOpacity={
+                closestDpGroup === undefined || closestDpGroup === dgName
+                  ? 1
+                  : 0.5
+              }
+            />
+          );
+        })}
       </Group>
 
       {/* x axis */}
