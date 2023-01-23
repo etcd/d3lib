@@ -101,23 +101,25 @@ export const Chart = <T,>(props: ChartProps<T>) => {
   }, [windowSize]);
 
   // group data by z
-  const dataGroups = getZ ? groupBy(data, getZ) : undefined;
+  const dataGroups = getZ !== undefined ? groupBy(data, getZ) : undefined;
 
   // get colors
-  const groupColors = evenlySpacedColors(
-    dataGroups ? Object.keys(dataGroups).length : 1,
+  const groupColorsArray = evenlySpacedColors(
+    dataGroups !== undefined ? Object.keys(dataGroups).length : 1,
     1,
     0.75
   );
+  if (!groupColorsArray) return null;
 
-  if (!groupColors) return null;
-
-  const legendScale = dataGroups
-    ? scaleOrdinal({
-        domain: Object.keys(dataGroups),
-        range: groupColors.map(rgbArrayToString),
-      })
-    : undefined;
+  const groupColorsMap =
+    dataGroups !== undefined
+      ? Object.fromEntries(
+          Object.keys(dataGroups).map((groupName, i) => [
+            groupName,
+            groupColorsArray[i]!,
+          ])
+        )
+      : undefined;
 
   // x scale
   const xValues = data.map(getX);
@@ -161,6 +163,33 @@ export const Chart = <T,>(props: ChartProps<T>) => {
       margins?.top ?? DEFAULT_MARGINS.top,
     ],
   });
+
+  // legend scale
+  const legendScale = (() => {
+    if (dataGroups === undefined) return undefined;
+
+    const sortedGroups = Object.entries(dataGroups).sort((groupA, groupB) => {
+      const [_groupAName, groupAData] = groupA;
+      const [_groupBName, groupBData] = groupB;
+
+      const lastADp = groupAData[groupAData.length - 1];
+      const lastBDp = groupBData[groupBData.length - 1];
+
+      const finalAValue = lastADp ? getY(lastADp) : undefined;
+      const finalBValue = lastBDp ? getY(lastBDp) : undefined;
+
+      if (finalAValue === undefined) return -1;
+      if (finalBValue === undefined) return 1;
+      return -1 * (finalAValue - finalBValue);
+    });
+
+    return scaleOrdinal({
+      domain: sortedGroups.map(([groupName]) => groupName),
+      range: sortedGroups.map(([groupName]) =>
+        rgbArrayToString(groupColorsMap?.[groupName] ?? [0, 0, 0])
+      ),
+    });
+  })();
 
   // chart
   const chart = (
@@ -243,13 +272,13 @@ export const Chart = <T,>(props: ChartProps<T>) => {
           <Group>
             {/* points */}
             {dataGroups
-              ? Object.entries(dataGroups).map(([dgName, dg], groupIndex) => {
+              ? Object.entries(dataGroups).map(([dgName, dg]) => {
                   if (closestDpGroup !== undefined && closestDpGroup !== dgName)
                     return;
 
                   // color of the group
                   const groupColor = rgbArrayToString(
-                    groupColors[groupIndex] ?? [0, 0, 0]
+                    groupColorsMap?.[dgName] ?? [0, 0, 0]
                   );
 
                   // make points for this datagroup
@@ -270,7 +299,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
                     cx={xScale(getX(dp))}
                     cy={yScale(getY(dp))}
                     r={pointRadius}
-                    fill={rgbArrayToString(groupColors[0] ?? [0, 0, 0])}
+                    fill={rgbArrayToString(groupColorsArray[0] ?? [0, 0, 0])}
                     opacity={pointOpacity}
                   />
                 ))}
@@ -280,7 +309,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
         {/* endpoint labels */}
         {showEndpointLabels && dataGroups && getZ && (
           <Group>
-            {Object.values(dataGroups).map((dg, i) => {
+            {Object.entries(dataGroups).map(([dgName, dg], i) => {
               const lastDp = dg[dg.length - 1];
               if (lastDp === undefined) return;
 
@@ -300,7 +329,9 @@ export const Chart = <T,>(props: ChartProps<T>) => {
                     cx={pointX}
                     cy={pointY}
                     r={1.5}
-                    fill={rgbArrayToString(groupColors[i] ?? [0, 0, 0])}
+                    fill={rgbArrayToString(
+                      groupColorsMap?.[dgName] ?? [0, 0, 0]
+                    )}
                     opacity={opacity}
                   />
                   {/* group */}
@@ -324,15 +355,17 @@ export const Chart = <T,>(props: ChartProps<T>) => {
         {showLines && (
           <Group>
             {dataGroups ? (
-              Object.entries(dataGroups).map(([dgName, dg], i) => {
+              Object.entries(dataGroups).map(([dgName, dg]) => {
                 return (
                   <LinePath<T>
-                    key={i}
+                    key={dgName}
                     curve={curveLinear}
                     data={dg}
                     x={(dp) => xScale(getX(dp))}
                     y={(dp) => yScale(getY(dp))}
-                    stroke={rgbArrayToString(groupColors[i] ?? [0, 0, 0])}
+                    stroke={rgbArrayToString(
+                      groupColorsMap?.[dgName] ?? [0, 0, 0]
+                    )}
                     strokeWidth={lineWidth}
                     strokeOpacity={
                       closestDpGroup === undefined || closestDpGroup === dgName
@@ -348,7 +381,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
                 data={data}
                 x={(dp) => xScale(getX(dp))}
                 y={(dp) => yScale(getY(dp))}
-                stroke={rgbArrayToString(groupColors[0] ?? [0, 0, 0])}
+                stroke={rgbArrayToString(groupColorsArray[0] ?? [0, 0, 0])}
                 strokeWidth={lineWidth}
               />
             )}

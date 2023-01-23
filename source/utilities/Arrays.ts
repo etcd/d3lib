@@ -19,7 +19,8 @@ export const extent = (array: readonly number[]) => {
 /** Groups an array of elements by some key of each element. */
 export const groupBy = <Element>(
   array: readonly Element[],
-  getGroup: (element: Element) => string
+  getGroup: (element: Element) => string,
+  sortGroupsBy?: (element: Element) => number
 ) => {
   // the unique groups that elements can be part of
   const uniqueGroups = [...new Set(array.map((element) => getGroup(element)))];
@@ -36,7 +37,13 @@ export const groupBy = <Element>(
     else accumulator[group] = [element];
   });
 
-  return accumulator;
+  if (sortGroupsBy === undefined) return accumulator;
+
+  return Object.keys(accumulator).map((group) => {
+    return [...accumulator[group]!].sort(
+      (e1: Element, e2: Element) => sortGroupsBy(e1) - sortGroupsBy(e2)
+    );
+  });
 };
 
 /** Returns a given amount of evenly spaced numbers */
