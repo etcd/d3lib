@@ -8,6 +8,7 @@ import { groupBy } from "../utilities/Arrays";
 import { useEffect, useRef, useState } from "react";
 
 import "./ReactLineChart.css";
+import { useWindowSize } from "../utilities/useWindowSize";
 
 interface Margins {
   top?: number;
@@ -56,6 +57,9 @@ export const Chart = <T,>(props: ChartProps<T>) => {
     lineColor = "#303030",
   } = props;
 
+  // window size
+  const windowSize = useWindowSize();
+
   // dimensions
   const ref = useRef<SVGSVGElement>(null);
   const [width, setWidth] = useState(0);
@@ -76,7 +80,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
     setTop(boundingRect.top);
     setLeft(boundingRect.left);
     setWidth(current.clientWidth);
-  }, []);
+  }, [windowSize]);
 
   // group data by z
   const dataGroups = getZ ? groupBy(data, getZ) : undefined;
