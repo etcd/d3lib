@@ -18,8 +18,9 @@ rootElement &&
           getX={(dp) => dp.x}
           getY={(dp) => dp.startingBalance}
           getZ={(dp) => dp.name}
-          xAxisLabel={"x axis"}
-          yAxisLabel={"y axis"}
+          chartType="log"
+          xAxisLabel="x axis"
+          yAxisLabel="y axis"
           // dimensions
           height={300}
         />
