@@ -27,11 +27,7 @@ RgbArray | undefined => {
   const x = c * (1 - Math.abs((hprime % 2) - 1));
 
   let r, g, b;
-  if (hprime === 0) {
-    r = 0;
-    g = 0;
-    b = 0;
-  } else if (hprime > 0 && hprime < 1) {
+  if (hprime >= 0 && hprime < 1) {
     r = c;
     g = x;
     b = 0;

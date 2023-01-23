@@ -180,27 +180,30 @@ export const Chart = <T,>(props: ChartProps<T>) => {
         <Group>
           {/* points */}
           {dataGroups
-            ? Object.entries(dataGroups).map(([dgName, dg]) => {
+            ? Object.entries(dataGroups).map(([dgName, dg], groupIndex) => {
                 if (closestDpGroup !== undefined && closestDpGroup !== dgName)
                   return;
 
+                // color of the group
+                const groupColor = rgbArrayToString(
+                  groupColors[groupIndex] ?? [0, 0, 0]
+                );
+
                 // make points for this datagroup
-                return dg.map((dp, i) => {
-                  return (
-                    <circle
-                      key={i}
-                      cx={xScale(getX(dp))}
-                      cy={yScale(getY(dp))}
-                      r={pointRadius}
-                      fill={rgbArrayToString(groupColors[i] ?? [0, 0, 0])}
-                      opacity={pointOpacity}
-                    />
-                  );
-                });
+                return dg.map((dp, datapointIndex) => (
+                  <circle
+                    key={datapointIndex}
+                    cx={xScale(getX(dp))}
+                    cy={yScale(getY(dp))}
+                    r={pointRadius}
+                    fill={groupColor}
+                    opacity={pointOpacity}
+                  />
+                ));
               })
-            : data.map((dp, i) => (
+            : data.map((dp, datapointIndex) => (
                 <circle
-                  key={i}
+                  key={datapointIndex}
                   cx={xScale(getX(dp))}
                   cy={yScale(getY(dp))}
                   r={pointRadius}

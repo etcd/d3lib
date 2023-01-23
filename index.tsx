@@ -42,7 +42,7 @@ rootElement &&
             yAxisLabel="Scaled amount won"
             // display
             height={500}
-            pointOpacity={500 / N_POINTS}
+            pointOpacity={1000 / N_POINTS}
             showLines={false}
             showPoints={true}
             yDomain={[-0.2, 0.2]}
