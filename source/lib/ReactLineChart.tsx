@@ -34,8 +34,9 @@ export interface ChartProps<T> {
   pointColor?: string;
   lineWidth?: number;
   lineColor?: string;
-  plotPoints?: boolean;
-  plotLines?: boolean;
+  showPoints?: boolean;
+  showLines?: boolean;
+  showEndpointLabels?: boolean;
   chartType?: "linear" | "log";
 }
 
@@ -58,8 +59,9 @@ export const Chart = <T,>(props: ChartProps<T>) => {
     pointColor = "#303030",
     lineWidth = 1,
     lineColor = "#303030",
-    plotPoints = true,
-    plotLines = true,
+    showPoints = true,
+    showLines = true,
+    showEndpointLabels = true,
     chartType = "linear",
   } = props;
 
@@ -138,7 +140,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
       ref={ref}
     >
       {/* data */}
-      {plotPoints && (
+      {showPoints && (
         <Group>
           {/* points */}
           {dataGroups
@@ -173,7 +175,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
       )}
 
       {/* endpoint labels */}
-      {dataGroups && getZ && (
+      {showEndpointLabels && dataGroups && getZ && (
         <Group>
           {Object.values(dataGroups).map((dg, i) => {
             const lastDp = dg[dg.length - 1];
@@ -216,7 +218,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
       )}
 
       {/* lines */}
-      {plotLines && (
+      {showLines && (
         <Group>
           {dataGroups ? (
             Object.entries(dataGroups).map(([dgName, dg], i) => {
