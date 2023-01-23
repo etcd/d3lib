@@ -297,7 +297,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
             {/* tooltip body text */}
             <text
               x={tooltipX + 10}
-              y={tooltipY + (tooltipTitle ? 35 : 15)}
+              y={tooltipY + (tooltipTitle ? 35 : 20)}
               fontSize={12}
               fontFamily="sans-serif"
             >
@@ -305,7 +305,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
             </text>
             <text
               x={tooltipX + 10}
-              y={tooltipY + (tooltipTitle ? 50 : 30)}
+              y={tooltipY + (tooltipTitle ? 50 : 35)}
               fontSize={12}
               fontFamily="sans-serif"
             >
