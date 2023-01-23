@@ -156,7 +156,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
               strokeOpacity={
                 closestDpGroup === undefined || closestDpGroup === dgName
                   ? 1
-                  : 0.3
+                  : 0.2
               }
             />
           );
