@@ -136,6 +136,8 @@ export const Chart = <T,>(props: ChartProps<T>) => {
     range: [height - axisWidth - (margins.bottom ?? 0), margins.top ?? 0],
   });
 
+  console.log(yScale(0));
+
   // chart
   const chart = (
     <svg
