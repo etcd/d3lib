@@ -136,8 +136,6 @@ export const Chart = <T,>(props: ChartProps<T>) => {
     range: [height - axisWidth - (margins.bottom ?? 0), margins.top ?? 0],
   });
 
-  console.log(xAxisLocation && yScale(xAxisLocation));
-
   // chart
   const chart = (
     <svg
@@ -279,7 +277,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
       <Axis
         orientation={Orientation.bottom}
         top={
-          xAxisLocation
+          xAxisLocation !== undefined
             ? yScale(xAxisLocation)
             : height - axisWidth - (margins.bottom ?? 0)
         }
