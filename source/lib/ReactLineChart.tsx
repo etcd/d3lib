@@ -41,7 +41,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
     height,
     axisWidth = 50,
     axisColor = "#000000",
-    pointRadius = 1.5,
+    pointRadius = 1.3,
     pointColor = "#303030",
     lineWidth = 1,
     lineColor = "#303030",
@@ -210,7 +210,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
         return (
           <Group>
             {/* point corresponding to tooltip */}
-            <circle cx={dpX} cy={dpY} r={4} fill={pointColor} />
+            <circle cx={dpX} cy={dpY} r={3} fill={pointColor} />
 
             {/* tooltip box */}
             <rect
