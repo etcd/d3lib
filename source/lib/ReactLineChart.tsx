@@ -122,6 +122,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
             if (closestDpGroup === undefined || closestDpGroup !== dgName)
               return;
 
+            // make points for this datagroup
             return dg.map((dp, i) => {
               return (
                 <circle
@@ -148,6 +149,34 @@ export const Chart = <T,>(props: ChartProps<T>) => {
           //   />
           // );
         )}
+      </Group>
+
+      {/* endpoint labels */}
+      <Group>
+        {Object.values(dataGroups).map((dg) => {
+          const lastDp = dg[dg.length - 1];
+          if (lastDp === undefined) return;
+
+          const pointX = xScale(getX(lastDp));
+          const pointY = yScale(getY(lastDp));
+
+          return (
+            <>
+              {/* point */}
+              <circle cx={pointX} cy={pointY} r={1.5} fill={pointColor} />
+              {/* group */}
+              <text
+                x={pointX + 3}
+                y={pointY + 3}
+                fontSize={11}
+                fontFamily="sans-serif"
+                fontWeight="bold"
+              >
+                {getZ(lastDp)}
+              </text>
+            </>
+          );
+        })}
       </Group>
 
       {/* lines */}
