@@ -15,11 +15,13 @@ import "./ReactLineChart.css";
 import { formatNumber } from "../utilities/Numbers";
 
 interface Margins {
-  top?: number;
-  right?: number;
-  bottom?: number;
-  left?: number;
+  top: number;
+  right: number;
+  bottom: number;
+  left: number;
 }
+
+const DEFAULT_MARGINS: Margins = { left: 10, top: 50, right: 50, bottom: 10 };
 
 export interface ChartProps<T> {
   // data
@@ -32,7 +34,7 @@ export interface ChartProps<T> {
   // display
   height: number;
   width?: number;
-  margins?: Margins;
+  margins?: Partial<Margins>;
   axisWidth?: number;
   axisColor?: string;
   pointRadius?: number;
@@ -59,7 +61,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
     // display
     height,
     width,
-    margins = { left: 10, top: 50, right: 50, bottom: 10 },
+    margins,
     axisWidth = 50,
     axisColor = "#000000",
     pointRadius = 1.3,
@@ -122,8 +124,8 @@ export const Chart = <T,>(props: ChartProps<T>) => {
   const xScale = scaleLinear({
     domain: [Math.min(...xValues), Math.max(...xValues)],
     range: [
-      (margins.left ?? 0) + axisWidth,
-      measuredWidth - (margins.right ?? 0),
+      (margins?.left ?? DEFAULT_MARGINS.left) + axisWidth,
+      measuredWidth - (margins?.right ?? DEFAULT_MARGINS.right),
     ],
   });
 
@@ -154,7 +156,10 @@ export const Chart = <T,>(props: ChartProps<T>) => {
   // y scale
   const yScale = yScaleType({
     domain: yScaleDomain,
-    range: [height - axisWidth - (margins.bottom ?? 0), margins.top ?? 0],
+    range: [
+      height - axisWidth - (margins?.bottom ?? DEFAULT_MARGINS.bottom),
+      margins?.top ?? DEFAULT_MARGINS.top,
+    ],
   });
 
   // chart
@@ -337,7 +342,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
           top={
             xAxisLocation !== undefined
               ? yScale(xAxisLocation)
-              : height - axisWidth - (margins.bottom ?? 0)
+              : height - axisWidth - (margins?.bottom ?? DEFAULT_MARGINS.bottom)
           }
           scale={xScale}
           stroke={axisColor}
@@ -354,7 +359,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
         {/* y axis */}
         <Axis
           orientation={Orientation.left}
-          left={axisWidth + (margins.left ?? 0)}
+          left={axisWidth + (margins?.left ?? DEFAULT_MARGINS.left)}
           scale={yScale}
           stroke={axisColor}
           tickStroke={axisColor}
