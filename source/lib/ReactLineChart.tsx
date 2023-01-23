@@ -145,7 +145,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
           {/* points */}
           {dataGroups
             ? Object.entries(dataGroups).map(([dgName, dg]) => {
-                if (closestDpGroup === undefined || closestDpGroup !== dgName)
+                if (closestDpGroup !== undefined && closestDpGroup !== dgName)
                   return;
 
                 // make points for this datagroup
