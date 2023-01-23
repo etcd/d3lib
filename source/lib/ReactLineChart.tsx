@@ -202,7 +202,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
         const dpX = xScale(getX(closestDp));
         const dpY = yScale(getY(closestDp));
 
-        const tooltipWidth = 100;
+        const tooltipWidth = 120;
         const tooltipHeight = 60;
         const tooltipX = dpX - tooltipWidth / 2;
         const tooltipY = dpY - tooltipHeight - 10;
@@ -219,7 +219,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
               width={tooltipWidth}
               height={tooltipHeight}
               fill="#ffffff"
-              fillOpacity={0.75}
+              fillOpacity={0.85}
               stroke="#000000"
               strokeOpacity={0.9}
             />
