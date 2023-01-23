@@ -7,8 +7,10 @@ import { curveLinear } from "@visx/curve";
 import { groupBy } from "../utilities/Arrays";
 import { Fragment, useEffect, useRef, useState } from "react";
 
-import "./ReactLineChart.css";
+import * as Colors from "../utilities/Colors";
 import { useWindowSize } from "../utilities/useWindowSize";
+
+import "./ReactLineChart.css";
 
 interface Margins {
   top?: number;
@@ -79,8 +81,8 @@ export const Chart = <T,>(props: ChartProps<T>) => {
   // dimensions
   const ref = useRef<SVGSVGElement>(null);
   const [measuredWidth, setMeasuredWidth] = useState(0);
-  const [top, setTop] = useState(0);
-  const [left, setLeft] = useState(0);
+  const [measuredTop, setMeasuredTop] = useState(0);
+  const [measuredLeft, setMeasuredLeft] = useState(0);
 
   // closest datapoint
   const [closestDp, setClosestDp] = useState<T | undefined>(undefined);
@@ -93,8 +95,8 @@ export const Chart = <T,>(props: ChartProps<T>) => {
 
     const boundingRect = current.getBoundingClientRect();
 
-    setTop(boundingRect.top);
-    setLeft(boundingRect.left);
+    setMeasuredTop(boundingRect.top);
+    setMeasuredLeft(boundingRect.left);
     setMeasuredWidth(current.clientWidth);
   }, [windowSize]);
 
@@ -149,7 +151,10 @@ export const Chart = <T,>(props: ChartProps<T>) => {
       style={width ? undefined : { width: "100%" }}
       onPointerMove={(e) => {
         // get mouse coordinates relative to top left of chart
-        const [localX, localY] = [e.clientX - left, e.clientY - top];
+        const [localX, localY] = [
+          e.clientX - measuredLeft,
+          e.clientY - measuredTop,
+        ];
 
         // get closest datapoint
         const dpDistances = data.map((dp) =>
