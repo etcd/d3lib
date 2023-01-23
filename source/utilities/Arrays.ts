@@ -16,6 +16,7 @@ export const extent = (array: readonly number[]) => {
   );
 };
 
+/** Groups an array of elements by some key of each element. */
 export const groupBy = <Element>(
   array: readonly Element[],
   getGroup: (element: Element) => string
@@ -36,4 +37,36 @@ export const groupBy = <Element>(
   });
 
   return accumulator;
+};
+
+/** Returns a given amount of evenly spaced numbers */
+export const evenlySpacedNumbers = (
+  /** Desired amount of numbers */
+  n: number,
+  /** The first output number */
+  min: number,
+  /** The last output number */
+  max: number
+): readonly number[] | undefined => {
+  if (n < 0) return undefined;
+  if (max < min) return undefined;
+
+  const nColorsFloor = Math.floor(n);
+  const spacing = (max - min) / nColorsFloor;
+
+  return Array.from({ length: nColorsFloor }, (_, i) => min + i * spacing);
+};
+
+/** Type guard for a value being not `null` and not `undefined` */
+const _isDefined = <T>(
+  value: NonNullable<T> | undefined | null
+): value is NonNullable<T> => {
+  return value !== null && value !== undefined;
+};
+
+/** Type guard for an array with no `undefined` or `null` values */
+export const isAllDefined = <T>(
+  value: Array<NonNullable<T> | undefined | null>
+): value is Array<NonNullable<T>> => {
+  return value.every(_isDefined);
 };

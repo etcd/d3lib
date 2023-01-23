@@ -1,3 +1,7 @@
+import { evenlySpacedNumbers, isAllDefined } from "./Arrays";
+
+export type RgbArray = readonly [number, number, number];
+
 /**
  * Converts an HSV color value to RGB.
  *
@@ -13,7 +17,11 @@ export const hsvToRgb = (
   /** value ∈ [0, 1] */
   v: number
 ): /** [r ∈ [0, 255], g ∈ [0, 255], b ∈ [0, 255]], or undefined if invalid input */
-readonly [number, number, number] | undefined => {
+RgbArray | undefined => {
+  if (h < 0 || 360 < h) return undefined;
+  if (s < 0 || 1 < s) return undefined;
+  if (v < 0 || 1 < v) return undefined;
+
   const hprime = h / 60;
   const c = v * s;
   const x = c * (1 - Math.abs((hprime % 2) - 1));
@@ -43,7 +51,7 @@ readonly [number, number, number] | undefined => {
     r = x;
     g = 0;
     b = c;
-  } else if (hprime >= 5 && hprime < 6) {
+  } else if (hprime >= 5 && hprime <= 6) {
     r = c;
     g = 0;
     b = x;
@@ -58,4 +66,30 @@ readonly [number, number, number] | undefined => {
     Math.round((g + m) * 255),
     Math.round((b + m) * 255),
   ] as const;
+};
+
+/**
+ * Returns a desired number of colors evenly distributed in
+ * HSV color space.
+ */
+export const evenlySpacedColors = (
+  /** desired number of colors */
+  nColors: number,
+  /** saturation of color ∈ [0, 1] */
+  saturation: number,
+  /** value of color ∈ [0, 1] */
+  value: number
+): /** An array of [r ∈ [0, 255], g ∈ [0, 255], b ∈ [0, 255]], or undefined if invalid input */
+readonly RgbArray[] | undefined => {
+  const hues = evenlySpacedNumbers(nColors, 0, 360);
+  if (hues === undefined) return undefined;
+
+  const colors = hues.map((n) => hsvToRgb(n, saturation, value));
+  if (!isAllDefined(colors)) return undefined;
+
+  return colors;
+};
+
+export const rgbArrayToString = (rgbArray: RgbArray): `rgb${string}` => {
+  return `rgb(${rgbArray[0]},${rgbArray[1]},${rgbArray[2]})`;
 };

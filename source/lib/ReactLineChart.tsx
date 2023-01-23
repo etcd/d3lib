@@ -37,7 +37,6 @@ export interface ChartProps<T> {
   pointColor?: string;
   pointOpacity?: number;
   lineWidth?: number;
-  lineColor?: string;
   showPoints?: boolean;
   showLines?: boolean;
   showEndpointLabels?: boolean;
@@ -66,7 +65,6 @@ export const Chart = <T,>(props: ChartProps<T>) => {
     pointColor = "#303030",
     pointOpacity = 1,
     lineWidth = 1,
-    lineColor = "#303030",
     showPoints = false,
     showLines = true,
     showEndpointLabels = false,
@@ -91,7 +89,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
   // get dimensions
   useEffect(() => {
     const current = ref.current;
-    if (!current) return;
+    if (!current) return undefined;
 
     const boundingRect = current.getBoundingClientRect();
 
@@ -102,6 +100,15 @@ export const Chart = <T,>(props: ChartProps<T>) => {
 
   // group data by z
   const dataGroups = getZ ? groupBy(data, getZ) : undefined;
+
+  // get line colors
+  const lineColors = Colors.evenlySpacedColors(
+    dataGroups ? Object.keys(dataGroups).length : 1,
+    1,
+    0.75
+  );
+
+  if (!lineColors) return null;
 
   // x scale
   const xValues = data.map(getX);
@@ -261,7 +268,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
                   data={dg}
                   x={(dp) => xScale(getX(dp))}
                   y={(dp) => yScale(getY(dp))}
-                  stroke={lineColor}
+                  stroke={Colors.rgbArrayToString(lineColors[i] ?? [0, 0, 0])}
                   strokeWidth={lineWidth}
                   strokeOpacity={
                     closestDpGroup === undefined || closestDpGroup === dgName
@@ -277,7 +284,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
               data={data}
               x={(dp) => xScale(getX(dp))}
               y={(dp) => yScale(getY(dp))}
-              stroke={lineColor}
+              stroke={Colors.rgbArrayToString(lineColors[0] ?? [0, 0, 0])}
               strokeWidth={lineWidth}
             />
           )}
