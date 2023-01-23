@@ -5,7 +5,7 @@ import { Group } from "@visx/group";
 import ReactDOM from "react-dom/client";
 import { curveLinear } from "@visx/curve";
 import { groupBy } from "../utilities/Arrays";
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 
 import "./ReactLineChart.css";
 import { useWindowSize } from "../utilities/useWindowSize";
@@ -154,7 +154,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
       {/* endpoint labels */}
       {dataGroups && getZ && (
         <Group>
-          {Object.values(dataGroups).map((dg) => {
+          {Object.values(dataGroups).map((dg, i) => {
             const lastDp = dg[dg.length - 1];
             if (lastDp === undefined) return;
 
@@ -168,7 +168,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
                 : 0.4;
 
             return (
-              <>
+              <Fragment key={i}>
                 {/* point */}
                 <circle
                   cx={pointX}
@@ -188,7 +188,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
                 >
                   {groupName}
                 </text>
-              </>
+              </Fragment>
             );
           })}
         </Group>
