@@ -131,6 +131,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
                   cy={yScale(getY(dp))}
                   r={pointRadius}
                   fill={pointColor}
+                  opacity={0.25}
                 />
               );
             });
@@ -248,7 +249,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
         return (
           <Group>
             {/* point corresponding to tooltip */}
-            <circle cx={dpX} cy={dpY} r={3} fill={pointColor} />
+            <circle cx={dpX} cy={dpY} r={2} fill={pointColor} />
 
             {/* tooltip box */}
             <rect
