@@ -59,7 +59,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
     pointColor = "#303030",
     lineWidth = 1,
     lineColor = "#303030",
-    showPoints = true,
+    showPoints = false,
     showLines = true,
     showEndpointLabels = false,
     chartType = "linear",
