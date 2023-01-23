@@ -40,6 +40,7 @@ export interface ChartProps<T> {
   showEndpointLabels?: boolean;
   chartType?: "linear" | "log";
   yDomain?: [number, number];
+  xAxisLocation?: number;
 }
 
 export const Chart = <T,>(props: ChartProps<T>) => {
@@ -67,6 +68,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
     showEndpointLabels = false,
     chartType = "linear",
     yDomain,
+    xAxisLocation,
   } = props;
 
   // window size
@@ -274,7 +276,11 @@ export const Chart = <T,>(props: ChartProps<T>) => {
       {/* x axis */}
       <Axis
         orientation={Orientation.bottom}
-        top={height - axisWidth - (margins.bottom ?? 0)}
+        top={
+          xAxisLocation
+            ? yScale(xAxisLocation)
+            : height - axisWidth - (margins.bottom ?? 0)
+        }
         scale={xScale}
         stroke={axisColor}
         tickStroke={axisColor}
