@@ -32,6 +32,7 @@ export interface ChartProps<T> {
   axisColor?: string;
   pointRadius?: number;
   pointColor?: string;
+  pointOpacity?: number;
   lineWidth?: number;
   lineColor?: string;
   showPoints?: boolean;
@@ -57,6 +58,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
     axisColor = "#000000",
     pointRadius = 1.3,
     pointColor = "#303030",
+    pointOpacity = 1,
     lineWidth = 1,
     lineColor = "#303030",
     showPoints = false,
@@ -157,7 +159,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
                       cy={yScale(getY(dp))}
                       r={pointRadius}
                       fill={pointColor}
-                      opacity={0.4}
+                      opacity={pointOpacity}
                     />
                   );
                 });
@@ -169,6 +171,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
                   cy={yScale(getY(dp))}
                   r={pointRadius}
                   fill={pointColor}
+                  opacity={pointOpacity}
                 />
               ))}
         </Group>
