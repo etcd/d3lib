@@ -1,4 +1,3 @@
-// import { Group } from "@visx/group";
 import { Axis, Orientation } from "@visx/axis";
 import { LinePath } from "@visx/shape";
 import { scaleLinear, scaleLog } from "@visx/scale";
@@ -106,18 +105,6 @@ export const Chart = <T,>(props: ChartProps<T>) => {
       }}
       ref={ref}
     >
-      {/* tooltip */}
-      <Group>
-        {closestDp && (
-          <circle
-            cx={xScale(getX(closestDp))}
-            cy={yScale(getY(closestDp))}
-            r={3}
-            fill={pointColor}
-          />
-        )}
-      </Group>
-
       {/* data */}
       <Group>
         {/* points */}
@@ -152,8 +139,10 @@ export const Chart = <T,>(props: ChartProps<T>) => {
           //   />
           // );
         )}
+      </Group>
 
-        {/* lines */}
+      {/* lines */}
+      <Group>
         {Object.entries(dataGroups).map(([dgName, dg], i) => {
           return (
             <LinePath<T>
@@ -205,6 +194,32 @@ export const Chart = <T,>(props: ChartProps<T>) => {
           fontFamily: "sans-serif",
         }}
       />
+
+      {/* tooltip */}
+      {(() => {
+        if (!closestDp) return;
+
+        const dpX = xScale(getX(closestDp));
+        const dpY = yScale(getY(closestDp));
+
+        const ttWidth = 50;
+
+        return (
+          <Group>
+            <circle cx={dpX} cy={dpY} r={4} fill={pointColor} />
+            <rect
+              x={dpX - ttWidth / 2}
+              y={dpY - 40}
+              width={ttWidth}
+              height={24}
+              fill="#ffffff"
+              fillOpacity={0.75}
+              stroke="#000000"
+              strokeOpacity={0.9}
+            />
+          </Group>
+        );
+      })()}
     </svg>
   );
 
