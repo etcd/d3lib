@@ -61,7 +61,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
     lineColor = "#303030",
     showPoints = true,
     showLines = true,
-    showEndpointLabels = true,
+    showEndpointLabels = false,
     chartType = "linear",
   } = props;
 
