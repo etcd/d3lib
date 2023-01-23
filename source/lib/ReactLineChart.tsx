@@ -9,6 +9,13 @@ import { useEffect, useRef, useState } from "react";
 
 import "./ReactLineChart.css";
 
+interface Margins {
+  top?: number;
+  right?: number;
+  bottom?: number;
+  left?: number;
+}
+
 export interface ChartProps<T> {
   // data
   data: T[];
@@ -19,6 +26,7 @@ export interface ChartProps<T> {
   yAxisLabel?: string;
   // styles
   height: number;
+  margins?: Margins;
   axisWidth?: number;
   axisColor?: string;
   pointRadius?: number;
@@ -39,6 +47,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
     yAxisLabel,
     // styles
     height,
+    margins = { left: 10, top: 50, right: 50, bottom: 10 },
     axisWidth = 50,
     axisColor = "#000000",
     pointRadius = 1.3,
@@ -75,11 +84,11 @@ export const Chart = <T,>(props: ChartProps<T>) => {
   // scales
   const xScale = scaleLinear({
     domain: [0, Math.max(...data.map(getX))],
-    range: [axisWidth, width],
+    range: [(margins.left ?? 0) + axisWidth, width - (margins.right ?? 0)],
   });
   const yScale = scaleLog({
     domain: [1, Math.max(...data.map(getY))],
-    range: [height - axisWidth, 0],
+    range: [height - axisWidth - (margins.bottom ?? 0), margins.top ?? 0],
   });
 
   // chart
@@ -166,7 +175,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
       {/* x axis */}
       <Axis
         orientation={Orientation.bottom}
-        top={height - axisWidth}
+        top={height - axisWidth - (margins.bottom ?? 0)}
         scale={xScale}
         stroke={axisColor}
         tickStroke={axisColor}
@@ -182,7 +191,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
       {/* y axis */}
       <Axis
         orientation={Orientation.left}
-        left={axisWidth}
+        left={axisWidth + (margins.left ?? 0)}
         scale={yScale}
         stroke={axisColor}
         tickStroke={axisColor}
