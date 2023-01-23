@@ -169,29 +169,47 @@ export const Chart = <T,>(props: ChartProps<T>) => {
     >
       {/* legend */}
       {legendScale && (
-        <LegendOrdinal
-          scale={legendScale}
-          style={{ position: "absolute", top: 0 }}
+        <div
+          style={{
+            position: "absolute",
+            top: margins?.top ?? DEFAULT_MARGINS.top,
+            left: (margins?.left ?? DEFAULT_MARGINS.left) + axisWidth,
+            margin: "0 20px",
+            padding: "0 10px",
+            border: "1px solid black",
+            borderRadius: 4,
+          }}
         >
-          {(labels) => (
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                gap: 5,
-              }}
-            >
-              {labels.map((label, i) => (
-                <LegendItem key={i}>
-                  <svg width={10} height={10}>
-                    <rect fill={label.value} width={10} height={10} />
-                  </svg>
-                  <LegendLabel margin={4}>{label.text}</LegendLabel>
-                </LegendItem>
-              ))}
-            </div>
-          )}
-        </LegendOrdinal>
+          <LegendOrdinal scale={legendScale}>
+            {(labels) => (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  gap: 10,
+                }}
+              >
+                {labels.map((label, i) => (
+                  <LegendItem key={i}>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: 5,
+                      }}
+                    >
+                      <svg width={10} height={10}>
+                        <rect fill={label.value} width={10} height={10} />
+                      </svg>
+                      <LegendLabel>{label.text}</LegendLabel>
+                    </div>
+                  </LegendItem>
+                ))}
+              </div>
+            )}
+          </LegendOrdinal>
+        </div>
       )}
 
       {/* chart */}
