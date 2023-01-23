@@ -7,8 +7,8 @@ import { curveLinear } from "@visx/curve";
 import { groupBy } from "../utilities/Arrays";
 import { Fragment, useEffect, useRef, useState } from "react";
 
-import * as Colors from "../utilities/Colors";
 import { useWindowSize } from "../utilities/useWindowSize";
+import { evenlySpacedColors, rgbArrayToString } from "../utilities/Colors";
 
 import "./ReactLineChart.css";
 
@@ -34,7 +34,6 @@ export interface ChartProps<T> {
   axisWidth?: number;
   axisColor?: string;
   pointRadius?: number;
-  pointColor?: string;
   pointOpacity?: number;
   lineWidth?: number;
   showPoints?: boolean;
@@ -62,7 +61,6 @@ export const Chart = <T,>(props: ChartProps<T>) => {
     axisWidth = 50,
     axisColor = "#000000",
     pointRadius = 1.3,
-    pointColor = "#303030",
     pointOpacity = 1,
     lineWidth = 1,
     showPoints = false,
@@ -102,13 +100,13 @@ export const Chart = <T,>(props: ChartProps<T>) => {
   const dataGroups = getZ ? groupBy(data, getZ) : undefined;
 
   // get line colors
-  const lineColors = Colors.evenlySpacedColors(
+  const groupColors = evenlySpacedColors(
     dataGroups ? Object.keys(dataGroups).length : 1,
     1,
     0.75
   );
 
-  if (!lineColors) return null;
+  if (!groupColors) return null;
 
   // x scale
   const xValues = data.map(getX);
@@ -194,7 +192,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
                       cx={xScale(getX(dp))}
                       cy={yScale(getY(dp))}
                       r={pointRadius}
-                      fill={pointColor}
+                      fill={rgbArrayToString(groupColors[i] ?? [0, 0, 0])}
                       opacity={pointOpacity}
                     />
                   );
@@ -206,7 +204,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
                   cx={xScale(getX(dp))}
                   cy={yScale(getY(dp))}
                   r={pointRadius}
-                  fill={pointColor}
+                  fill={rgbArrayToString(groupColors[0] ?? [0, 0, 0])}
                   opacity={pointOpacity}
                 />
               ))}
@@ -236,7 +234,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
                   cx={pointX}
                   cy={pointY}
                   r={1.5}
-                  fill={pointColor}
+                  fill={rgbArrayToString(groupColors[i] ?? [0, 0, 0])}
                   opacity={opacity}
                 />
                 {/* group */}
@@ -268,7 +266,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
                   data={dg}
                   x={(dp) => xScale(getX(dp))}
                   y={(dp) => yScale(getY(dp))}
-                  stroke={Colors.rgbArrayToString(lineColors[i] ?? [0, 0, 0])}
+                  stroke={rgbArrayToString(groupColors[i] ?? [0, 0, 0])}
                   strokeWidth={lineWidth}
                   strokeOpacity={
                     closestDpGroup === undefined || closestDpGroup === dgName
@@ -284,7 +282,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
               data={data}
               x={(dp) => xScale(getX(dp))}
               y={(dp) => yScale(getY(dp))}
-              stroke={Colors.rgbArrayToString(lineColors[0] ?? [0, 0, 0])}
+              stroke={rgbArrayToString(groupColors[0] ?? [0, 0, 0])}
               strokeWidth={lineWidth}
             />
           )}
@@ -343,7 +341,12 @@ export const Chart = <T,>(props: ChartProps<T>) => {
         return (
           <Group>
             {/* point corresponding to tooltip */}
-            <circle cx={dpX} cy={dpY} r={2} fill={pointColor} />
+            <circle
+              cx={dpX}
+              cy={dpY}
+              r={2}
+              fill={rgbArrayToString([0, 0, 0])}
+            />
 
             {/* tooltip box */}
             <rect
