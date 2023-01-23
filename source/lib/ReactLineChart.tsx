@@ -92,22 +92,25 @@ export const Chart = <T,>(props: ChartProps<T>) => {
   const dataGroups = getZ ? groupBy(data, getZ) : undefined;
 
   // x scale
+  const xValues = data.map(getX);
   const xScale = scaleLinear({
-    domain: [0, Math.max(...data.map(getX))],
+    domain: [Math.min(...xValues), Math.max(...xValues)],
     range: [(margins.left ?? 0) + axisWidth, width - (margins.right ?? 0)],
   });
 
   // y scale
-  const yScaleType = (() => {
+  const [yScaleType, yScaleDomain] = (() => {
+    const yValues = data.map(getY);
+
     switch (chartType) {
       case "linear":
-        return scaleLinear;
+        return [scaleLinear, [Math.min(...yValues), Math.max(...yValues)]];
       case "log":
-        return scaleLog;
+        return [scaleLog, [1, Math.max(...yValues)]];
     }
   })();
   const yScale = yScaleType({
-    domain: [1, Math.max(...data.map(getY))],
+    domain: yScaleDomain,
     range: [height - axisWidth - (margins.bottom ?? 0), margins.top ?? 0],
   });
 
