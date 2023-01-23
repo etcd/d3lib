@@ -202,21 +202,43 @@ export const Chart = <T,>(props: ChartProps<T>) => {
         const dpX = xScale(getX(closestDp));
         const dpY = yScale(getY(closestDp));
 
-        const ttWidth = 50;
+        const tooltipWidth = 100;
+        const tooltipHeight = 60;
+        const tooltipX = dpX - tooltipWidth / 2;
+        const tooltipY = dpY - tooltipHeight - 10;
 
         return (
           <Group>
+            {/* point corresponding to tooltip */}
             <circle cx={dpX} cy={dpY} r={4} fill={pointColor} />
+
+            {/* tooltip box */}
             <rect
-              x={dpX - ttWidth / 2}
-              y={dpY - 40}
-              width={ttWidth}
-              height={24}
+              x={tooltipX}
+              y={tooltipY}
+              width={tooltipWidth}
+              height={tooltipHeight}
               fill="#ffffff"
               fillOpacity={0.75}
               stroke="#000000"
               strokeOpacity={0.9}
             />
+            {/* tooltip title */}
+            <text
+              x={tooltipX + 10}
+              y={tooltipY + 20}
+              fontSize={12}
+              fontWeight="bold"
+            >
+              {closestDpGroup}
+            </text>
+            {/* tooltip body text */}
+            <text x={tooltipX + 10} y={tooltipY + 35} fontSize={12}>
+              {getX(closestDp)}
+            </text>
+            <text x={tooltipX + 10} y={tooltipY + 50} fontSize={12}>
+              {Number(getY(closestDp)).toFixed(2)}
+            </text>
           </Group>
         );
       })()}
