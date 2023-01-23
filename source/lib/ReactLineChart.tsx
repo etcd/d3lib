@@ -1,9 +1,10 @@
 import { Axis, Orientation } from "@visx/axis";
 import { LinePath } from "@visx/shape";
-import { scaleLinear, scaleLog } from "@visx/scale";
+import { scaleLinear, scaleLog, scaleOrdinal } from "@visx/scale";
 import { Group } from "@visx/group";
 import ReactDOM from "react-dom/client";
 import { curveLinear } from "@visx/curve";
+import { LegendOrdinal, LegendItem, LegendLabel } from "@visx/legend";
 import { groupBy } from "../utilities/Arrays";
 import { Fragment, useEffect, useRef, useState } from "react";
 
@@ -100,7 +101,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
   // group data by z
   const dataGroups = getZ ? groupBy(data, getZ) : undefined;
 
-  // get line colors
+  // get colors
   const groupColors = evenlySpacedColors(
     dataGroups ? Object.keys(dataGroups).length : 1,
     1,
@@ -108,6 +109,11 @@ export const Chart = <T,>(props: ChartProps<T>) => {
   );
 
   if (!groupColors) return null;
+
+  const legendScale = scaleOrdinal({
+    domain: ["a", "b", "c", "d"],
+    range: ["#66d981", "#71f5ef", "#4899f1", "#7d81f6"],
+  });
 
   // x scale
   const xValues = data.map(getX);
@@ -394,6 +400,25 @@ export const Chart = <T,>(props: ChartProps<T>) => {
         );
       })()}
     </svg>
+  //   <LegendOrdinal
+  //   scale={legendScale}
+  //   labelFormat={(label) => `${label.toUpperCase()}`}
+  // >
+  //   {(labels) => (
+  //     <div style={{ display: "flex", flexDirection: "row" }}>
+  //       {labels.map((label, i) => (
+  //         <LegendItem key={`legend-quantile-${i}`} margin="0 5px">
+  //           <svg width={10} height={10}>
+  //             <rect fill={label.value} width={10} height={10} />
+  //           </svg>
+  //           <LegendLabel align="left" margin="0 0 0 4px">
+  //             {label.text}
+  //           </LegendLabel>
+  //         </LegendItem>
+  //       ))}
+  //     </div>
+  //   )}
+  // </LegendOrdinal>
   );
 
   return chart;
