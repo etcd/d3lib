@@ -39,6 +39,7 @@ export interface ChartProps<T> {
   showLines?: boolean;
   showEndpointLabels?: boolean;
   chartType?: "linear" | "log";
+  yDomain?: [number, number];
 }
 
 export const Chart = <T,>(props: ChartProps<T>) => {
@@ -65,6 +66,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
     showLines = true,
     showEndpointLabels = false,
     chartType = "linear",
+    yDomain,
   } = props;
 
   // window size
@@ -102,17 +104,31 @@ export const Chart = <T,>(props: ChartProps<T>) => {
     range: [(margins.left ?? 0) + axisWidth, width - (margins.right ?? 0)],
   });
 
-  // y scale
-  const [yScaleType, yScaleDomain] = (() => {
+  // y scale type
+  const yScaleType = (() => {
+    switch (chartType) {
+      case "linear":
+        return scaleLinear;
+      case "log":
+        return scaleLog;
+    }
+  })();
+
+  // y scale domain
+  const yScaleDomain = (() => {
     const yValues = data.map(getY);
+
+    if (yDomain !== undefined) return yDomain;
 
     switch (chartType) {
       case "linear":
-        return [scaleLinear, [Math.min(...yValues), Math.max(...yValues)]];
+        return [Math.min(...yValues), Math.max(...yValues)];
       case "log":
-        return [scaleLog, [1, Math.max(...yValues)]];
+        return [1, Math.max(...yValues)];
     }
   })();
+
+  // y scale
   const yScale = yScaleType({
     domain: yScaleDomain,
     range: [height - axisWidth - (margins.bottom ?? 0), margins.top ?? 0],
