@@ -264,7 +264,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
 
         const tooltipTitle = closestDpGroup;
         const tooltipWidth = 120;
-        const tooltipHeight = tooltipTitle ? 60 : 40;
+        const tooltipHeight = tooltipTitle ? 60 : 45;
         const tooltipX = dpX - tooltipWidth / 2;
         const tooltipY = dpY - tooltipHeight - 10;
 
