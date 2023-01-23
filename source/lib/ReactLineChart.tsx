@@ -110,10 +110,12 @@ export const Chart = <T,>(props: ChartProps<T>) => {
 
   if (!groupColors) return null;
 
-  const legendScale = scaleOrdinal({
-    domain: ["a", "b", "c", "d"],
-    range: ["#66d981", "#71f5ef", "#4899f1", "#7d81f6"],
-  });
+  const legendScale = dataGroups
+    ? scaleOrdinal({
+        domain: Object.keys(dataGroups),
+        range: groupColors.map(rgbArrayToString),
+      })
+    : undefined;
 
   // x scale
   const xValues = data.map(getX);
@@ -157,7 +159,36 @@ export const Chart = <T,>(props: ChartProps<T>) => {
 
   // chart
   const chart = (
-    <div>
+    <div style={{ position: "relative" }}>
+      {/* legend */}
+      {legendScale && (
+        <LegendOrdinal
+          scale={legendScale}
+          style={{ position: "absolute", top: 0 }}
+        >
+          {(labels) => (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                fontSize: 12,
+                gap: 5,
+              }}
+            >
+              {labels.map((label, i) => (
+                <LegendItem key={i}>
+                  <svg width={10} height={10}>
+                    <rect fill={label.value} width={10} height={10} />
+                  </svg>
+                  <LegendLabel margin={4}>{label.text}</LegendLabel>
+                </LegendItem>
+              ))}
+            </div>
+          )}
+        </LegendOrdinal>
+      )}
+
+      {/* chart */}
       <svg
         height={height}
         width={width}
@@ -401,27 +432,6 @@ export const Chart = <T,>(props: ChartProps<T>) => {
           );
         })()}
       </svg>
-
-      {/* legend */}
-      <LegendOrdinal
-        scale={legendScale}
-        labelFormat={(label) => `${label.toUpperCase()}`}
-      >
-        {(labels) => (
-          <div style={{ display: "flex", flexDirection: "row" }}>
-            {labels.map((label, i) => (
-              <LegendItem key={`legend-quantile-${i}`} margin="0 5px">
-                <svg width={10} height={10}>
-                  <rect fill={label.value} width={10} height={10} />
-                </svg>
-                <LegendLabel align="left" margin="0 0 0 4px">
-                  {label.text}
-                </LegendLabel>
-              </LegendItem>
-            ))}
-          </div>
-        )}
-      </LegendOrdinal>
     </div>
   );
 
