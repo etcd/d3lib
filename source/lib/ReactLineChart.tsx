@@ -262,8 +262,9 @@ export const Chart = <T,>(props: ChartProps<T>) => {
         const dpX = xScale(getX(closestDp));
         const dpY = yScale(getY(closestDp));
 
+        const tooltipTitle = closestDpGroup;
         const tooltipWidth = 120;
-        const tooltipHeight = 60;
+        const tooltipHeight = tooltipTitle ? 60 : 40;
         const tooltipX = dpX - tooltipWidth / 2;
         const tooltipY = dpY - tooltipHeight - 10;
 
@@ -291,12 +292,12 @@ export const Chart = <T,>(props: ChartProps<T>) => {
               fontFamily="sans-serif"
               fontWeight="bold"
             >
-              {closestDpGroup}
+              {tooltipTitle}
             </text>
             {/* tooltip body text */}
             <text
               x={tooltipX + 10}
-              y={tooltipY + 35}
+              y={tooltipY + (tooltipTitle ? 35 : 15)}
               fontSize={12}
               fontFamily="sans-serif"
             >
@@ -304,7 +305,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
             </text>
             <text
               x={tooltipX + 10}
-              y={tooltipY + 50}
+              y={tooltipY + (tooltipTitle ? 50 : 30)}
               fontSize={12}
               fontFamily="sans-serif"
             >
