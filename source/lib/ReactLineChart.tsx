@@ -27,6 +27,7 @@ export interface ChartProps<T> {
   yAxisLabel?: string;
   // display
   height: number;
+  width?: number;
   margins?: Margins;
   axisWidth?: number;
   axisColor?: string;
@@ -55,6 +56,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
     yAxisLabel,
     // display
     height,
+    width,
     margins = { left: 10, top: 50, right: 50, bottom: 10 },
     axisWidth = 50,
     axisColor = "#000000",
@@ -76,7 +78,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
 
   // dimensions
   const ref = useRef<SVGSVGElement>(null);
-  const [width, setWidth] = useState(0);
+  const [measuredWidth, setMeasuredWidth] = useState(0);
   const [top, setTop] = useState(0);
   const [left, setLeft] = useState(0);
 
@@ -93,7 +95,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
 
     setTop(boundingRect.top);
     setLeft(boundingRect.left);
-    setWidth(current.clientWidth);
+    setMeasuredWidth(current.clientWidth);
   }, [windowSize]);
 
   // group data by z
@@ -103,7 +105,10 @@ export const Chart = <T,>(props: ChartProps<T>) => {
   const xValues = data.map(getX);
   const xScale = scaleLinear({
     domain: [Math.min(...xValues), Math.max(...xValues)],
-    range: [(margins.left ?? 0) + axisWidth, width - (margins.right ?? 0)],
+    range: [
+      (margins.left ?? 0) + axisWidth,
+      measuredWidth - (margins.right ?? 0),
+    ],
   });
 
   // y scale type
@@ -140,7 +145,8 @@ export const Chart = <T,>(props: ChartProps<T>) => {
   const chart = (
     <svg
       height={height}
-      style={{ width: "100%" }}
+      width={width}
+      style={width ? undefined : { width: "100%" }}
       onPointerMove={(e) => {
         // get mouse coordinates relative to top left of chart
         const [localX, localY] = [e.clientX - left, e.clientY - top];
