@@ -161,10 +161,22 @@ export const Chart = <T,>(props: ChartProps<T>) => {
           const pointX = xScale(getX(lastDp));
           const pointY = yScale(getY(lastDp));
 
+          const groupName = getZ(lastDp);
+          const opacity =
+            closestDpGroup === undefined || closestDpGroup === groupName
+              ? 1
+              : 0.4;
+
           return (
             <>
               {/* point */}
-              <circle cx={pointX} cy={pointY} r={1.5} fill={pointColor} />
+              <circle
+                cx={pointX}
+                cy={pointY}
+                r={1.5}
+                fill={pointColor}
+                opacity={opacity}
+              />
               {/* group */}
               <text
                 x={pointX + 3}
@@ -172,8 +184,9 @@ export const Chart = <T,>(props: ChartProps<T>) => {
                 fontSize={11}
                 fontFamily="sans-serif"
                 fontWeight="bold"
+                opacity={opacity}
               >
-                {getZ(lastDp)}
+                {groupName}
               </text>
             </>
           );
@@ -195,7 +208,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
               strokeOpacity={
                 closestDpGroup === undefined || closestDpGroup === dgName
                   ? 1
-                  : 0.2
+                  : 0.15
               }
             />
           );
