@@ -228,6 +228,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
               x={tooltipX + 10}
               y={tooltipY + 20}
               fontSize={12}
+              fontFamily="sans-serif"
               fontWeight="bold"
             >
               {closestDpGroup}
