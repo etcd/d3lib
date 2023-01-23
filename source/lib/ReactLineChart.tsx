@@ -36,6 +36,7 @@ export interface ChartProps<T> {
   lineColor?: string;
   plotPoints?: boolean;
   plotLines?: boolean;
+  chartType?: "linear" | "log";
 }
 
 export const Chart = <T,>(props: ChartProps<T>) => {
@@ -59,6 +60,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
     lineColor = "#303030",
     plotPoints = true,
     plotLines = true,
+    chartType = "linear",
   } = props;
 
   // window size
@@ -89,12 +91,22 @@ export const Chart = <T,>(props: ChartProps<T>) => {
   // group data by z
   const dataGroups = getZ ? groupBy(data, getZ) : undefined;
 
-  // scales
+  // x scale
   const xScale = scaleLinear({
     domain: [0, Math.max(...data.map(getX))],
     range: [(margins.left ?? 0) + axisWidth, width - (margins.right ?? 0)],
   });
-  const yScale = scaleLog({
+
+  // y scale
+  const yScaleType = (() => {
+    switch (chartType) {
+      case "linear":
+        return scaleLinear;
+      case "log":
+        return scaleLog;
+    }
+  })();
+  const yScale = yScaleType({
     domain: [1, Math.max(...data.map(getY))],
     range: [height - axisWidth - (margins.bottom ?? 0), margins.top ?? 0],
   });
