@@ -379,7 +379,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
               fontSize={12}
               fontFamily="sans-serif"
             >
-              {getX(closestDp)}
+              {getX(closestDp).toFixed(3)}
             </text>
             <text
               x={tooltipX + 10}
@@ -387,7 +387,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
               fontSize={12}
               fontFamily="sans-serif"
             >
-              {Number(getY(closestDp)).toFixed(2)}
+              {getY(closestDp).toFixed(3)}
             </text>
           </Group>
         );
