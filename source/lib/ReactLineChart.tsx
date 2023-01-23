@@ -233,10 +233,20 @@ export const Chart = <T,>(props: ChartProps<T>) => {
               {closestDpGroup}
             </text>
             {/* tooltip body text */}
-            <text x={tooltipX + 10} y={tooltipY + 35} fontSize={12}>
+            <text
+              x={tooltipX + 10}
+              y={tooltipY + 35}
+              fontSize={12}
+              fontFamily="sans-serif"
+            >
               {getX(closestDp)}
             </text>
-            <text x={tooltipX + 10} y={tooltipY + 50} fontSize={12}>
+            <text
+              x={tooltipX + 10}
+              y={tooltipY + 50}
+              fontSize={12}
+              fontFamily="sans-serif"
+            >
               {Number(getY(closestDp)).toFixed(2)}
             </text>
           </Group>
