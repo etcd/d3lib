@@ -164,7 +164,9 @@ export const Chart = <T,>(props: ChartProps<T>) => {
 
   // chart
   const chart = (
-    <div style={{ position: "relative" }}>
+    <div
+      style={{ position: "relative", fontSize: 12, fontFamily: "sans-serif" }}
+    >
       {/* legend */}
       {legendScale && (
         <LegendOrdinal
@@ -176,7 +178,6 @@ export const Chart = <T,>(props: ChartProps<T>) => {
               style={{
                 display: "flex",
                 flexDirection: "row",
-                fontSize: 12,
                 gap: 5,
               }}
             >
