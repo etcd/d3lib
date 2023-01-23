@@ -157,268 +157,251 @@ export const Chart = <T,>(props: ChartProps<T>) => {
 
   // chart
   const chart = (
-    <svg
-      height={height}
-      width={width}
-      style={width ? undefined : { width: "100%" }}
-      onPointerMove={(e) => {
-        // get mouse coordinates relative to top left of chart
-        const [localX, localY] = [
-          e.clientX - measuredLeft,
-          e.clientY - measuredTop,
-        ];
+    <div>
+      <svg
+        height={height}
+        width={width}
+        style={width ? undefined : { width: "100%" }}
+        onPointerMove={(e) => {
+          // get mouse coordinates relative to top left of chart
+          const [localX, localY] = [
+            e.clientX - measuredLeft,
+            e.clientY - measuredTop,
+          ];
 
-        // get closest datapoint
-        const dpDistances = data.map((dp) =>
-          Math.hypot(xScale(getX(dp))! - localX, yScale(getY(dp))! - localY)
-        );
-        const minDistance = Math.min(...dpDistances);
-        const minDistanceIdx = dpDistances.indexOf(minDistance);
+          // get closest datapoint
+          const dpDistances = data.map((dp) =>
+            Math.hypot(xScale(getX(dp))! - localX, yScale(getY(dp))! - localY)
+          );
+          const minDistance = Math.min(...dpDistances);
+          const minDistanceIdx = dpDistances.indexOf(minDistance);
 
-        setClosestDp(data[minDistanceIdx]);
-      }}
-      onPointerOut={() => {
-        setClosestDp(undefined);
-      }}
-      ref={ref}
-    >
-      {/* data */}
-      {showPoints && (
-        <Group>
-          {/* points */}
-          {dataGroups
-            ? Object.entries(dataGroups).map(([dgName, dg], groupIndex) => {
-                if (closestDpGroup !== undefined && closestDpGroup !== dgName)
-                  return;
+          setClosestDp(data[minDistanceIdx]);
+        }}
+        onPointerOut={() => {
+          setClosestDp(undefined);
+        }}
+        ref={ref}
+      >
+        {/* data */}
+        {showPoints && (
+          <Group>
+            {/* points */}
+            {dataGroups
+              ? Object.entries(dataGroups).map(([dgName, dg], groupIndex) => {
+                  if (closestDpGroup !== undefined && closestDpGroup !== dgName)
+                    return;
 
-                // color of the group
-                const groupColor = rgbArrayToString(
-                  groupColors[groupIndex] ?? [0, 0, 0]
-                );
+                  // color of the group
+                  const groupColor = rgbArrayToString(
+                    groupColors[groupIndex] ?? [0, 0, 0]
+                  );
 
-                // make points for this datagroup
-                return dg.map((dp, datapointIndex) => (
+                  // make points for this datagroup
+                  return dg.map((dp, datapointIndex) => (
+                    <circle
+                      key={datapointIndex}
+                      cx={xScale(getX(dp))}
+                      cy={yScale(getY(dp))}
+                      r={pointRadius}
+                      fill={groupColor}
+                      opacity={pointOpacity}
+                    />
+                  ));
+                })
+              : data.map((dp, datapointIndex) => (
                   <circle
                     key={datapointIndex}
                     cx={xScale(getX(dp))}
                     cy={yScale(getY(dp))}
                     r={pointRadius}
-                    fill={groupColor}
+                    fill={rgbArrayToString(groupColors[0] ?? [0, 0, 0])}
                     opacity={pointOpacity}
                   />
-                ));
-              })
-            : data.map((dp, datapointIndex) => (
-                <circle
-                  key={datapointIndex}
-                  cx={xScale(getX(dp))}
-                  cy={yScale(getY(dp))}
-                  r={pointRadius}
-                  fill={rgbArrayToString(groupColors[0] ?? [0, 0, 0])}
-                  opacity={pointOpacity}
-                />
-              ))}
-        </Group>
-      )}
-
-      {/* endpoint labels */}
-      {showEndpointLabels && dataGroups && getZ && (
-        <Group>
-          {Object.values(dataGroups).map((dg, i) => {
-            const lastDp = dg[dg.length - 1];
-            if (lastDp === undefined) return;
-
-            const pointX = xScale(getX(lastDp));
-            const pointY = yScale(getY(lastDp));
-
-            const groupName = getZ(lastDp);
-            const opacity =
-              closestDpGroup === undefined || closestDpGroup === groupName
-                ? 1
-                : 0.4;
-
-            return (
-              <Fragment key={i}>
-                {/* point */}
-                <circle
-                  cx={pointX}
-                  cy={pointY}
-                  r={1.5}
-                  fill={rgbArrayToString(groupColors[i] ?? [0, 0, 0])}
-                  opacity={opacity}
-                />
-                {/* group */}
-                <text
-                  x={pointX + 3}
-                  y={pointY + 3}
-                  fontSize={11}
-                  fontFamily="sans-serif"
-                  fontWeight="bold"
-                  opacity={opacity}
-                >
-                  {groupName}
-                </text>
-              </Fragment>
-            );
-          })}
-        </Group>
-      )}
-
-      {/* lines */}
-      {showLines && (
-        <Group>
-          {dataGroups ? (
-            Object.entries(dataGroups).map(([dgName, dg], i) => {
-              return (
-                <LinePath<T>
-                  key={i}
-                  curve={curveLinear}
-                  data={dg}
-                  x={(dp) => xScale(getX(dp))}
-                  y={(dp) => yScale(getY(dp))}
-                  stroke={rgbArrayToString(groupColors[i] ?? [0, 0, 0])}
-                  strokeWidth={lineWidth}
-                  strokeOpacity={
-                    closestDpGroup === undefined || closestDpGroup === dgName
-                      ? 1
-                      : 0.15
-                  }
-                />
-              );
-            })
-          ) : (
-            <LinePath<T>
-              curve={curveLinear}
-              data={data}
-              x={(dp) => xScale(getX(dp))}
-              y={(dp) => yScale(getY(dp))}
-              stroke={rgbArrayToString(groupColors[0] ?? [0, 0, 0])}
-              strokeWidth={lineWidth}
-            />
-          )}
-        </Group>
-      )}
-
-      {/* x axis */}
-      <Axis
-        orientation={Orientation.bottom}
-        top={
-          xAxisLocation !== undefined
-            ? yScale(xAxisLocation)
-            : height - axisWidth - (margins.bottom ?? 0)
-        }
-        scale={xScale}
-        stroke={axisColor}
-        tickStroke={axisColor}
-        label={xAxisLabel}
-        labelProps={{
-          y: 36,
-          fontSize: 12,
-          fontWeight: "bold",
-          fontFamily: "sans-serif",
-        }}
-      />
-
-      {/* y axis */}
-      <Axis
-        orientation={Orientation.left}
-        left={axisWidth + (margins.left ?? 0)}
-        scale={yScale}
-        stroke={axisColor}
-        tickStroke={axisColor}
-        label={yAxisLabel}
-        labelProps={{
-          y: -22,
-          fontSize: 12,
-          fontWeight: "bold",
-          fontFamily: "sans-serif",
-        }}
-      />
-
-      {/* tooltip */}
-      {(() => {
-        if (!closestDp) return;
-
-        const dpX = xScale(getX(closestDp));
-        const dpY = yScale(getY(closestDp));
-
-        const tooltipTitle = closestDpGroup;
-        const tooltipWidth = 120;
-        const tooltipHeight = tooltipTitle ? 60 : 45;
-        const tooltipX = dpX - tooltipWidth / 2;
-        const tooltipY = dpY - tooltipHeight - 10;
-
-        return (
-          <Group>
-            {/* point corresponding to tooltip */}
-            <circle
-              cx={dpX}
-              cy={dpY}
-              r={2}
-              fill={rgbArrayToString([0, 0, 0])}
-            />
-
-            {/* tooltip box */}
-            <rect
-              x={tooltipX}
-              y={tooltipY}
-              width={tooltipWidth}
-              height={tooltipHeight}
-              fill="#ffffff"
-              fillOpacity={0.85}
-              stroke="#000000"
-              strokeOpacity={0.9}
-            />
-            {/* tooltip title */}
-            <text
-              x={tooltipX + 10}
-              y={tooltipY + 20}
-              fontSize={12}
-              fontFamily="sans-serif"
-              fontWeight="bold"
-            >
-              {tooltipTitle}
-            </text>
-            {/* tooltip body text */}
-            <text
-              x={tooltipX + 10}
-              y={tooltipY + (tooltipTitle ? 35 : 20)}
-              fontSize={12}
-              fontFamily="sans-serif"
-            >
-              x: {formatNumber(getX(closestDp))}
-            </text>
-            <text
-              x={tooltipX + 10}
-              y={tooltipY + (tooltipTitle ? 50 : 35)}
-              fontSize={12}
-              fontFamily="sans-serif"
-            >
-              y: {formatNumber(getY(closestDp))}
-            </text>
+                ))}
           </Group>
-        );
-      })()}
-    </svg>
-  //   <LegendOrdinal
-  //   scale={legendScale}
-  //   labelFormat={(label) => `${label.toUpperCase()}`}
-  // >
-  //   {(labels) => (
-  //     <div style={{ display: "flex", flexDirection: "row" }}>
-  //       {labels.map((label, i) => (
-  //         <LegendItem key={`legend-quantile-${i}`} margin="0 5px">
-  //           <svg width={10} height={10}>
-  //             <rect fill={label.value} width={10} height={10} />
-  //           </svg>
-  //           <LegendLabel align="left" margin="0 0 0 4px">
-  //             {label.text}
-  //           </LegendLabel>
-  //         </LegendItem>
-  //       ))}
-  //     </div>
-  //   )}
-  // </LegendOrdinal>
+        )}
+
+        {/* endpoint labels */}
+        {showEndpointLabels && dataGroups && getZ && (
+          <Group>
+            {Object.values(dataGroups).map((dg, i) => {
+              const lastDp = dg[dg.length - 1];
+              if (lastDp === undefined) return;
+
+              const pointX = xScale(getX(lastDp));
+              const pointY = yScale(getY(lastDp));
+
+              const groupName = getZ(lastDp);
+              const opacity =
+                closestDpGroup === undefined || closestDpGroup === groupName
+                  ? 1
+                  : 0.4;
+
+              return (
+                <Fragment key={i}>
+                  {/* point */}
+                  <circle
+                    cx={pointX}
+                    cy={pointY}
+                    r={1.5}
+                    fill={rgbArrayToString(groupColors[i] ?? [0, 0, 0])}
+                    opacity={opacity}
+                  />
+                  {/* group */}
+                  <text
+                    x={pointX + 3}
+                    y={pointY + 3}
+                    fontSize={11}
+                    fontFamily="sans-serif"
+                    fontWeight="bold"
+                    opacity={opacity}
+                  >
+                    {groupName}
+                  </text>
+                </Fragment>
+              );
+            })}
+          </Group>
+        )}
+
+        {/* lines */}
+        {showLines && (
+          <Group>
+            {dataGroups ? (
+              Object.entries(dataGroups).map(([dgName, dg], i) => {
+                return (
+                  <LinePath<T>
+                    key={i}
+                    curve={curveLinear}
+                    data={dg}
+                    x={(dp) => xScale(getX(dp))}
+                    y={(dp) => yScale(getY(dp))}
+                    stroke={rgbArrayToString(groupColors[i] ?? [0, 0, 0])}
+                    strokeWidth={lineWidth}
+                    strokeOpacity={
+                      closestDpGroup === undefined || closestDpGroup === dgName
+                        ? 1
+                        : 0.15
+                    }
+                  />
+                );
+              })
+            ) : (
+              <LinePath<T>
+                curve={curveLinear}
+                data={data}
+                x={(dp) => xScale(getX(dp))}
+                y={(dp) => yScale(getY(dp))}
+                stroke={rgbArrayToString(groupColors[0] ?? [0, 0, 0])}
+                strokeWidth={lineWidth}
+              />
+            )}
+          </Group>
+        )}
+
+        {/* x axis */}
+        <Axis
+          orientation={Orientation.bottom}
+          top={
+            xAxisLocation !== undefined
+              ? yScale(xAxisLocation)
+              : height - axisWidth - (margins.bottom ?? 0)
+          }
+          scale={xScale}
+          stroke={axisColor}
+          tickStroke={axisColor}
+          label={xAxisLabel}
+          labelProps={{
+            y: 36,
+            fontSize: 12,
+            fontWeight: "bold",
+            fontFamily: "sans-serif",
+          }}
+        />
+
+        {/* y axis */}
+        <Axis
+          orientation={Orientation.left}
+          left={axisWidth + (margins.left ?? 0)}
+          scale={yScale}
+          stroke={axisColor}
+          tickStroke={axisColor}
+          label={yAxisLabel}
+          labelProps={{
+            y: -22,
+            fontSize: 12,
+            fontWeight: "bold",
+            fontFamily: "sans-serif",
+          }}
+        />
+
+        {/* tooltip */}
+        {(() => {
+          if (!closestDp) return;
+
+          const dpX = xScale(getX(closestDp));
+          const dpY = yScale(getY(closestDp));
+
+          const tooltipTitle = closestDpGroup;
+          const tooltipWidth = 120;
+          const tooltipHeight = tooltipTitle ? 60 : 45;
+          const tooltipX = dpX - tooltipWidth / 2;
+          const tooltipY = dpY - tooltipHeight - 10;
+
+          return (
+            <Group>
+              {/* point corresponding to tooltip */}
+              <circle
+                cx={dpX}
+                cy={dpY}
+                r={2}
+                fill={rgbArrayToString([0, 0, 0])}
+              />
+
+              {/* tooltip box */}
+              <rect
+                x={tooltipX}
+                y={tooltipY}
+                width={tooltipWidth}
+                height={tooltipHeight}
+                fill="#ffffff"
+                fillOpacity={0.85}
+                stroke="#000000"
+                strokeOpacity={0.9}
+              />
+              {/* tooltip title */}
+              <text
+                x={tooltipX + 10}
+                y={tooltipY + 20}
+                fontSize={12}
+                fontFamily="sans-serif"
+                fontWeight="bold"
+              >
+                {tooltipTitle}
+              </text>
+              {/* tooltip body text */}
+              <text
+                x={tooltipX + 10}
+                y={tooltipY + (tooltipTitle ? 35 : 20)}
+                fontSize={12}
+                fontFamily="sans-serif"
+              >
+                x: {formatNumber(getX(closestDp))}
+              </text>
+              <text
+                x={tooltipX + 10}
+                y={tooltipY + (tooltipTitle ? 50 : 35)}
+                fontSize={12}
+                fontFamily="sans-serif"
+              >
+                y: {formatNumber(getY(closestDp))}
+              </text>
+            </Group>
+          );
+        })()}
+      </svg>
+    </div>
   );
 
   return chart;
