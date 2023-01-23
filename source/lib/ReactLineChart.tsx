@@ -25,7 +25,7 @@ export interface ChartProps<T> {
   getZ?: (p: T) => string;
   xAxisLabel?: string;
   yAxisLabel?: string;
-  // styles
+  // display
   height: number;
   margins?: Margins;
   axisWidth?: number;
@@ -34,6 +34,8 @@ export interface ChartProps<T> {
   pointColor?: string;
   lineWidth?: number;
   lineColor?: string;
+  plotPoints?: boolean;
+  plotLines?: boolean;
 }
 
 export const Chart = <T,>(props: ChartProps<T>) => {
@@ -46,7 +48,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
     getZ,
     xAxisLabel,
     yAxisLabel,
-    // styles
+    // display
     height,
     margins = { left: 10, top: 50, right: 50, bottom: 10 },
     axisWidth = 50,
@@ -55,6 +57,8 @@ export const Chart = <T,>(props: ChartProps<T>) => {
     pointColor = "#303030",
     lineWidth = 1,
     lineColor = "#303030",
+    plotPoints = true,
+    plotLines = true,
   } = props;
 
   // window size
@@ -119,37 +123,39 @@ export const Chart = <T,>(props: ChartProps<T>) => {
       ref={ref}
     >
       {/* data */}
-      <Group>
-        {/* points */}
-        {dataGroups
-          ? Object.entries(dataGroups).map(([dgName, dg]) => {
-              if (closestDpGroup === undefined || closestDpGroup !== dgName)
-                return;
+      {plotPoints && (
+        <Group>
+          {/* points */}
+          {dataGroups
+            ? Object.entries(dataGroups).map(([dgName, dg]) => {
+                if (closestDpGroup === undefined || closestDpGroup !== dgName)
+                  return;
 
-              // make points for this datagroup
-              return dg.map((dp, i) => {
-                return (
-                  <circle
-                    key={i}
-                    cx={xScale(getX(dp))}
-                    cy={yScale(getY(dp))}
-                    r={pointRadius}
-                    fill={pointColor}
-                    opacity={0.4}
-                  />
-                );
-              });
-            })
-          : data.map((dp, i) => (
-              <circle
-                key={i}
-                cx={xScale(getX(dp))}
-                cy={yScale(getY(dp))}
-                r={pointRadius}
-                fill={pointColor}
-              />
-            ))}
-      </Group>
+                // make points for this datagroup
+                return dg.map((dp, i) => {
+                  return (
+                    <circle
+                      key={i}
+                      cx={xScale(getX(dp))}
+                      cy={yScale(getY(dp))}
+                      r={pointRadius}
+                      fill={pointColor}
+                      opacity={0.4}
+                    />
+                  );
+                });
+              })
+            : data.map((dp, i) => (
+                <circle
+                  key={i}
+                  cx={xScale(getX(dp))}
+                  cy={yScale(getY(dp))}
+                  r={pointRadius}
+                  fill={pointColor}
+                />
+              ))}
+        </Group>
+      )}
 
       {/* endpoint labels */}
       {dataGroups && getZ && (
@@ -195,37 +201,39 @@ export const Chart = <T,>(props: ChartProps<T>) => {
       )}
 
       {/* lines */}
-      <Group>
-        {dataGroups ? (
-          Object.entries(dataGroups).map(([dgName, dg], i) => {
-            return (
-              <LinePath<T>
-                key={i}
-                curve={curveLinear}
-                data={dg}
-                x={(dp) => xScale(getX(dp))}
-                y={(dp) => yScale(getY(dp))}
-                stroke={lineColor}
-                strokeWidth={lineWidth}
-                strokeOpacity={
-                  closestDpGroup === undefined || closestDpGroup === dgName
-                    ? 1
-                    : 0.15
-                }
-              />
-            );
-          })
-        ) : (
-          <LinePath<T>
-            curve={curveLinear}
-            data={data}
-            x={(dp) => xScale(getX(dp))}
-            y={(dp) => yScale(getY(dp))}
-            stroke={lineColor}
-            strokeWidth={lineWidth}
-          />
-        )}
-      </Group>
+      {plotLines && (
+        <Group>
+          {dataGroups ? (
+            Object.entries(dataGroups).map(([dgName, dg], i) => {
+              return (
+                <LinePath<T>
+                  key={i}
+                  curve={curveLinear}
+                  data={dg}
+                  x={(dp) => xScale(getX(dp))}
+                  y={(dp) => yScale(getY(dp))}
+                  stroke={lineColor}
+                  strokeWidth={lineWidth}
+                  strokeOpacity={
+                    closestDpGroup === undefined || closestDpGroup === dgName
+                      ? 1
+                      : 0.15
+                  }
+                />
+              );
+            })
+          ) : (
+            <LinePath<T>
+              curve={curveLinear}
+              data={data}
+              x={(dp) => xScale(getX(dp))}
+              y={(dp) => yScale(getY(dp))}
+              stroke={lineColor}
+              strokeWidth={lineWidth}
+            />
+          )}
+        </Group>
+      )}
 
       {/* x axis */}
       <Axis
