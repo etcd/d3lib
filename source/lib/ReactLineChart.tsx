@@ -11,6 +11,7 @@ import { useWindowSize } from "../utilities/useWindowSize";
 import { evenlySpacedColors, rgbArrayToString } from "../utilities/Colors";
 
 import "./ReactLineChart.css";
+import { formatNumber } from "../utilities/Numbers";
 
 interface Margins {
   top?: number;
@@ -379,7 +380,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
               fontSize={12}
               fontFamily="sans-serif"
             >
-              {getX(closestDp).toFixed(3)}
+              x: {formatNumber(getX(closestDp))}
             </text>
             <text
               x={tooltipX + 10}
@@ -387,7 +388,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
               fontSize={12}
               fontFamily="sans-serif"
             >
-              {getY(closestDp).toFixed(3)}
+              y: {formatNumber(getY(closestDp))}
             </text>
           </Group>
         );
