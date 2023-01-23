@@ -77,8 +77,8 @@ export const Chart = <T,>(props: ChartProps<T>) => {
     domain: [0, Math.max(...data.map(getX))],
     range: [axisWidth, width],
   });
-  const yScale = scaleLinear({
-    domain: [0, Math.max(...data.map(getY))],
+  const yScale = scaleLog({
+    domain: [1, Math.max(...data.map(getY))],
     range: [height - axisWidth, 0],
   });
 
@@ -110,7 +110,7 @@ export const Chart = <T,>(props: ChartProps<T>) => {
         {/* points */}
         {Object.entries(dataGroups).map(
           ([dgName, dg]) => {
-            if (closestDpGroup !== undefined && closestDpGroup !== dgName)
+            if (closestDpGroup === undefined || closestDpGroup !== dgName)
               return;
 
             return dg.map((dp, i) => {
