@@ -1,6 +1,6 @@
 {
   "name": "etchart",
-  "version": "1.0.3",
+  "version": "1.0.6",
   "scripts": {
     "build:esbuild": "esbuild source/lib/*.ts source/lib/*.tsx --bundle --outdir=build --format=esm --minify",
     "build:tsc": "tsc source/lib/*.ts source/lib/*.tsx --outdir build/ --allowSyntheticDefaultImports --declaration --sourceMap --jsx react-jsx --target ES2022 --moduleResolution node",
@@ -10,8 +10,8 @@
     "clean:node_modules": "rimraf node_modules"
   },
   "exports": {
-    ".": "./build/ReactLineChart.js",
-    "./build/ReactLineChart.js": "./build/ReactLineChart.js"
+    ".": "./build/lib/ReactLineChart.js",
+    "./build/lib/ReactLineChart": "./build/lib/ReactLineChart.js"
   },
   "repository": {
     "type": "git",

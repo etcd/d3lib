@@ -10,7 +10,7 @@ import { groupBy } from "../utilities/Arrays";
 import { Fragment, useEffect, useRef, useState } from "react";
 import { useWindowSize } from "../utilities/useWindowSize";
 import { evenlySpacedColors, rgbArrayToString } from "../utilities/Colors";
-import "./ReactLineChart.css";
+// import "./ReactLineChart.css";
 import { formatNumber } from "../utilities/Numbers";
 const DEFAULT_MARGINS = { left: 10, top: 50, right: 50, bottom: 10 };
 export const Chart = (props) => {

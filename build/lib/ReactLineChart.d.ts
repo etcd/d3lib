@@ -1,5 +1,4 @@
 /// <reference types="react" />
-import "./ReactLineChart.css";
 interface Margins {
     top: number;
     right: number;
