@@ -1,12 +1,15 @@
 {
   "name": "etchart",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "scripts": {
     "build": "esbuild source/lib/*.ts source/lib/*.tsx --bundle --outdir=build --format=esm --minify",
     "dev": "vite",
     "typecheck": "tsc --noEmit --listFiles",
     "clean:build": "rimraf build",
     "clean:node_modules": "rimraf node_modules"
+  },
+  "exports": {
+    ".": "./build/ReactLineChart.js"
   },
   "repository": {
     "type": "git",
