@@ -16,8 +16,8 @@ const N_POINTS = 2000;
 rootElement &&
   ReactDOM.createRoot(rootElement).render(
     <React.StrictMode>
-      <div>
-        <div className="m-5">
+      <div className="m-28">
+        <div className="m-10 border">
           <ReactLineChart
             // data
             data={testSimData}
@@ -31,7 +31,7 @@ rootElement &&
             height={300}
           />
         </div>
-        <div className="m-5">
+        <div className="m-10 border">
           <ReactLineChart
             // data
             data={testSimData}
