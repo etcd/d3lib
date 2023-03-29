@@ -1,7 +1,8 @@
-export const formatNumber = (n) => {
+export var formatNumber = function(n) {
     if (Number.isInteger(n)) {
         return n;
     }
     return n.toFixed(3);
 };
-//# sourceMappingURL=Numbers.js.map
+
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uLy4uL3NvdXJjZS91dGlsaXRpZXMvTnVtYmVycy50cyJdLCJzb3VyY2VzQ29udGVudCI6WyJleHBvcnQgY29uc3QgZm9ybWF0TnVtYmVyID0gKG46IG51bWJlcikgPT4ge1xuICBpZiAoTnVtYmVyLmlzSW50ZWdlcihuKSkge1xuICAgIHJldHVybiBuO1xuICB9XG5cbiAgcmV0dXJuIG4udG9GaXhlZCgzKTtcbn07XG4iXSwibmFtZXMiOlsiZm9ybWF0TnVtYmVyIiwibiIsIk51bWJlciIsImlzSW50ZWdlciIsInRvRml4ZWQiXSwibWFwcGluZ3MiOiJBQUFBLE9BQU8sSUFBTUEsZUFBZSxTQUFDQyxHQUFjO0lBQ3pDLElBQUlDLE9BQU9DLFNBQVMsQ0FBQ0YsSUFBSTtRQUN2QixPQUFPQTtJQUNULENBQUM7SUFFRCxPQUFPQSxFQUFFRyxPQUFPLENBQUM7QUFDbkIsRUFBRSJ9
