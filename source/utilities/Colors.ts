@@ -1,4 +1,4 @@
-import { evenlySpacedNumbers, isAllDefined } from "./Arrays";
+import { evenlySpacedNumbers, isAllDefined } from "./Arrays.js";
 
 export type RgbArray = readonly [number, number, number];
 

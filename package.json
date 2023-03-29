@@ -1,20 +1,18 @@
 {
   "name": "etchart",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "scripts": {
     "build:swc": "swc source/lib source/utilities -d build/ -C module.type=es6 -C sourceMaps=inline",
     "build:types": "yarn run tsc source/lib/*.{ts,tsx} --emitDeclarationOnly --outDir build/ --declaration --downlevelIteration --jsx react-jsx --esModuleInterop",
     "build": "yarn run build:swc; yarn run build:types",
     "dev": "vite",
-    "typecheck": "tsc --noEmit --listFiles",
+    "typecheck": "tsc --noEmit",
     "clean:build": "rimraf build",
     "clean:node_modules": "rimraf node_modules"
   },
   "type": "module",
   "exports": {
-    ".": "./build/lib/ReactLineChart.js",
-    "./build/lib/*": "./build/lib/*.js",
-    "./build/utilities/*": "./build/utilities/*.js"
+    "./*": "./build/*"
   },
   "repository": {
     "type": "git",

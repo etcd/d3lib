@@ -2,7 +2,7 @@ import React from "react";
 import * as ReactDOM from "react-dom/client";
 
 import testSimData from "./source/constants/testSimData.json";
-import { Chart as ReactLineChart } from "./source/lib/ReactLineChart";
+import { Chart as ReactLineChart } from "./source/lib/ReactLineChart.js";
 
 import "./global.css";
 

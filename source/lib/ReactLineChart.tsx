@@ -5,14 +5,14 @@ import { Group } from "@visx/group";
 import ReactDOM from "react-dom/client";
 import { curveLinear } from "@visx/curve";
 import { LegendOrdinal, LegendItem, LegendLabel } from "@visx/legend";
-import { groupBy } from "../utilities/Arrays";
+import { groupBy } from "../utilities/Arrays.js";
 import { Fragment, useEffect, useRef, useState } from "react";
 
-import { useWindowSize } from "../utilities/useWindowSize";
-import { evenlySpacedColors, rgbArrayToString } from "../utilities/Colors";
+import { useWindowSize } from "../utilities/useWindowSize.js";
+import { evenlySpacedColors, rgbArrayToString } from "../utilities/Colors.js";
 
 // import "./ReactLineChart.css";
-import { formatNumber } from "../utilities/Numbers";
+import { formatNumber } from "../utilities/Numbers.js";
 
 interface Margins {
   top: number;

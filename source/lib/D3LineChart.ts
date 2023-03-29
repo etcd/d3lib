@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 
-import * as Arrays from "../utilities/Arrays";
+import * as Arrays from "../utilities/Arrays.js";
 
 const extentIsDefined = (
   extent: readonly [number, number] | readonly [undefined, undefined]
