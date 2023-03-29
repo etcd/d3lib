@@ -1,6 +1,6 @@
 {
   "name": "etchart",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "scripts": {
     "build:swc": "swc source/lib source/utilities -d build/ -C module.type=es6 -C sourceMaps=inline",
     "build:types": "yarn run tsc source/lib/*.{ts,tsx} --emitDeclarationOnly --outDir build/ --declaration --downlevelIteration --jsx react-jsx --esModuleInterop",
@@ -40,7 +40,7 @@
     "@visx/curve": "^3.0.0",
     "@visx/group": "^3.0.0",
     "@visx/legend": "^3.0.0",
-    "@visx/scale": "^3.0.0",
+    "@visx/scale": "^2.18.0",
     "@visx/shape": "^3.0.0",
     "@visx/tooltip": "^3.0.0",
     "d3": "^7.8.1",
