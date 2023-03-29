@@ -1,3 +1,4 @@
+import React from "react";
 import { Axis, Orientation } from "@visx/axis";
 import { LinePath } from "@visx/shape";
 import { scaleLinear, scaleLog, scaleOrdinal } from "@visx/scale";
