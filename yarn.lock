@@ -796,7 +796,7 @@
     "@types/react-dom" "*"
     prop-types "^15.5.10"
 
-"@visx/curve@2.17.0", "@visx/curve@^2.18.0":
+"@visx/curve@2.17.0", "@visx/curve@^2.17.0":
   version "2.17.0"
   resolved "https://registry.yarnpkg.com/@visx/curve/-/curve-2.17.0.tgz#9b4c87dd0d10a62a0f85d5a72e4c0400316df9bf"
   integrity sha512-8Fw2ZalgYbpeoelLqTOmMs/wD8maSKsKS9rRIwmHZ0O0XxY8iG9oVYbD4CLWzf/uFWCY6+qofk4J1g9BWQSXJQ==
@@ -804,7 +804,7 @@
     "@types/d3-shape" "^1.3.1"
     d3-shape "^1.0.6"
 
-"@visx/group@2.17.0", "@visx/group@^2.18.0":
+"@visx/group@2.17.0", "@visx/group@^2.17.0":
   version "2.17.0"
   resolved "https://registry.yarnpkg.com/@visx/group/-/group-2.17.0.tgz#b349fd6507e56fcb43d0b067d728df4ab329ca2e"
   integrity sha512-60Y2dIKRh3cp/Drpq//wM067ZNrnCcvFCXufPgIihv0Ix8O7oMsYxu3ch4XUMjks+U2IAZQr5Dnc+C9sTQFkhw==
@@ -871,7 +871,7 @@
     prop-types "^15.7.2"
     reduce-css-calc "^1.3.0"
 
-"@visx/tooltip@^2.18.0":
+"@visx/tooltip@^2.17.0":
   version "2.17.0"
   resolved "https://registry.yarnpkg.com/@visx/tooltip/-/tooltip-2.17.0.tgz#e5e39a62795d2f6c7d2a1472e7af092005374106"
   integrity sha512-+dMHURP9NqSFZLomMUnoVYjRs+I2qcOw1yYvLtTp/4GUAFRMSUJoSJeuLwng1VBIgCEB95xuQ95NgGID4qzPxA==
